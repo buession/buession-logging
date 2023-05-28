@@ -10,7 +10,7 @@
 [![Javadocs](http://www.javadoc.io/badge/com.buession.logging/buession-logging-core.svg)](http://www.javadoc.io/doc/com.buession.logging/buession-logging-core)
 
 
-这是一款系统操作日志框架，完成用户操作记录，实现日志审计。轻松实现和业务解耦。
+这是一款系统操作日志框架，完成用户操作记录，实现日志审计。支持文件、任何支持 JDBC 的关系型数据库、MongoDB、Elasticsearch、ClickHouse、InfluxDB，并可通过 RabbitMQ、Kafka、Rest 异步写入。轻松实现和业务解耦。
 
 
 <p align="center">
