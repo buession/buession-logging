@@ -25,7 +25,6 @@
 package com.buession.logging.springboot.autoconfigure.rabbit;
 
 import com.buession.logging.core.handler.LogHandler;
-import com.buession.logging.rabbitmq.handler.RabbitLogHandler;
 import com.buession.logging.rabbitmq.spring.RabbitLogHandlerFactoryBean;
 import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
@@ -46,7 +45,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(LogProperties.class)
 @ConditionalOnMissingBean(LogHandler.class)
-@ConditionalOnClass({RabbitLogHandler.class})
+@ConditionalOnClass({RabbitLogHandlerFactoryBean.class})
 @ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "rabbit.enabled", havingValue = "true")
 public class RabbitLogHandlerConfiguration extends AbstractLogHandlerConfiguration<RabbitProperties,
 		RabbitLogHandlerFactoryBean> {

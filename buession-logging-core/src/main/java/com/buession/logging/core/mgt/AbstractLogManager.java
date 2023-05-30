@@ -74,54 +74,52 @@ public abstract class AbstractLogManager implements LogManager {
 	private final static Logger logger = LoggerFactory.getLogger(AbstractLogManager.class);
 
 	@Override
-	public Request getRequest(){
+	public Request getRequest() {
 		return request;
 	}
 
 	@Override
-	public void setRequest(Request request){
+	public void setRequest(Request request) {
 		this.request = request;
 	}
 
 	@Override
-	public PrincipalHandler<?> getPrincipalHandler(){
+	public PrincipalHandler<?> getPrincipalHandler() {
 		return principalHandler;
 	}
 
 	@Override
-	public void setPrincipalHandler(PrincipalHandler<?> principalHandler){
+	public void setPrincipalHandler(PrincipalHandler<?> principalHandler) {
 		this.principalHandler = principalHandler;
 	}
 
 	@Override
-	public LogHandler getLogHandler(){
+	public LogHandler getLogHandler() {
 		return logHandler;
 	}
 
 	@Override
-	public void setLogHandler(LogHandler logHandler){
+	public void setLogHandler(LogHandler logHandler) {
 		this.logHandler = logHandler;
 	}
 
 	@Override
-	public Resolver getGeoResolver(){
+	public Resolver getGeoResolver() {
 		return geoResolver;
 	}
 
 	@Override
-	public void setGeoResolver(Resolver geoResolver){
+	public void setGeoResolver(Resolver geoResolver) {
 		this.geoResolver = geoResolver;
 	}
 
 	@Override
-	public Status execute(){
-		final LogData logData = new LogData();
-
-		logData.setPrincipal(null);
+	public Status execute(final LogData logData) {
+		//logData.setPrincipal(null);
 		logData.setDateTime(new Date());
-		logData.setBusinessType(null);
-		logData.setEvent(null);
-		logData.setDescription("");
+		//logData.setBusinessType(null);
+		//logData.setEvent(null);
+		//logData.setDescription("");
 		logData.setUrl(getRequest().getUrl());
 		logData.setRequestMethod(getRequest().getRequestMethod());
 		logData.setRequestBody(null);
@@ -130,12 +128,8 @@ public abstract class AbstractLogManager implements LogManager {
 		logData.setClientIp(getRequest().getClientIp());
 		logData.setRemoteAddr(getRequest().getRemoteAddr());
 		logData.setUserAgent(getRequest().getUserAgent());
-		logData.setOperatingSystem(null);
-		logData.setDeviceType(null);
-		logData.setBrowser(null);
-		logData.setLocation(null);
-		logData.setStatus(null);
-		logData.setExtra(null);
+		//logData.setStatus(null);
+		//logData.setExtra(null);
 
 		if(getGeoResolver() != null){
 			parseLocation(logData);
@@ -146,9 +140,9 @@ public abstract class AbstractLogManager implements LogManager {
 		return getLogHandler().handle(logData);
 	}
 
-	protected void parseLocation(final LogData logData){
+	protected void parseLocation(final LogData logData) {
 		try{
-			Location location = getGeoResolver().location(logData.getClientIp());
+			final Location location = getGeoResolver().location(logData.getClientIp());
 
 			if(location == null){
 				return;
@@ -156,7 +150,10 @@ public abstract class AbstractLogManager implements LogManager {
 
 			final GeoLocation geoLocation = new GeoLocation();
 
-			geoLocation.setGeo(new Geo(location.getGeo().getLongitude(), location.getGeo().getLatitude()));
+			if(location.getGeo() != null && location.getGeo().getLongitude() != null &&
+					location.getGeo().getLatitude() != null){
+				geoLocation.setGeo(new Geo(location.getGeo().getLongitude(), location.getGeo().getLatitude()));
+			}
 
 			final GeoLocation.Country country = new GeoLocation.Country();
 			country.setCode(location.getCountry().getCode());
@@ -181,7 +178,9 @@ public abstract class AbstractLogManager implements LogManager {
 		}
 	}
 
-	protected void parseUserAgent(final LogData logData){
+	protected void parseUserAgent(final LogData logData) {
+		logData.setUserAgent(getRequest().getUserAgent());
+
 		final UserAgent userAgent = new UserAgent(logData.getUserAgent());
 
 		final OperatingSystem operatingSystem = new OperatingSystem();

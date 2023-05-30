@@ -31,6 +31,9 @@ import com.buession.logging.core.RequestMethod;
 import com.buession.web.servlet.http.request.RequestUtils;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -47,11 +50,20 @@ public class ServletRequest extends AbstractRequest {
 
 	/**
 	 * 构造函数
+	 */
+	public ServletRequest() {
+		final ServletRequestAttributes requestAttributes =
+				(ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+		this.request = requestAttributes.getRequest();
+	}
+
+	/**
+	 * 构造函数
 	 *
 	 * @param request
 	 *        {@link ServletRequest}
 	 */
-	public ServletRequest(final HttpServletRequest request){
+	public ServletRequest(final HttpServletRequest request) {
 		Assert.isNull(request, "HttpServletRequest cloud not be null.");
 		this.request = request;
 	}
@@ -64,13 +76,13 @@ public class ServletRequest extends AbstractRequest {
 	 * @param clientIpHeaderName
 	 * 		客户端 IP 请求头名称
 	 */
-	public ServletRequest(final HttpServletRequest request, final String clientIpHeaderName){
+	public ServletRequest(final HttpServletRequest request, final String clientIpHeaderName) {
 		this(request);
 		setClientIpHeaderName(clientIpHeaderName);
 	}
 
 	@Override
-	public String getUrl(){
+	public String getUrl() {
 		String url = request.getRequestURL().toString();
 
 		if(Validate.hasText(url)){
@@ -85,7 +97,7 @@ public class ServletRequest extends AbstractRequest {
 	}
 
 	@Override
-	public RequestMethod getRequestMethod(){
+	public RequestMethod getRequestMethod() {
 		try{
 			return EnumUtils.getEnumIgnoreCase(RequestMethod.class, request.getMethod());
 		}catch(Exception e){
@@ -94,12 +106,12 @@ public class ServletRequest extends AbstractRequest {
 	}
 
 	@Override
-	public String getRequestBody(){
+	public String getRequestBody() {
 		return "";
 	}
 
 	@Override
-	public Multimap<String, String> getRequestParameters(){
+	public Multimap<String, String> getRequestParameters() {
 		Map<String, String[]> originalParameters = request.getParameterMap();
 
 		if(originalParameters == null){
@@ -121,7 +133,7 @@ public class ServletRequest extends AbstractRequest {
 	}
 
 	@Override
-	public String getClientIp(){
+	public String getClientIp() {
 		String clientIp = null;
 
 		if(Validate.isNotBlank(getClientIpHeaderName())){
@@ -132,12 +144,12 @@ public class ServletRequest extends AbstractRequest {
 	}
 
 	@Override
-	public String getRemoteAddr(){
+	public String getRemoteAddr() {
 		return request.getRemoteAddr();
 	}
 
 	@Override
-	public String getUserAgent(){
+	public String getUserAgent() {
 		return request.getHeader("Useer-Agent");
 	}
 

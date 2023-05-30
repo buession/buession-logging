@@ -71,12 +71,12 @@ public class RabbitProperties implements HandlerProperties, Serializable {
 	/**
 	 * 连接超时
 	 */
-	private Duration connectionTimeout;
+	private Duration connectionTimeout = Duration.ofSeconds(1);
 
 	/**
 	 * SSL 配置
 	 */
-	private SslConfiguration sslConfiguration;
+	private SslConfiguration sslConfiguration = new SslConfiguration();
 
 	/**
 	 * Requested heartbeat timeout; zero for none. If a duration suffix is not specified,

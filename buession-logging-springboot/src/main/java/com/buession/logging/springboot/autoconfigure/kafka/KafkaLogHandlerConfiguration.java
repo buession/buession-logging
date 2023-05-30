@@ -25,7 +25,6 @@
 package com.buession.logging.springboot.autoconfigure.kafka;
 
 import com.buession.logging.core.handler.LogHandler;
-import com.buession.logging.kafka.handler.KafkaLogHandler;
 import com.buession.logging.kafka.spring.KafkaLogHandlerFactoryBean;
 import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
@@ -46,18 +45,18 @@ import org.springframework.context.annotation.Configuration;
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(LogProperties.class)
 @ConditionalOnMissingBean(LogHandler.class)
-@ConditionalOnClass({KafkaLogHandler.class})
+@ConditionalOnClass({KafkaLogHandlerFactoryBean.class})
 @ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "kafka.enabled", havingValue = "true")
 public class KafkaLogHandlerConfiguration extends AbstractLogHandlerConfiguration<KafkaProperties,
 		KafkaLogHandlerFactoryBean> {
 
-	public KafkaLogHandlerConfiguration(LogProperties logProperties){
+	public KafkaLogHandlerConfiguration(LogProperties logProperties) {
 		super(logProperties.getKafka());
 	}
 
 	@Bean
 	@Override
-	public KafkaLogHandlerFactoryBean logHandlerFactoryBean(){
+	public KafkaLogHandlerFactoryBean logHandlerFactoryBean() {
 		final KafkaLogHandlerFactoryBean logHandlerFactoryBean = new KafkaLogHandlerFactoryBean();
 
 		propertyMapper.from(handlerProperties::getBootstrapServers).to(logHandlerFactoryBean::setBootstrapServers);

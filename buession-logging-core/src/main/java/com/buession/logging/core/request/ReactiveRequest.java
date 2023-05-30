@@ -27,11 +27,13 @@ package com.buession.logging.core.request;
 import com.buession.core.utils.Assert;
 import com.buession.core.validator.Validate;
 import com.buession.logging.core.RequestMethod;
+import com.buession.web.reactive.context.request.ReactiveRequestAttributes;
 import com.buession.web.reactive.http.request.RequestUtils;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import java.util.List;
 import java.util.Objects;
@@ -48,11 +50,20 @@ public class ReactiveRequest extends AbstractRequest {
 
 	/**
 	 * 构造函数
+	 */
+	public ReactiveRequest() {
+		final ReactiveRequestAttributes requestAttributes =
+				(ReactiveRequestAttributes) RequestContextHolder.currentRequestAttributes();
+		this.request = requestAttributes.getRequest();
+	}
+
+	/**
+	 * 构造函数
 	 *
 	 * @param request
 	 *        {@link ServletRequest}
 	 */
-	public ReactiveRequest(final ServerHttpRequest request){
+	public ReactiveRequest(final ServerHttpRequest request) {
 		Assert.isNull(request, "ServerHttpRequest cloud not be null.");
 		this.request = request;
 	}
@@ -65,18 +76,18 @@ public class ReactiveRequest extends AbstractRequest {
 	 * @param clientIpHeaderName
 	 * 		客户端 IP 请求头名称
 	 */
-	public ReactiveRequest(final ServerHttpRequest request, final String clientIpHeaderName){
+	public ReactiveRequest(final ServerHttpRequest request, final String clientIpHeaderName) {
 		this(request);
 		setClientIpHeaderName(clientIpHeaderName);
 	}
 
 	@Override
-	public String getUrl(){
+	public String getUrl() {
 		return request.getURI().toString();
 	}
 
 	@Override
-	public RequestMethod getRequestMethod(){
+	public RequestMethod getRequestMethod() {
 		try{
 			switch(Objects.requireNonNull(request.getMethod())){
 				case GET:
@@ -104,12 +115,12 @@ public class ReactiveRequest extends AbstractRequest {
 	}
 
 	@Override
-	public String getRequestBody(){
+	public String getRequestBody() {
 		return request.getBody().toString();
 	}
 
 	@Override
-	public Multimap<String, String> getRequestParameters(){
+	public Multimap<String, String> getRequestParameters() {
 		MultiValueMap<String, String> originalParameters = request.getQueryParams();
 
 		if(originalParameters == null){
@@ -131,7 +142,7 @@ public class ReactiveRequest extends AbstractRequest {
 	}
 
 	@Override
-	public String getClientIp(){
+	public String getClientIp() {
 		if(Validate.isNotBlank(getClientIpHeaderName())){
 			List<String> values = request.getHeaders().get(getClientIpHeaderName());
 			if(values != null){
@@ -147,13 +158,13 @@ public class ReactiveRequest extends AbstractRequest {
 	}
 
 	@Override
-	public String getRemoteAddr(){
+	public String getRemoteAddr() {
 		return request.getRemoteAddress() == null ? "127.0.0.1" :
 				request.getRemoteAddress().getAddress().getHostAddress();
 	}
 
 	@Override
-	public String getUserAgent(){
+	public String getUserAgent() {
 		return request.getHeaders().get("User-Agent").get(0);
 	}
 }

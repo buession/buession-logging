@@ -25,7 +25,6 @@
 package com.buession.logging.springboot.autoconfigure.rest;
 
 import com.buession.logging.core.handler.LogHandler;
-import com.buession.logging.rest.handler.RestLogHandler;
 import com.buession.logging.rest.spring.RestLogHandlerFactoryBean;
 import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
@@ -47,18 +46,18 @@ import org.springframework.context.annotation.Configuration;
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(LogProperties.class)
 @ConditionalOnMissingBean(LogHandler.class)
-@ConditionalOnClass({RestLogHandler.class})
+@ConditionalOnClass({RestLogHandlerFactoryBean.class})
 @ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "rest.enabled", havingValue = "true")
 public class RestLogHandlerConfiguration extends AbstractLogHandlerConfiguration<RestProperties,
 		RestLogHandlerFactoryBean> {
 
-	public RestLogHandlerConfiguration(LogProperties logProperties){
+	public RestLogHandlerConfiguration(LogProperties logProperties) {
 		super(logProperties.getRest());
 	}
 
 	@Bean
 	@Override
-	public RestLogHandlerFactoryBean logHandlerFactoryBean(){
+	public RestLogHandlerFactoryBean logHandlerFactoryBean() {
 		final RestLogHandlerFactoryBean logHandlerFactoryBean = new RestLogHandlerFactoryBean();
 
 		propertyMapper.from(handlerProperties::getUrl).to(logHandlerFactoryBean::setUrl);

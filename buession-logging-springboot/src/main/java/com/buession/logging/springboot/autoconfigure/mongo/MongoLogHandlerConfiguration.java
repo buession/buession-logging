@@ -25,7 +25,6 @@
 package com.buession.logging.springboot.autoconfigure.mongo;
 
 import com.buession.logging.core.handler.LogHandler;
-import com.buession.logging.mongodb.handler.MongoLogHandler;
 import com.buession.logging.mongodb.spring.MongoHandlerFactoryBean;
 import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
@@ -46,7 +45,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(LogProperties.class)
 @ConditionalOnMissingBean(LogHandler.class)
-@ConditionalOnClass({MongoLogHandler.class})
+@ConditionalOnClass({MongoHandlerFactoryBean.class})
 @ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "mongo.enabled", havingValue = "true")
 public class MongoLogHandlerConfiguration extends AbstractLogHandlerConfiguration<MongoProperties,
 		MongoHandlerFactoryBean> {
@@ -70,11 +69,16 @@ public class MongoLogHandlerConfiguration extends AbstractLogHandlerConfiguratio
 		propertyMapper.from(handlerProperties::getAuthenticationDatabase)
 				.to(logHandlerFactoryBean::setAuthenticationDatabase);
 		propertyMapper.from(handlerProperties::getCollectionName).to(logHandlerFactoryBean::setCollectionName);
+		propertyMapper.from(handlerProperties::getConnectionTimeout).to(logHandlerFactoryBean::setConnectionTimeout);
+		propertyMapper.from(handlerProperties::getReadTimeout).to(logHandlerFactoryBean::setReadTimeout);
 		propertyMapper.from(handlerProperties::getUuidRepresentation).to(logHandlerFactoryBean::setUuidRepresentation);
 		propertyMapper.from(handlerProperties::getAutoIndexCreation).to(logHandlerFactoryBean::setAutoIndexCreation);
 		propertyMapper.from(handlerProperties::getFieldNamingStrategy)
 				.to(logHandlerFactoryBean::setFieldNamingStrategy);
-		propertyMapper.from(handlerProperties::getClientSettings).to(logHandlerFactoryBean::setClientSettings);
+		propertyMapper.from(handlerProperties::getReadPreference).to(logHandlerFactoryBean::setReadPreference);
+		propertyMapper.from(handlerProperties::getReadConcern).to(logHandlerFactoryBean::setReadConcern);
+		propertyMapper.from(handlerProperties::getWriteConcern).to(logHandlerFactoryBean::setWriteConcern);
+		propertyMapper.from(handlerProperties::getPool).to(logHandlerFactoryBean::setPoolConfiguration);
 
 		return logHandlerFactoryBean;
 	}

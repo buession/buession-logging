@@ -24,18 +24,28 @@
  */
 package com.buession.logging.mongodb.spring;
 
+import com.buession.core.converter.mapper.PropertyMapper;
 import com.buession.core.utils.Assert;
 import com.buession.core.validator.Validate;
+import com.buession.dao.mongodb.core.ReadConcern;
+import com.buession.dao.mongodb.core.ReadPreference;
+import com.buession.dao.mongodb.core.WriteConcern;
+import com.buession.logging.mongodb.core.PoolConfiguration;
 import com.buession.logging.mongodb.handler.MongoLogHandler;
 import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClients;
+import com.mongodb.connection.ConnectionPoolSettings;
+import com.mongodb.connection.SocketSettings;
 import org.bson.UuidRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mapping.model.FieldNamingStrategy;
 import org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy;
 import org.springframework.data.mongodb.core.MongoTemplate;
+
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 /**
  * MongoDB 日志处理器 {@link MongoLogHandler} 工厂 Bean 基类
@@ -48,6 +58,10 @@ public class MongoHandlerFactoryBean extends BaseLogHandlerFactoryBean<MongoLogH
 	public final static int DEFAULT_PORT = MongoClientFactory.DEFAULT_PORT;
 
 	public final static String DEFAULT_URL = "mongodb://localhost/test";
+
+	public final static Duration DEFAULT_CONNECTION_TIMEOUT = Duration.ofSeconds(1);
+
+	public final static Duration DEFAULT_READ_TIMEOUT = Duration.ofSeconds(3);
 
 	public final static UuidRepresentation DEFAULT_UUID_REPRESENTATION = UuidRepresentation.JAVA_LEGACY;
 
@@ -100,6 +114,16 @@ public class MongoHandlerFactoryBean extends BaseLogHandlerFactoryBean<MongoLogH
 	private String collectionName;
 
 	/**
+	 * 连接超时
+	 */
+	private Duration connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
+
+	/**
+	 * 读取超时
+	 */
+	private Duration readTimeout = DEFAULT_READ_TIMEOUT;
+
+	/**
 	 * Representation to use when converting a UUID to a BSON binary value.
 	 */
 	private UuidRepresentation uuidRepresentation = DEFAULT_UUID_REPRESENTATION;
@@ -115,9 +139,24 @@ public class MongoHandlerFactoryBean extends BaseLogHandlerFactoryBean<MongoLogH
 	private Class<? extends FieldNamingStrategy> fieldNamingStrategy = DEFAULT_FIELD_NAMING_STRATEGY;
 
 	/**
-	 * {@link MongoClientSettings}
+	 * {@link ReadPreference}
 	 */
-	private MongoClientSettings clientSettings;
+	private ReadPreference readPreference;
+
+	/**
+	 * {@link ReadConcern}
+	 */
+	private ReadConcern readConcern = ReadConcern.AVAILABLE;
+
+	/**
+	 * {@link WriteConcern}
+	 */
+	private WriteConcern writeConcern = WriteConcern.ACKNOWLEDGED;
+
+	/**
+	 * 连接池配置
+	 */
+	private PoolConfiguration poolConfiguration = new PoolConfiguration();
 
 	private final static Logger logger = LoggerFactory.getLogger(MongoHandlerFactoryBean.class);
 
@@ -293,6 +332,44 @@ public class MongoHandlerFactoryBean extends BaseLogHandlerFactoryBean<MongoLogH
 	}
 
 	/**
+	 * 返回连接超时
+	 *
+	 * @return 连接超时
+	 */
+	public Duration getConnectionTimeout() {
+		return connectionTimeout;
+	}
+
+	/**
+	 * 设置连接超时
+	 *
+	 * @param connectionTimeout
+	 * 		连接超时
+	 */
+	public void setConnectionTimeout(Duration connectionTimeout) {
+		this.connectionTimeout = connectionTimeout;
+	}
+
+	/**
+	 * 返回读取超时
+	 *
+	 * @return 读取超时
+	 */
+	public Duration getReadTimeout() {
+		return readTimeout;
+	}
+
+	/**
+	 * 设置读取超时
+	 *
+	 * @param readTimeout
+	 * 		读取超时
+	 */
+	public void setReadTimeout(Duration readTimeout) {
+		this.readTimeout = readTimeout;
+	}
+
+	/**
 	 * Return representation to use when converting a UUID to a BSON binary value.
 	 *
 	 * @return Representation to use when converting a UUID to a BSON binary value.
@@ -351,33 +428,91 @@ public class MongoHandlerFactoryBean extends BaseLogHandlerFactoryBean<MongoLogH
 	}
 
 	/**
-	 * 返回 {@link MongoClientSettings}
+	 * 返回 {@link ReadPreference}
 	 *
-	 * @return {@link MongoClientSettings}
+	 * @return {@link ReadPreference}
 	 */
-	public MongoClientSettings getClientSettings() {
-		return clientSettings;
+	public ReadPreference getReadPreference() {
+		return readPreference;
 	}
 
 	/**
-	 * 设置 {@link MongoClientSettings}
+	 * 设置 {@link ReadPreference}
 	 *
-	 * @param clientSettings
-	 *        {@link MongoClientSettings}
+	 * @param readPreference
+	 *        {@link ReadPreference}
 	 */
-	public void setClientSettings(MongoClientSettings clientSettings) {
-		this.clientSettings = clientSettings;
+	public void setReadPreference(ReadPreference readPreference) {
+		this.readPreference = readPreference;
+	}
+
+	/**
+	 * 返回 {@link ReadConcern}
+	 *
+	 * @return {@link ReadConcern}
+	 */
+	public ReadConcern getReadConcern() {
+		return readConcern;
+	}
+
+	/**
+	 * 设置 {@link ReadConcern}
+	 *
+	 * @param readConcern
+	 *        {@link ReadConcern}
+	 */
+	public void setReadConcern(ReadConcern readConcern) {
+		this.readConcern = readConcern;
+	}
+
+	/**
+	 * 返回 {@link WriteConcern}
+	 *
+	 * @return {@link WriteConcern}
+	 */
+	public WriteConcern getWriteConcern() {
+		return writeConcern;
+	}
+
+	/**
+	 * 设置 {@link WriteConcern}
+	 *
+	 * @param writeConcern
+	 *        {@link WriteConcern}
+	 */
+	public void setWriteConcern(WriteConcern writeConcern) {
+		this.writeConcern = writeConcern;
+	}
+
+	/**
+	 * 返回连接池配置
+	 *
+	 * @return 连接池配置
+	 */
+	public PoolConfiguration getPoolConfiguration() {
+		return poolConfiguration;
+	}
+
+	/**
+	 * 设置连接池配置
+	 *
+	 * @param poolConfiguration
+	 * 		连接池配置
+	 */
+	public void setPoolConfiguration(PoolConfiguration poolConfiguration) {
+		this.poolConfiguration = poolConfiguration;
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.isTrue(Validate.isBlank(username) && Validate.isBlank(url),
-				"Username or url cloud not be empty, blank or null..");
+				"Username or url cloud not be empty, blank or null.");
 		Assert.isBlank(databaseName, "Database name cloud not be empty, blank or null.");
 
+		final MongoClientSettings.Builder mongoClientSettingsBuilder = mongoClientSettingsBuilder();
 		final MongoClientFactory mongoClientFactory = new MongoClientFactory(host, port, username, password == null ?
 				null : password.toCharArray(), url, replicaSetName, databaseName, authenticationDatabase,
-				uuidRepresentation, clientSettings, MongoClients::create);
+				uuidRepresentation, mongoClientSettingsBuilder.build(), MongoClients::create);
 		final MongoDatabaseFactory mongoDatabaseFactory = new MongoDatabaseFactory(mongoClientFactory, databaseName);
 		final MongoTemplateFactory mongoTemplateFactory = new MongoTemplateFactory(mongoDatabaseFactory,
 				autoIndexCreation, fieldNamingStrategy);
@@ -386,6 +521,65 @@ public class MongoHandlerFactoryBean extends BaseLogHandlerFactoryBean<MongoLogH
 		createCollection(mongoTemplate);
 
 		logHandler = new MongoLogHandler(mongoTemplate, collectionName);
+	}
+
+	private MongoClientSettings.Builder mongoClientSettingsBuilder() {
+		final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
+		final MongoClientSettings.Builder builder = MongoClientSettings.builder();
+
+		propertyMapper.from(readPreference).as(ReadPreference::getValue).to(builder::readPreference);
+		propertyMapper.from(readConcern).as(ReadConcern::getValue).to(builder::readConcern);
+		propertyMapper.from(writeConcern).as(WriteConcern::getValue).to(builder::writeConcern);
+
+		builder.applyToSocketSettings(($builder)->{
+			final SocketSettings.Builder socketBuilder = SocketSettings.builder();
+
+			if(connectionTimeout != null){
+				socketBuilder.connectTimeout((int) connectionTimeout.toMillis(), TimeUnit.MILLISECONDS);
+			}
+			if(readTimeout != null){
+				socketBuilder.readTimeout((int) readTimeout.toMillis(), TimeUnit.MILLISECONDS);
+			}
+
+			$builder.applySettings(socketBuilder.build());
+		}).applyToConnectionPoolSettings(($builder)->{
+			if(poolConfiguration != null){
+				final ConnectionPoolSettings.Builder poolBuilder = ConnectionPoolSettings.builder();
+
+				if(poolConfiguration.getMinSize() > 0){
+					poolBuilder.minSize(poolConfiguration.getMinSize());
+				}
+				if(poolConfiguration.getMaxSize() > 0){
+					poolBuilder.minSize(poolConfiguration.getMaxSize());
+				}
+				if(poolConfiguration.getMaxWaitTime() != null){
+					poolBuilder.maxWaitTime(poolConfiguration.getMaxWaitTime().toMillis(), TimeUnit.MILLISECONDS);
+				}
+				if(poolConfiguration.getMaxConnectionLifeTime() != null){
+					poolBuilder.maxConnectionLifeTime(poolConfiguration.getMaxConnectionLifeTime().toMillis(),
+							TimeUnit.MILLISECONDS);
+				}
+				if(poolConfiguration.getMaxConnectionIdleTime() != null){
+					poolBuilder.maxConnectionIdleTime(poolConfiguration.getMaxConnectionIdleTime().toMillis(),
+							TimeUnit.MILLISECONDS);
+				}
+				if(poolConfiguration.getMaintenanceInitialDelay() != null){
+					poolBuilder.maintenanceInitialDelay(poolConfiguration.getMaintenanceInitialDelay().toMillis(),
+							TimeUnit.MILLISECONDS);
+				}
+				if(poolConfiguration.getMaintenanceFrequency() != null){
+					poolBuilder.maintenanceFrequency(poolConfiguration.getMaintenanceFrequency().toMillis(),
+							TimeUnit.MILLISECONDS);
+				}
+				if(poolConfiguration.getMaxConnecting() > 0){
+					poolBuilder.maxConnecting(poolConfiguration.getMaxConnecting());
+				}
+
+				$builder.applySettings(poolBuilder.build());
+			}
+		});
+
+		return builder;
 	}
 
 	private void createCollection(final MongoTemplate mongoTemplate) {

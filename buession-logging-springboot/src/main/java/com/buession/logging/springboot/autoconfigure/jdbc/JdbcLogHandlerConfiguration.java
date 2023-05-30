@@ -25,7 +25,6 @@
 package com.buession.logging.springboot.autoconfigure.jdbc;
 
 import com.buession.logging.core.handler.LogHandler;
-import com.buession.logging.jdbc.handler.JdbcLogHandler;
 import com.buession.logging.jdbc.spring.JdbcLogHandlerFactoryBean;
 import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
@@ -47,7 +46,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(LogProperties.class)
 @ConditionalOnMissingBean(LogHandler.class)
-@ConditionalOnClass({JdbcLogHandler.class})
+@ConditionalOnClass({JdbcLogHandlerFactoryBean.class})
 @ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "jdbc.enabled", havingValue = "true")
 public class JdbcLogHandlerConfiguration extends AbstractLogHandlerConfiguration<JdbcProperties,
 		JdbcLogHandlerFactoryBean> {
