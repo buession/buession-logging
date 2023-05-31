@@ -357,7 +357,6 @@ public class FieldConfiguration implements Serializable {
 		this.clientIpFieldName = clientIpFieldName;
 	}
 
-
 	/**
 	 * 返回 Remote Addr 字段名称
 	 *

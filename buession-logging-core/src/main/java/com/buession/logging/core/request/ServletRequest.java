@@ -150,7 +150,7 @@ public class ServletRequest extends AbstractRequest {
 
 	@Override
 	public String getUserAgent() {
-		return request.getHeader("Useer-Agent");
+		return request.getHeader("User-Agent");
 	}
 
 }

@@ -65,13 +65,10 @@
 		<dependency>
 			<groupId>com.buession</groupId>
 			<artifactId>buession-geoip</artifactId>
-			<version>${buession.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.buession</groupId>
 			<artifactId>buession-web</artifactId>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>

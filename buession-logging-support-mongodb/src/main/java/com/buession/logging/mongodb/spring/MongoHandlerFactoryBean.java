@@ -33,6 +33,7 @@ import com.buession.dao.mongodb.core.WriteConcern;
 import com.buession.logging.mongodb.core.PoolConfiguration;
 import com.buession.logging.mongodb.handler.MongoLogHandler;
 import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
+import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClients;
 import com.mongodb.connection.ConnectionPoolSettings;
@@ -507,7 +508,10 @@ public class MongoHandlerFactoryBean extends BaseLogHandlerFactoryBean<MongoLogH
 	public void afterPropertiesSet() throws Exception {
 		Assert.isTrue(Validate.isBlank(username) && Validate.isBlank(url),
 				"Username or url cloud not be empty, blank or null.");
-		Assert.isBlank(databaseName, "Database name cloud not be empty, blank or null.");
+
+		if(Validate.isBlank(databaseName) && Validate.hasText(url)){
+			databaseName = new ConnectionString(url).getDatabase();
+		}
 
 		final MongoClientSettings.Builder mongoClientSettingsBuilder = mongoClientSettingsBuilder();
 		final MongoClientFactory mongoClientFactory = new MongoClientFactory(host, port, username, password == null ?

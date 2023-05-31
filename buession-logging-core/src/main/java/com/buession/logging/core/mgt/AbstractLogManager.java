@@ -52,11 +52,6 @@ import java.util.Date;
 public abstract class AbstractLogManager implements LogManager {
 
 	/**
-	 * 请求对象
-	 */
-	private Request request;
-
-	/**
 	 * 用户凭证处理器
 	 */
 	private PrincipalHandler<?> principalHandler;
@@ -72,16 +67,6 @@ public abstract class AbstractLogManager implements LogManager {
 	private Resolver geoResolver;
 
 	private final static Logger logger = LoggerFactory.getLogger(AbstractLogManager.class);
-
-	@Override
-	public Request getRequest() {
-		return request;
-	}
-
-	@Override
-	public void setRequest(Request request) {
-		this.request = request;
-	}
 
 	@Override
 	public PrincipalHandler<?> getPrincipalHandler() {
@@ -114,20 +99,20 @@ public abstract class AbstractLogManager implements LogManager {
 	}
 
 	@Override
-	public Status execute(final LogData logData) {
+	public Status execute(final LogData logData, final Request request) {
 		//logData.setPrincipal(null);
 		logData.setDateTime(new Date());
 		//logData.setBusinessType(null);
 		//logData.setEvent(null);
 		//logData.setDescription("");
-		logData.setUrl(getRequest().getUrl());
-		logData.setRequestMethod(getRequest().getRequestMethod());
+		logData.setUrl(request.getUrl());
+		logData.setRequestMethod(request.getRequestMethod());
 		logData.setRequestBody(null);
 		logData.setRequestParameters(logData.getRequestParameters());
 		logData.setResponseBody(null);
-		logData.setClientIp(getRequest().getClientIp());
-		logData.setRemoteAddr(getRequest().getRemoteAddr());
-		logData.setUserAgent(getRequest().getUserAgent());
+		logData.setClientIp(request.getClientIp());
+		logData.setRemoteAddr(request.getRemoteAddr());
+		logData.setUserAgent(request.getUserAgent());
 		//logData.setStatus(null);
 		//logData.setExtra(null);
 
@@ -135,7 +120,7 @@ public abstract class AbstractLogManager implements LogManager {
 			parseLocation(logData);
 		}
 
-		parseUserAgent(logData);
+		parseUserAgent(logData, request);
 
 		return getLogHandler().handle(logData);
 	}
@@ -178,8 +163,8 @@ public abstract class AbstractLogManager implements LogManager {
 		}
 	}
 
-	protected void parseUserAgent(final LogData logData) {
-		logData.setUserAgent(getRequest().getUserAgent());
+	protected void parseUserAgent(final LogData logData, final Request request) {
+		logData.setUserAgent(request.getUserAgent());
 
 		final UserAgent userAgent = new UserAgent(logData.getUserAgent());
 

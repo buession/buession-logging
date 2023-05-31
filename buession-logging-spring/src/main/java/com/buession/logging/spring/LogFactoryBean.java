@@ -45,25 +45,21 @@ public class LogFactoryBean extends LogFactory implements FactoryBean<LogManager
 	private LogManager logManager;
 
 	@Override
-	public LogManager getObject() throws Exception{
+	public LogManager getObject() throws Exception {
 		return logManager;
 	}
 
 	@Override
-	public Class<? extends LogManager> getObjectType(){
+	public Class<? extends LogManager> getObjectType() {
 		return logManager.getClass();
 	}
 
 	@Override
-	public void afterPropertiesSet() throws Exception{
+	public void afterPropertiesSet() throws Exception {
 		logManager = new DefaultLogManager();
-		logManager.setRequest(getRequest());
 		logManager.setPrincipalHandler(getPrincipalHandler());
 		logManager.setLogHandler(getLogHandler());
-
-		if(Validate.hasText(getClientIpHeaderName())){
-			((AbstractRequest) logManager.getRequest()).setClientIpHeaderName(getClientIpHeaderName());
-		}
+		logManager.setGeoResolver(getGeoResolver());
 	}
 
 }

@@ -24,11 +24,11 @@
  */
 package com.buession.logging.spring;
 
+import com.buession.geoip.Resolver;
 import com.buession.logging.core.handler.DefaultLogHandler;
 import com.buession.logging.core.handler.DefaultPrincipalHandler;
 import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.core.handler.PrincipalHandler;
-import com.buession.logging.core.request.Request;
 
 /**
  * 日志工厂
@@ -37,11 +37,6 @@ import com.buession.logging.core.request.Request;
  * @since 0.0.1
  */
 public class LogFactory {
-
-	/**
-	 * 请求对象
-	 */
-	private Request request;
 
 	/**
 	 * 客户端 IP 请求头名称
@@ -59,30 +54,16 @@ public class LogFactory {
 	private LogHandler logHandler = new DefaultLogHandler();
 
 	/**
-	 * 返回请求对象
-	 *
-	 * @return 请求对象
+	 * Geo 解析器
 	 */
-	public Request getRequest(){
-		return request;
-	}
-
-	/**
-	 * 设置请求对象
-	 *
-	 * @param request
-	 * 		请求对象
-	 */
-	public void setRequest(Request request){
-		this.request = request;
-	}
+	private Resolver geoResolver;
 
 	/**
 	 * 返回客户端 IP 请求头名称
 	 *
 	 * @return 客户端 IP 请求头名称
 	 */
-	public String getClientIpHeaderName(){
+	public String getClientIpHeaderName() {
 		return clientIpHeaderName;
 	}
 
@@ -92,7 +73,7 @@ public class LogFactory {
 	 * @param clientIpHeaderName
 	 * 		客户端 IP 请求头名称
 	 */
-	public void setClientIpHeaderName(String clientIpHeaderName){
+	public void setClientIpHeaderName(String clientIpHeaderName) {
 		this.clientIpHeaderName = clientIpHeaderName;
 	}
 
@@ -101,7 +82,7 @@ public class LogFactory {
 	 *
 	 * @return 用户凭证处理器
 	 */
-	public PrincipalHandler<?> getPrincipalHandler(){
+	public PrincipalHandler<?> getPrincipalHandler() {
 		return principalHandler;
 	}
 
@@ -111,7 +92,7 @@ public class LogFactory {
 	 * @param principalHandler
 	 * 		用户凭证处理器
 	 */
-	public void setPrincipalHandler(PrincipalHandler<?> principalHandler){
+	public void setPrincipalHandler(PrincipalHandler<?> principalHandler) {
 		this.principalHandler = principalHandler;
 	}
 
@@ -120,7 +101,7 @@ public class LogFactory {
 	 *
 	 * @return 日期处理器
 	 */
-	public LogHandler getLogHandler(){
+	public LogHandler getLogHandler() {
 		return logHandler;
 	}
 
@@ -130,8 +111,27 @@ public class LogFactory {
 	 * @param logHandler
 	 * 		日期处理器
 	 */
-	public void setLogHandler(LogHandler logHandler){
+	public void setLogHandler(LogHandler logHandler) {
 		this.logHandler = logHandler;
+	}
+
+	/**
+	 * 返回 Geo 解析器
+	 *
+	 * @return Geo 解析器
+	 */
+	public Resolver getGeoResolver() {
+		return geoResolver;
+	}
+
+	/**
+	 * 设置 Geo 解析器
+	 *
+	 * @param geoResolver
+	 * 		Geo 解析器
+	 */
+	public void setGeoResolver(Resolver geoResolver) {
+		this.geoResolver = geoResolver;
 	}
 
 }

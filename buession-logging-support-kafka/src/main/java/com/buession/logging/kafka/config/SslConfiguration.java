@@ -25,6 +25,7 @@
 package com.buession.logging.kafka.config;
 
 import com.buession.core.converter.mapper.PropertyMapper;
+import com.buession.core.utils.StringUtils;
 import com.buession.logging.kafka.core.Properties;
 import org.apache.kafka.common.config.SslConfigs;
 
@@ -43,20 +44,43 @@ public class SslConfiguration extends com.buession.logging.core.SslConfiguration
 	private final static long serialVersionUID = -6202862395424350713L;
 
 	@Override
-	public Map<String, Object> buildProperties(){
+	public Map<String, Object> buildProperties() {
 		final Properties properties = new Properties();
 		final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 
-		propertyMapper.from(this::getKeyPassword).to(properties.in(SslConfigs.SSL_KEY_PASSWORD_CONFIG));
-		propertyMapper.from(this::getKeyStorePath).to(properties.in(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG));
-		propertyMapper.from(this::getKeyStorePassword).to(properties.in(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG));
-		propertyMapper.from(this::getKeyStoreType).to(properties.in(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG));
-		propertyMapper.from(this::getTrustStorePath).to(properties.in(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG));
-		propertyMapper.from(this::getTrustStorePassword).to(properties.in(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG));
-		propertyMapper.from(this::getTrustStoreType).to(properties.in(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG));
 		propertyMapper.from(this::getProtocol).to(properties.in(SslConfigs.SSL_PROTOCOL_CONFIG));
+		propertyMapper.from(this::getKeyStorePath).to(properties.in(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG));
+		propertyMapper.from(this::getKeyStoreType).to(properties.in(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG));
+		propertyMapper.from(this::getKeyPassword).to(properties.in(SslConfigs.SSL_KEY_PASSWORD_CONFIG));
+		propertyMapper.from(this::getKeyStorePassword).to(properties.in(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG));
+		propertyMapper.from(this::getTrustStorePath).to(properties.in(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG));
+		propertyMapper.from(this::getTrustStoreType).to(properties.in(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG));
+		propertyMapper.from(this::getTrustStorePassword).to(properties.in(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG));
+		propertyMapper.from(this::getAlgorithms).as((v)->StringUtils.join(v, ','))
+				.to(properties.in(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG));
 
 		return properties;
+	}
+
+	public static SslConfiguration from(final com.buession.logging.core.SslConfiguration sslConfiguration) {
+		if(sslConfiguration == null){
+			return null;
+		}
+
+		final SslConfiguration instance = new SslConfiguration();
+		final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
+
+		propertyMapper.from(sslConfiguration::isEnabled).to(instance::setEnabled);
+		propertyMapper.from(sslConfiguration::getProtocol).to(instance::setProtocol);
+		propertyMapper.from(sslConfiguration::getKeyStorePath).to(instance::setKeyStorePath);
+		propertyMapper.from(sslConfiguration::getKeyStoreType).to(instance::setKeyStoreType);
+		propertyMapper.from(sslConfiguration::getKeyPassword).to(instance::setKeyPassword);
+		propertyMapper.from(sslConfiguration::getKeyStorePassword).to(instance::setKeyStorePassword);
+		propertyMapper.from(sslConfiguration::getTrustStorePath).to(instance::setTrustStorePath);
+		propertyMapper.from(sslConfiguration::getTrustStorePassword).to(instance::setTrustStorePassword);
+		propertyMapper.from(sslConfiguration::getAlgorithms).to(instance::setAlgorithms);
+
+		return instance;
 	}
 
 }

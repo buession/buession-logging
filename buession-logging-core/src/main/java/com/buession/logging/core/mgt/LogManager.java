@@ -40,21 +40,6 @@ import com.buession.logging.core.request.Request;
 public interface LogManager {
 
 	/**
-	 * 返回请求对象
-	 *
-	 * @return 请求对象
-	 */
-	Request getRequest();
-
-	/**
-	 * 设置请求对象
-	 *
-	 * @param request
-	 * 		请求对象
-	 */
-	void setRequest(Request request);
-
-	/**
 	 * 返回用户凭证处理器
 	 *
 	 * @return 用户凭证处理器
@@ -104,9 +89,11 @@ public interface LogManager {
 	 *
 	 * @param logData
 	 * 		日志数据
+	 * @param request
+	 * 		请求对象
 	 *
 	 * @return 执行结果
 	 */
-	Status execute(final LogData logData);
+	Status execute(final LogData logData, final Request request);
 
 }

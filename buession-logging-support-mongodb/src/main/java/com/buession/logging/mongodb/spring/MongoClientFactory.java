@@ -99,7 +99,7 @@ class MongoClientFactory {
 					   final String url, final String replicaSetName, final String databaseName,
 					   final String authenticationDatabase, final UuidRepresentation uuidRepresentation,
 					   final MongoClientSettings clientSettings,
-					   final BiFunction<MongoClientSettings, MongoDriverInformation, MongoClient> clientCreator){
+					   final BiFunction<MongoClientSettings, MongoDriverInformation, MongoClient> clientCreator) {
 		this.host = host;
 		this.port = port;
 		this.username = username;
@@ -113,27 +113,27 @@ class MongoClientFactory {
 		this.clientCreator = clientCreator;
 	}
 
-	public MongoClient createMongoClient(){
+	public MongoClient createMongoClient() {
 		final MongoClientSettings targetSettings = computeClientSettings(clientSettings);
 		return clientCreator.apply(targetSettings, driverInformation());
 	}
 
-	private MongoClientSettings computeClientSettings(final MongoClientSettings settings){
+	private MongoClientSettings computeClientSettings(final MongoClientSettings settings) {
 		final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 		final MongoClientSettings.Builder settingsBuilder = settings != null ? MongoClientSettings.builder(settings)
 				: MongoClientSettings.builder();
 
-		propertyMapper.from(this.uuidRepresentation).to(settingsBuilder::uuidRepresentation);
+		propertyMapper.from(uuidRepresentation).to(settingsBuilder::uuidRepresentation);
 		applyHostAndPort(settingsBuilder);
 
-		propertyMapper.from(this.replicaSetName).whenHasText()
-				.as((v)->(Block<ClusterSettings.Builder>) builder->builder.requiredReplicaSetName(replicaSetName)
-				   ).to(settingsBuilder::applyToClusterSettings);
+		propertyMapper.from(replicaSetName).whenHasText()
+				.as((v)->(Block<ClusterSettings.Builder>) builder->builder.requiredReplicaSetName(replicaSetName))
+				.to(settingsBuilder::applyToClusterSettings);
 
 		return settingsBuilder.build();
 	}
 
-	private void applyHostAndPort(final MongoClientSettings.Builder builder){
+	private void applyHostAndPort(final MongoClientSettings.Builder builder) {
 		if(hasCustomAddress()){
 			int port = this.port > 0 ? this.port : DEFAULT_PORT;
 			final ServerAddress serverAddress = new ServerAddress(host, port);
@@ -146,7 +146,7 @@ class MongoClientFactory {
 		builder.applyConnectionString(new ConnectionString(url));
 	}
 
-	private void applyCredentials(final MongoClientSettings.Builder builder){
+	private void applyCredentials(final MongoClientSettings.Builder builder) {
 		if(username != null && password != null){
 			final String database = authenticationDatabase == null ? databaseName : authenticationDatabase;
 			final MongoCredential credential = MongoCredential.createCredential(username, database, password);
@@ -155,11 +155,11 @@ class MongoClientFactory {
 		}
 	}
 
-	private boolean hasCustomAddress(){
+	private boolean hasCustomAddress() {
 		return host != null;
 	}
 
-	private static MongoDriverInformation driverInformation(){
+	private static MongoDriverInformation driverInformation() {
 		final MongoDriverInformation.Builder mongoDriverInformationBuilder = MongoDriverInformation.builder();
 		return mongoDriverInformationBuilder.driverName("buession-logging").build();
 	}
