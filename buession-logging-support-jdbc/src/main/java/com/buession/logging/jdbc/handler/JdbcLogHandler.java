@@ -28,6 +28,7 @@ import com.buession.core.collect.Arrays;
 import com.buession.core.id.IdGenerator;
 import com.buession.core.id.SnowflakeIdGenerator;
 import com.buession.core.utils.Assert;
+import com.buession.core.utils.StringUtils;
 import com.buession.core.validator.Validate;
 import com.buession.lang.Status;
 import com.buession.logging.core.LogData;
@@ -44,6 +45,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * JDBC 日志处理器
@@ -231,332 +235,332 @@ public class JdbcLogHandler implements LogHandler {
 
 	private String buildLogSql() {
 		final StringBuilder sql = new StringBuilder();
-		final String[] fields = new String[0];
+		final List<String> fields = new ArrayList<>();
 
 		// 主键
 		if(Validate.isNotBlank(fieldConfiguration.getIdFieldName())){
-			Arrays.add(fields, fieldConfiguration.getIdFieldName());
+			fields.add(fieldConfiguration.getIdFieldName());
 		}
 
 		// 用户 ID 字段
 		if(Validate.isNotBlank(fieldConfiguration.getUserIdFieldName())){
-			Arrays.add(fields, fieldConfiguration.getUserIdFieldName());
+			fields.add(fieldConfiguration.getUserIdFieldName());
 		}
 
 		// 用户名字段
 		if(Validate.isNotBlank(fieldConfiguration.getUserNameFieldName())){
-			Arrays.add(fields, fieldConfiguration.getUserNameFieldName());
+			fields.add(fieldConfiguration.getUserNameFieldName());
 		}
 
 		// 真实姓名字段
 		if(Validate.isNotBlank(fieldConfiguration.getRealNameFieldName())){
-			Arrays.add(fields, fieldConfiguration.getRealNameFieldName());
+			fields.add(fieldConfiguration.getRealNameFieldName());
 		}
 
 		// 日期时间字段
 		if(Validate.isNotBlank(fieldConfiguration.getDateTimeFieldName())){
-			Arrays.add(fields, fieldConfiguration.getDateTimeFieldName());
+			fields.add(fieldConfiguration.getDateTimeFieldName());
 		}
 
 		// 业务类型字段
 		if(Validate.isNotBlank(fieldConfiguration.getBusinessTypeFieldName())){
-			Arrays.add(fields, fieldConfiguration.getBusinessTypeFieldName());
+			fields.add(fieldConfiguration.getBusinessTypeFieldName());
 		}
 
 		// 事件字段
 		if(Validate.isNotBlank(fieldConfiguration.getEventFieldName())){
-			Arrays.add(fields, fieldConfiguration.getEventFieldName());
+			fields.add(fieldConfiguration.getEventFieldName());
 		}
 
 		// 描述字段
 		if(Validate.isNotBlank(fieldConfiguration.getDescriptionFieldName())){
-			Arrays.add(fields, fieldConfiguration.getDescriptionFieldName());
+			fields.add(fieldConfiguration.getDescriptionFieldName());
 		}
 
 		// 客户端 IP 字段
 		if(Validate.isNotBlank(fieldConfiguration.getClientIpFieldName())){
-			Arrays.add(fields, fieldConfiguration.getClientIpFieldName());
+			fields.add(fieldConfiguration.getClientIpFieldName());
 		}
 
 		// Remote Addr 字段
 		if(Validate.isNotBlank(fieldConfiguration.getRemoteAddrFieldName())){
-			Arrays.add(fields, fieldConfiguration.getRemoteAddrFieldName());
+			fields.add(fieldConfiguration.getRemoteAddrFieldName());
 		}
 
 		// 请求地址字段
 		if(Validate.isNotBlank(fieldConfiguration.getUrlFieldName())){
-			Arrays.add(fields, fieldConfiguration.getUrlFieldName());
+			fields.add(fieldConfiguration.getUrlFieldName());
 		}
 
 		// 请求方式字段
 		if(Validate.isNotBlank(fieldConfiguration.getRequestMethodFieldName())){
-			Arrays.add(fields, fieldConfiguration.getRequestMethodFieldName());
+			fields.add(fieldConfiguration.getRequestMethodFieldName());
 		}
 
 		// 请求参数字段
 		if(Validate.isNotBlank(fieldConfiguration.getRequestParametersFieldName())){
-			Arrays.add(fields, fieldConfiguration.getRequestParametersFieldName());
+			fields.add(fieldConfiguration.getRequestParametersFieldName());
 		}
 
 		// 请求体字段
 		if(Validate.isNotBlank(fieldConfiguration.getRequestBodyFieldName())){
-			Arrays.add(fields, fieldConfiguration.getRequestBodyFieldName());
+			fields.add(fieldConfiguration.getRequestBodyFieldName());
 		}
 
 		// 响应体字段
 		if(Validate.isNotBlank(fieldConfiguration.getResponseBodyFieldName())){
-			Arrays.add(fields, fieldConfiguration.getResponseBodyFieldName());
+			fields.add(fieldConfiguration.getResponseBodyFieldName());
 		}
 
 		// User-Agent 字段
 		if(Validate.isNotBlank(fieldConfiguration.getUserAgentFieldName())){
-			Arrays.add(fields, fieldConfiguration.getUserAgentFieldName());
+			fields.add(fieldConfiguration.getUserAgentFieldName());
 		}
 
 		// 操作系统名称字段
 		if(Validate.isNotBlank(fieldConfiguration.getOperatingSystemNameFieldName())){
-			Arrays.add(fields, fieldConfiguration.getOperatingSystemNameFieldName());
+			fields.add(fieldConfiguration.getOperatingSystemNameFieldName());
 		}
 
 		// 操作系统版本字段
 		if(Validate.isNotBlank(fieldConfiguration.getOperatingSystemVersionFieldName())){
-			Arrays.add(fields, fieldConfiguration.getOperatingSystemVersionFieldName());
+			fields.add(fieldConfiguration.getOperatingSystemVersionFieldName());
 		}
 
 		// 设备类型字段
 		if(Validate.isNotBlank(fieldConfiguration.getDeviceTypeFieldName())){
-			Arrays.add(fields, fieldConfiguration.getDeviceTypeFieldName());
+			fields.add(fieldConfiguration.getDeviceTypeFieldName());
 		}
 
 		// 浏览器名称字段
 		if(Validate.isNotBlank(fieldConfiguration.getBrowserNameFieldName())){
-			Arrays.add(fields, fieldConfiguration.getBrowserNameFieldName());
+			fields.add(fieldConfiguration.getBrowserNameFieldName());
 		}
 
 		// 浏览器l类型字段
 		if(Validate.isNotBlank(fieldConfiguration.getBrowserTypeFieldName())){
-			Arrays.add(fields, fieldConfiguration.getBrowserTypeFieldName());
+			fields.add(fieldConfiguration.getBrowserTypeFieldName());
 		}
 
 		// 浏览器版本字段
 		if(Validate.isNotBlank(fieldConfiguration.getBrowserVersionFieldName())){
-			Arrays.add(fields, fieldConfiguration.getBrowserVersionFieldName());
+			fields.add(fieldConfiguration.getBrowserVersionFieldName());
 		}
 
 		// 地理位置信息字段
 		if(Validate.isNotBlank(fieldConfiguration.getLocationFieldName())){
-			Arrays.add(fields, fieldConfiguration.getLocationFieldName());
+			fields.add(fieldConfiguration.getLocationFieldName());
 		}
 
 		// 国家 Code 字段
 		if(Validate.isNotBlank(fieldConfiguration.getCountryCodeFieldName())){
-			Arrays.add(fields, fieldConfiguration.getCountryCodeFieldName());
+			fields.add(fieldConfiguration.getCountryCodeFieldName());
 		}
 
 		// 国家名称字段
 		if(Validate.isNotBlank(fieldConfiguration.getCountryNameFieldName())){
-			Arrays.add(fields, fieldConfiguration.getCountryNameFieldName());
+			fields.add(fieldConfiguration.getCountryNameFieldName());
 		}
 
 		// 国家名称全称字段
 		if(Validate.isNotBlank(fieldConfiguration.getCountryFullNameFieldName())){
-			Arrays.add(fields, fieldConfiguration.getCountryFullNameFieldName());
+			fields.add(fieldConfiguration.getCountryFullNameFieldName());
 		}
 
 		// 地区名称字段
 		if(Validate.isNotBlank(fieldConfiguration.getDistrictNameFieldName())){
-			Arrays.add(fields, fieldConfiguration.getDistrictNameFieldName());
+			fields.add(fieldConfiguration.getDistrictNameFieldName());
 		}
 
 		// 地区名称全称字段
 		if(Validate.isNotBlank(fieldConfiguration.getDistrictFullNameFieldName())){
-			Arrays.add(fields, fieldConfiguration.getDistrictFullNameFieldName());
+			fields.add(fieldConfiguration.getDistrictFullNameFieldName());
 		}
 
 		// 结果字段
 		if(Validate.isNotBlank(fieldConfiguration.getStatusFieldName())){
-			Arrays.add(fields, fieldConfiguration.getStatusFieldName());
+			fields.add(fieldConfiguration.getStatusFieldName());
 		}
 
 		// 附加参数字段
 		if(Validate.isNotBlank(fieldConfiguration.getExtraFieldName())){
-			Arrays.add(fields, fieldConfiguration.getExtraFieldName());
+			fields.add(fieldConfiguration.getExtraFieldName());
 		}
 
 		sql.append("INSERT ")
 				.append(tableName)
 				.append(" (")
-				.append(Arrays.toString(fields, ", "))
+				.append(StringUtils.join(fields, ','))
 				.append(") VALUES (")
-				.append(Arrays.repeat('?', fields.length))
+				.append(StringUtils.join(Arrays.repeat('?', fields.size()), ','))
 				.append(')');
 
 		return sql.toString();
 	}
 
 	private Object[] buildData(final LogData logData) {
-		final String[] values = new String[0];
+		final List<String> values = new ArrayList<>();
 
 		// 主键
 		if(Validate.isNotBlank(fieldConfiguration.getIdFieldName())){
 			if(idGenerator == null){
 				idGenerator = new SnowflakeIdGenerator();
 			}
-			Arrays.add(values, idGenerator.nextId());
+			values.add(String.valueOf(idGenerator.nextId()));
 		}
 
 		// 用户 ID 字段
 		if(Validate.isNotBlank(fieldConfiguration.getUserIdFieldName())){
-			Arrays.add(values, logData.getPrincipal().getId());
+			values.add(logData.getPrincipal().getId());
 		}
 
 		// 用户名字段
 		if(Validate.isNotBlank(fieldConfiguration.getUserNameFieldName())){
-			Arrays.add(values, logData.getPrincipal().getUserName());
+			values.add(logData.getPrincipal().getUserName());
 		}
 
 		// 真实姓名字段
 		if(Validate.isNotBlank(fieldConfiguration.getRealNameFieldName())){
-			Arrays.add(values, logData.getPrincipal().getRealName());
+			values.add(logData.getPrincipal().getRealName());
 		}
 
 		// 日期时间字段
 		if(Validate.isNotBlank(fieldConfiguration.getDateTimeFieldName())){
-			Arrays.add(values, dateTimeFormatter.format(logData.getDateTime()));
+			values.add(dateTimeFormatter.format(logData.getDateTime()).toString());
 		}
 
 		// 业务类型字段
 		if(Validate.isNotBlank(fieldConfiguration.getBusinessTypeFieldName())){
-			Arrays.add(values, logData.getBusinessType());
+			values.add(logData.getBusinessType() == null ? null : logData.getBusinessType().toString());
 		}
 
 		// 事件字段
 		if(Validate.isNotBlank(fieldConfiguration.getEventFieldName())){
-			Arrays.add(values, logData.getEvent());
+			values.add(logData.getEvent() == null ? null : logData.getEvent().toString());
 		}
 
 		// 描述字段
 		if(Validate.isNotBlank(fieldConfiguration.getDescriptionFieldName())){
-			Arrays.add(values, logData.getDescription());
+			values.add(logData.getDescription());
 		}
 
 		// 客户端 IP 字段
 		if(Validate.isNotBlank(fieldConfiguration.getClientIpFieldName())){
-			Arrays.add(values, logData.getClientIp());
+			values.add(logData.getClientIp());
 		}
 
 		// Remote Addr 字段
 		if(Validate.isNotBlank(fieldConfiguration.getRemoteAddrFieldName())){
-			Arrays.add(values, logData.getRemoteAddr());
+			values.add(logData.getRemoteAddr());
 		}
 
 		// 请求地址字段
 		if(Validate.isNotBlank(fieldConfiguration.getUrlFieldName())){
-			Arrays.add(values, logData.getUrl());
+			values.add(logData.getUrl());
 		}
 
 		// 请求方式字段
 		if(Validate.isNotBlank(fieldConfiguration.getRequestMethodFieldName())){
-			Arrays.add(values, logData.getRequestMethod().name());
+			values.add(logData.getRequestMethod().name());
 		}
 
 		// 请求参数字段
 		if(Validate.isNotBlank(fieldConfiguration.getRequestParametersFieldName())){
-			Arrays.add(values, requestParametersFormatter.format(logData.getRequestParameters()));
+			values.add(requestParametersFormatter.format(logData.getRequestParameters()));
 		}
 
 		// 请求体字段
 		if(Validate.isNotBlank(fieldConfiguration.getRequestBodyFieldName())){
-			Arrays.add(values, logData.getRequestBody());
+			values.add(logData.getRequestBody());
 		}
 
 		// 响应体字段
 		if(Validate.isNotBlank(fieldConfiguration.getResponseBodyFieldName())){
-			Arrays.add(values, logData.getResponseBody());
+			values.add(logData.getResponseBody());
 		}
 
 		// User-Agent 字段
 		if(Validate.isNotBlank(fieldConfiguration.getUserAgentFieldName())){
-			Arrays.add(values, logData.getUserAgent());
+			values.add(logData.getUserAgent());
 		}
 
 		// 操作系统名称字段
 		if(Validate.isNotBlank(fieldConfiguration.getOperatingSystemNameFieldName())){
-			Arrays.add(values, logData.getOperatingSystem() == null ? null : logData.getOperatingSystem().getName());
+			values.add(logData.getOperatingSystem() == null ? null : logData.getOperatingSystem().getName());
 		}
 
 		// 操作系统版本字段
 		if(Validate.isNotBlank(fieldConfiguration.getOperatingSystemVersionFieldName())){
-			Arrays.add(values, logData.getOperatingSystem() == null ? null : logData.getOperatingSystem().getVersion());
+			values.add(logData.getOperatingSystem() == null ? null : logData.getOperatingSystem().getVersion());
 		}
 
 		// 设备类型字段
 		if(Validate.isNotBlank(fieldConfiguration.getDeviceTypeFieldName())){
-			Arrays.add(values, logData.getDeviceType() == null ? null : logData.getDeviceType().name());
+			values.add(logData.getDeviceType() == null ? null : logData.getDeviceType().name());
 		}
 
 		// 浏览器名称字段
 		if(Validate.isNotBlank(fieldConfiguration.getBrowserNameFieldName())){
-			Arrays.add(values, logData.getBrowser() == null ? null : logData.getBrowser().getName());
+			values.add(logData.getBrowser() == null ? null : logData.getBrowser().getName());
 		}
 
 		// 浏览器类型字段
 		if(Validate.isNotBlank(fieldConfiguration.getBrowserTypeFieldName())){
-			Arrays.add(values, logData.getBrowser() == null ? null : logData.getBrowser().getType().name());
+			values.add(logData.getBrowser() == null ? null : logData.getBrowser().getType().name());
 		}
 
 		// 浏览器版本字段
 		if(Validate.isNotBlank(fieldConfiguration.getBrowserVersionFieldName())){
-			Arrays.add(values, logData.getBrowser() == null ? null : logData.getBrowser().getVersion());
+			values.add(logData.getBrowser() == null ? null : logData.getBrowser().getVersion());
 		}
 
 		// 地理位置信息字段
 		if(Validate.isNotBlank(fieldConfiguration.getLocationFieldName())){
-			Arrays.add(values, logData.getLocation() == null ? null :
+			values.add(logData.getLocation() == null ? null :
 					geoFormatter.format(logData.getLocation().getGeo()));
 		}
 
 		// 国家 Code 字段
 		if(Validate.isNotBlank(fieldConfiguration.getCountryCodeFieldName())){
-			Arrays.add(values, logData.getLocation() == null || logData.getLocation().getCountry() == null ? null :
+			values.add(logData.getLocation() == null || logData.getLocation().getCountry() == null ? null :
 					logData.getLocation().getCountry().getCode());
 		}
 
 		// 国家名称字段
 		if(Validate.isNotBlank(fieldConfiguration.getCountryNameFieldName())){
-			Arrays.add(values, logData.getLocation() == null || logData.getLocation().getCountry() == null ? null :
+			values.add(logData.getLocation() == null || logData.getLocation().getCountry() == null ? null :
 					logData.getLocation().getCountry().getName());
 		}
 
 		// 国家名称全称字段
 		if(Validate.isNotBlank(fieldConfiguration.getCountryFullNameFieldName())){
-			Arrays.add(values, logData.getLocation() == null || logData.getLocation().getCountry() == null ? null :
+			values.add(logData.getLocation() == null || logData.getLocation().getCountry() == null ? null :
 					logData.getLocation().getCountry().getFullName());
 		}
 
 		// 地区名称字段
 		if(Validate.isNotBlank(fieldConfiguration.getDistrictNameFieldName())){
-			Arrays.add(values, logData.getLocation() == null || logData.getLocation().getDistrict() == null ? null :
+			values.add(logData.getLocation() == null || logData.getLocation().getDistrict() == null ? null :
 					logData.getLocation().getDistrict().getName());
 		}
 
 		// 地区名称全称字段
 		if(Validate.isNotBlank(fieldConfiguration.getDistrictFullNameFieldName())){
-			Arrays.add(values, logData.getLocation() == null || logData.getLocation().getDistrict() == null ? null :
+			values.add(logData.getLocation() == null || logData.getLocation().getDistrict() == null ? null :
 					logData.getLocation().getDistrict().getFullName());
 		}
 
 		// 结果字段
 		if(Validate.isNotBlank(fieldConfiguration.getStatusFieldName())){
-			Arrays.add(values, logData.getStatus() == null ? null : logData.getStatus().name());
+			values.add(logData.getStatus() == null ? null : logData.getStatus().name());
 		}
 
 		// 附加参数字段
 		if(Validate.isNotBlank(fieldConfiguration.getExtraFieldName())){
-			Arrays.add(values, extraFormatter.format(logData.getExtra()));
+			values.add(extraFormatter.format(logData.getExtra()));
 		}
 
-		return values;
+		return values.toArray(new String[]{});
 	}
 
 }

@@ -22,28 +22,21 @@
  * | Copyright @ 2013-2023 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.jdbc.formatter;
+package com.buession.logging.mongodb.core.converter;
 
-import java.util.Date;
+import com.buession.lang.Constants;
+import com.buession.logging.core.Event;
+import org.springframework.core.convert.converter.Converter;
 
 /**
- * 默认 {@link DateTimeFormatter}
- *
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class DefaultDateTimeFormatter implements DateTimeFormatter {
-
-	private final static java.time.format.DateTimeFormatter FORMATTER = java.time.format.DateTimeFormatter.ofPattern(
-			"yyyy-MM-dd HH:mm:ss");
+public class EventConverter implements Converter<Event, String> {
 
 	@Override
-	public Object format(final Date date) {
-		if(date == null){
-			return null;
-		}
-		
-		return FORMATTER.format(date.toInstant());
+	public String convert(Event event) {
+		return event == null ? Constants.EMPTY_STRING : event.toString();
 	}
 
 }

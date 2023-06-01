@@ -22,28 +22,8 @@
  * | Copyright @ 2013-2023 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.jdbc.formatter;
-
-import java.util.Date;
-
 /**
- * 默认 {@link DateTimeFormatter}
- *
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class DefaultDateTimeFormatter implements DateTimeFormatter {
-
-	private final static java.time.format.DateTimeFormatter FORMATTER = java.time.format.DateTimeFormatter.ofPattern(
-			"yyyy-MM-dd HH:mm:ss");
-
-	@Override
-	public Object format(final Date date) {
-		if(date == null){
-			return null;
-		}
-		
-		return FORMATTER.format(date.toInstant());
-	}
-
-}
+package com.buession.logging.mongodb.core.converter;

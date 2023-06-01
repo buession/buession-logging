@@ -66,7 +66,7 @@ public abstract class AbstractLogManager implements LogManager {
 	 */
 	private Resolver geoResolver;
 
-	private final static Logger logger = LoggerFactory.getLogger(AbstractLogManager.class);
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Override
 	public PrincipalHandler<?> getPrincipalHandler() {

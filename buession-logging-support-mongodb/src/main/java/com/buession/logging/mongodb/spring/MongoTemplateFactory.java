@@ -26,6 +26,8 @@ package com.buession.logging.mongodb.spring;
 
 import com.buession.core.builder.ListBuilder;
 import com.buession.core.converter.mapper.PropertyMapper;
+import com.buession.logging.mongodb.core.converter.BusinessTypeConverter;
+import com.buession.logging.mongodb.core.converter.EventConverter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.mapping.model.FieldNamingStrategy;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
@@ -50,24 +52,27 @@ class MongoTemplateFactory {
 
 	private final Class<? extends FieldNamingStrategy> fieldNamingStrategy;
 
-	private final MongoCustomConversions conversions = new MongoCustomConversions(ListBuilder.empty());
+	private final MongoCustomConversions conversions;
 
 	MongoTemplateFactory(final com.buession.logging.mongodb.spring.MongoDatabaseFactory mongoDatabaseFactory,
 						 final Boolean autoIndexCreation,
-						 final Class<? extends FieldNamingStrategy> fieldNamingStrategy){
+						 final Class<? extends FieldNamingStrategy> fieldNamingStrategy) {
 		this.mongoDatabaseFactory = mongoDatabaseFactory;
 		this.autoIndexCreation = autoIndexCreation;
 		this.fieldNamingStrategy = fieldNamingStrategy;
+		conversions =
+				new MongoCustomConversions(
+						ListBuilder.create().add(new BusinessTypeConverter()).add(new EventConverter()).build());
 	}
 
-	public MongoTemplate createMongoTemplate(){
+	public MongoTemplate createMongoTemplate() {
 		final MongoDatabaseFactory mongoDatabaseFactory = this.mongoDatabaseFactory.createMongoDatabaseFactory();
 		final MongoConverter mongoConverter = createMongoConverter(mongoDatabaseFactory);
 
 		return new MongoTemplate(mongoDatabaseFactory, mongoConverter);
 	}
 
-	protected MongoMappingContext createMongoMappingContext(){
+	protected MongoMappingContext createMongoMappingContext() {
 		final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 		final MongoMappingContext context = new MongoMappingContext();
 
@@ -80,7 +85,7 @@ class MongoTemplateFactory {
 		return context;
 	}
 
-	private MongoConverter createMongoConverter(final MongoDatabaseFactory factory){
+	private MongoConverter createMongoConverter(final MongoDatabaseFactory factory) {
 		final MongoMappingContext mappingContext = createMongoMappingContext();
 		final DbRefResolver dbRefResolver = new DefaultDbRefResolver(factory);
 		final DefaultMongoTypeMapper typeMapper = new DefaultMongoTypeMapper(null, mappingContext);
