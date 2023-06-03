@@ -27,9 +27,6 @@ package com.buession.logging.jdbc.support;
 import com.buession.core.utils.Assert;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.validation.constraints.NotNull;
 
@@ -39,33 +36,18 @@ import javax.validation.constraints.NotNull;
  */
 public class LoggingJdbcDaoSupport extends NamedParameterJdbcDaoSupport {
 
-	private final TransactionTemplate transactionTemplate;
-
 	private final String sql;
 
-	public LoggingJdbcDaoSupport(final JdbcTemplate jdbcTemplate, final TransactionTemplate transactionTemplate,
-								 final String sql){
+	public LoggingJdbcDaoSupport(final JdbcTemplate jdbcTemplate, final String sql) {
 		Assert.isNull(jdbcTemplate, "JdbcTemplate cloud not be null.");
 		Assert.isBlank(sql, "Log sql cloud not be null or empty.");
 
-		this.transactionTemplate = transactionTemplate;
 		this.sql = sql;
 		setJdbcTemplate(jdbcTemplate);
 	}
 
-	public void execute(final Object[] arguments){
-		if(transactionTemplate == null){
-			getJdbcTemplate().update(sql, arguments);
-		}else{
-			transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-
-				@Override
-				protected void doInTransactionWithoutResult(@NotNull TransactionStatus transactionStatus){
-					getJdbcTemplate().update(sql, arguments);
-				}
-
-			});
-		}
+	public void execute(final Object[] arguments) {
+		getJdbcTemplate().update(sql, arguments);
 	}
 
 }

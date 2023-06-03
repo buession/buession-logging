@@ -26,8 +26,6 @@ package com.buession.logging.jdbc.spring;
 
 import com.buession.core.converter.mapper.PropertyMapper;
 import com.buession.core.id.IdGenerator;
-import com.buession.core.utils.Assert;
-import com.buession.jdbc.datasource.config.PoolConfiguration;
 import com.buession.logging.jdbc.core.FieldConfiguration;
 import com.buession.logging.jdbc.formatter.DateTimeFormatter;
 import com.buession.logging.jdbc.formatter.DefaultDateTimeFormatter;
@@ -38,7 +36,6 @@ import com.buession.logging.jdbc.formatter.MapFormatter;
 import com.buession.logging.jdbc.handler.JdbcLogHandler;
 import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * JDBC 日志处理器 {@link JdbcLogHandler} 工厂 Bean 基类
@@ -57,29 +54,9 @@ public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLog
 	public final static MapFormatter DEFAULT_EXTRA_FORMATTER = new JsonMapFormatter();
 
 	/**
-	 * 数据库驱动类名
+	 * {@link JdbcTemplate}
 	 */
-	private String driverClassName;
-
-	/**
-	 * JDBC URL
-	 */
-	private String url;
-
-	/**
-	 * 数据库账号
-	 */
-	private String username;
-
-	/**
-	 * 数据库密码
-	 */
-	private String password;
-
-	/**
-	 * 连接池配置
-	 */
-	private PoolConfiguration poolConfiguration;
+	private JdbcTemplate jdbcTemplate;
 
 	/**
 	 * 数据表名称
@@ -117,98 +94,22 @@ public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLog
 	private MapFormatter extraFormatter = DEFAULT_EXTRA_FORMATTER;
 
 	/**
-	 * 返回数据库驱动类名
+	 * 返回 {@link JdbcTemplate}
 	 *
-	 * @return 数据库驱动类名
+	 * @return {@link JdbcTemplate}
 	 */
-	public String getDriverClassName() {
-		return driverClassName;
+	public JdbcTemplate getJdbcTemplate() {
+		return jdbcTemplate;
 	}
 
 	/**
-	 * 设置数据库驱动类名
+	 * 设置 {@link JdbcTemplate}
 	 *
-	 * @param driverClassName
-	 * 		数据库驱动类名
+	 * @param jdbcTemplate
+	 *        {@link JdbcTemplate}
 	 */
-	public void setDriverClassName(String driverClassName) {
-		this.driverClassName = driverClassName;
-	}
-
-	/**
-	 * 返回 JDBC URL
-	 *
-	 * @return JDBC URL
-	 */
-	public String getUrl() {
-		return url;
-	}
-
-	/**
-	 * 设置 JDBC URL
-	 *
-	 * @param url
-	 * 		JDBC URL
-	 */
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
-	/**
-	 * 返回数据库账号
-	 *
-	 * @return 数据库账号
-	 */
-	public String getUsername() {
-		return username;
-	}
-
-	/**
-	 * 设置数据库账号
-	 *
-	 * @param username
-	 * 		数据库账号
-	 */
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	/**
-	 * 返回数据库密码
-	 *
-	 * @return 数据库密码
-	 */
-	public String getPassword() {
-		return password;
-	}
-
-	/**
-	 * 设置数据库密码
-	 *
-	 * @param password
-	 * 		数据库密码
-	 */
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	/**
-	 * 返回连接池配置
-	 *
-	 * @return 连接池配置
-	 */
-	public PoolConfiguration getPoolConfiguration() {
-		return poolConfiguration;
-	}
-
-	/**
-	 * 设置连接池配置
-	 *
-	 * @param poolConfiguration
-	 * 		连接池配置
-	 */
-	public void setPoolConfiguration(PoolConfiguration poolConfiguration) {
-		this.poolConfiguration = poolConfiguration;
+	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
 	}
 
 	/**
@@ -346,19 +247,9 @@ public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLog
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isBlank(tableName, "Table name cloud not be blank, empty or null.");
-
 		final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
-		final DataSourceFactory dataSourceFactory = new DataSourceFactory(null, driverClassName, url, username,
-				password, poolConfiguration);
-		final JdbcTemplateFactory jdbcTemplateFactory = new JdbcTemplateFactory(dataSourceFactory);
-		final JdbcTemplate jdbcTemplate = jdbcTemplateFactory.createJdbcTemplate();
 
-		final TransactionTemplateFactory transactionTemplateFactory =
-				new TransactionTemplateFactory(dataSourceFactory.createDataSource());
-		final TransactionTemplate transactionTemplate = transactionTemplateFactory.createTransactionTemplate();
-
-		logHandler = new JdbcLogHandler(jdbcTemplate, transactionTemplate, tableName, fieldConfiguration);
+		logHandler = new JdbcLogHandler(jdbcTemplate, tableName, fieldConfiguration);
 
 		propertyMapper.from(idGenerator).to(logHandler::setIdGenerator);
 		propertyMapper.from(dateTimeFormatter).to(logHandler::setDateTimeFormatter);

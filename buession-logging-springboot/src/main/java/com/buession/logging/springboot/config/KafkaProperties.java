@@ -27,6 +27,7 @@ package com.buession.logging.springboot.config;
 import com.buession.logging.kafka.config.SecurityConfiguration;
 import com.buession.logging.kafka.config.SslConfiguration;
 import com.buession.logging.kafka.spring.KafkaLogHandlerFactoryBean;
+import com.buession.logging.kafka.spring.ProducerFactory;
 import org.springframework.util.unit.DataSize;
 
 import java.io.Serializable;
@@ -48,7 +49,7 @@ public class KafkaProperties implements HandlerProperties, Serializable {
 	 * Comma-delimited list of host:port pairs to use for establishing the initial
 	 * connections to the Kafka cluster. Applies to all components unless overridden.
 	 */
-	private List<String> bootstrapServers = KafkaLogHandlerFactoryBean.DEFAULT_BOOTSTRAP_SERVERS;
+	private List<String> bootstrapServers = ProducerFactory.DEFAULT_BOOTSTRAP_SERVERS;
 
 	/**
 	 * ID to pass to the server when making requests. Used for server-side logging.

@@ -25,10 +25,15 @@
 package com.buession.logging.springboot.autoconfigure.rabbit;
 
 import com.buession.logging.core.handler.LogHandler;
+import com.buession.logging.rabbitmq.spring.ConnectionFactoryBean;
 import com.buession.logging.rabbitmq.spring.RabbitLogHandlerFactoryBean;
+import com.buession.logging.rabbitmq.spring.RabbitTemplateFactoryBean;
 import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.RabbitProperties;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -54,27 +59,45 @@ public class RabbitLogHandlerConfiguration extends AbstractLogHandlerConfigurati
 		super(logProperties.getRabbit());
 	}
 
+	@Bean(name = "logRabbitConnectionFactory")
+	public ConnectionFactoryBean connectionFactoryBean() {
+		final ConnectionFactoryBean connectionFactoryBean = new ConnectionFactoryBean();
+
+		propertyMapper.from(handlerProperties::getHost).to(connectionFactoryBean::setHost);
+		propertyMapper.from(handlerProperties::getPort).to(connectionFactoryBean::setPort);
+		propertyMapper.from(handlerProperties::getUsername).to(connectionFactoryBean::setUsername);
+		propertyMapper.from(handlerProperties::getPassword).to(connectionFactoryBean::setPassword);
+		propertyMapper.from(handlerProperties::getVirtualHost).to(connectionFactoryBean::setVirtualHost);
+		propertyMapper.from(handlerProperties::getRequestedHeartbeat).to(connectionFactoryBean::setRequestedHeartbeat);
+		propertyMapper.from(handlerProperties::getRequestedChannelMax)
+				.to(connectionFactoryBean::setRequestedChannelMax);
+		propertyMapper.from(handlerProperties::getPublisherConfirmType)
+				.to(connectionFactoryBean::setPublisherConfirmType);
+		propertyMapper.from(handlerProperties::getConnectionTimeout).to(connectionFactoryBean::setConnectionTimeout);
+		propertyMapper.from(handlerProperties::getSslConfiguration).to(connectionFactoryBean::setSslConfiguration);
+		propertyMapper.from(handlerProperties::getCache).to(connectionFactoryBean::setCache);
+
+		return connectionFactoryBean;
+	}
+
+	@Bean(name = "logRabbitRabbitTemplate")
+	public RabbitTemplateFactoryBean rabbitTemplateFactoryBean(
+			@Qualifier("logRabbitConnectionFactory") ObjectProvider<org.springframework.amqp.rabbit.connection.ConnectionFactory> connectionFactory) {
+		final RabbitTemplateFactoryBean rabbitTemplateFactoryBean = new RabbitTemplateFactoryBean();
+
+		connectionFactory.ifUnique(rabbitTemplateFactoryBean::setConnectionFactory);
+		propertyMapper.from(handlerProperties::getTemplate).to(rabbitTemplateFactoryBean::setTemplate);
+		propertyMapper.from(handlerProperties::isPublisherReturns).to(rabbitTemplateFactoryBean::setPublisherReturns);
+
+		return rabbitTemplateFactoryBean;
+	}
+
 	@Bean
-	@Override
-	public RabbitLogHandlerFactoryBean logHandlerFactoryBean() {
+	public RabbitLogHandlerFactoryBean logHandlerFactoryBean(@Qualifier("logRabbitRabbitTemplate")
+																	 ObjectProvider<RabbitTemplate> rabbitTemplate) {
 		final RabbitLogHandlerFactoryBean logHandlerFactoryBean = new RabbitLogHandlerFactoryBean();
 
-		propertyMapper.from(handlerProperties::getHost).to(logHandlerFactoryBean::setHost);
-		propertyMapper.from(handlerProperties::getPort).to(logHandlerFactoryBean::setPort);
-		propertyMapper.from(handlerProperties::getUsername).to(logHandlerFactoryBean::setUsername);
-		propertyMapper.from(handlerProperties::getPassword).to(logHandlerFactoryBean::setPassword);
-		propertyMapper.from(handlerProperties::getVirtualHost).to(logHandlerFactoryBean::setVirtualHost);
-		propertyMapper.from(handlerProperties::getRequestedHeartbeat).to(logHandlerFactoryBean::setRequestedHeartbeat);
-		propertyMapper.from(handlerProperties::getRequestedChannelMax)
-				.to(logHandlerFactoryBean::setRequestedChannelMax);
-		propertyMapper.from(handlerProperties::isPublisherReturns).to(logHandlerFactoryBean::setPublisherReturns);
-		propertyMapper.from(handlerProperties::getPublisherConfirmType)
-				.to(logHandlerFactoryBean::setPublisherConfirmType);
-		propertyMapper.from(handlerProperties::getConnectionTimeout).to(logHandlerFactoryBean::setConnectionTimeout);
-		propertyMapper.from(handlerProperties::getSslConfiguration).to(logHandlerFactoryBean::setSslConfiguration);
-		propertyMapper.from(handlerProperties::getCache).to(logHandlerFactoryBean::setCache);
-		propertyMapper.from(handlerProperties::getTemplate).to(logHandlerFactoryBean::setTemplate);
-		propertyMapper.from(handlerProperties::getCache).to(logHandlerFactoryBean::setCache);
+		rabbitTemplate.ifUnique(logHandlerFactoryBean::setRabbitTemplate);
 
 		return logHandlerFactoryBean;
 	}

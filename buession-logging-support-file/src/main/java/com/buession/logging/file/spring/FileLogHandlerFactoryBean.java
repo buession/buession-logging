@@ -55,7 +55,7 @@ public class FileLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<FileLog
 	 *
 	 * @return 日志文件对象
 	 */
-	public File getFile(){
+	public File getFile() {
 		return file;
 	}
 
@@ -65,7 +65,7 @@ public class FileLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<FileLog
 	 * @param file
 	 * 		日志文件对象
 	 */
-	public void setFile(File file){
+	public void setFile(File file) {
 		this.file = file;
 	}
 
@@ -74,7 +74,7 @@ public class FileLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<FileLog
 	 *
 	 * @return 日志格式化
 	 */
-	public Formatter getFormatter(){
+	public Formatter getFormatter() {
 		return formatter;
 	}
 
@@ -84,13 +84,13 @@ public class FileLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<FileLog
 	 * @param formatter
 	 * 		日志格式化
 	 */
-	public void setFormatter(Formatter formatter){
+	public void setFormatter(Formatter formatter) {
 		this.formatter = formatter;
 	}
 
 	@Override
-	public void afterPropertiesSet() throws Exception{
-		Assert.isFalse(file.isDirectory(), file + " is a directory.");
+	public void afterPropertiesSet() throws Exception {
+		Assert.isTrue(file.isDirectory(), file + " is a directory.");
 		logHandler = new FileLogHandler(file, formatter);
 	}
 

@@ -26,16 +26,20 @@ package com.buession.logging.springboot.autoconfigure.jdbc;
 
 import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.jdbc.spring.JdbcLogHandlerFactoryBean;
+import com.buession.logging.jdbc.spring.JdbcTemplateFactoryBean;
 import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.JdbcProperties;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * JDBC 日志处理器自动配置类
@@ -55,16 +59,26 @@ public class JdbcLogHandlerConfiguration extends AbstractLogHandlerConfiguration
 		super(logProperties.getJdbc());
 	}
 
+	@Bean(name = "loggingJdbcJdbcTemplate")
+	public JdbcTemplateFactoryBean jdbcTemplateFactoryBean() {
+		final JdbcTemplateFactoryBean jdbcTemplateFactoryBean = new JdbcTemplateFactoryBean();
+
+		propertyMapper.from(handlerProperties::getDriverClassName).to(jdbcTemplateFactoryBean::setDriverClassName);
+		propertyMapper.from(handlerProperties::getUrl).to(jdbcTemplateFactoryBean::setUrl);
+		propertyMapper.from(handlerProperties::getUsername).to(jdbcTemplateFactoryBean::setUsername);
+		propertyMapper.from(handlerProperties::getPassword).to(jdbcTemplateFactoryBean::setPassword);
+		propertyMapper.from(handlerProperties::getPoolConfiguration).to(jdbcTemplateFactoryBean::setPoolConfiguration);
+
+		return jdbcTemplateFactoryBean;
+	}
+
 	@Bean
-	@Override
-	public JdbcLogHandlerFactoryBean logHandlerFactoryBean() {
+	public JdbcLogHandlerFactoryBean logHandlerFactoryBean(
+			@Qualifier("loggingJdbcJdbcTemplate") ObjectProvider<JdbcTemplate> jdbcTemplate) {
 		final JdbcLogHandlerFactoryBean logHandlerFactoryBean = new JdbcLogHandlerFactoryBean();
 
-		propertyMapper.from(handlerProperties::getDriverClassName).to(logHandlerFactoryBean::setDriverClassName);
-		propertyMapper.from(handlerProperties::getUrl).to(logHandlerFactoryBean::setUrl);
-		propertyMapper.from(handlerProperties::getUsername).to(logHandlerFactoryBean::setUsername);
-		propertyMapper.from(handlerProperties::getPassword).to(logHandlerFactoryBean::setPassword);
-		propertyMapper.from(handlerProperties::getPoolConfiguration).to(logHandlerFactoryBean::setPoolConfiguration);
+		jdbcTemplate.ifUnique(logHandlerFactoryBean::setJdbcTemplate);
+
 		propertyMapper.from(handlerProperties::getTableName).to(logHandlerFactoryBean::setTableName);
 		propertyMapper.from(handlerProperties::getFieldConfiguration).to(logHandlerFactoryBean::setFieldConfiguration);
 		propertyMapper.from(handlerProperties::getIdGenerator).as(BeanUtils::instantiateClass)

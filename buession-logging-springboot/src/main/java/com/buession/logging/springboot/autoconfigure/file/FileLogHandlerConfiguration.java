@@ -53,13 +53,12 @@ import java.io.File;
 public class FileLogHandlerConfiguration extends AbstractLogHandlerConfiguration<FileProperties,
 		FileLogHandlerFactoryBean> {
 
-	public FileLogHandlerConfiguration(LogProperties logProperties){
+	public FileLogHandlerConfiguration(LogProperties logProperties) {
 		super(logProperties.getFile());
 	}
 
 	@Bean
-	@Override
-	public FileLogHandlerFactoryBean logHandlerFactoryBean(){
+	public FileLogHandlerFactoryBean logHandlerFactoryBean() {
 		final FileLogHandlerFactoryBean logHandlerFactoryBean = new FileLogHandlerFactoryBean();
 
 		propertyMapper.from(handlerProperties::getPath).as(File::new).to(logHandlerFactoryBean::setFile);

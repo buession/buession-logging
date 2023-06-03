@@ -24,17 +24,38 @@
  */
 package com.buession.logging.springboot.autoconfigure.mongo;
 
+import com.buession.dao.mongodb.core.ReadConcern;
+import com.buession.dao.mongodb.core.ReadPreference;
+import com.buession.dao.mongodb.core.WriteConcern;
 import com.buession.logging.core.handler.LogHandler;
+import com.buession.logging.mongodb.spring.MongoClientFactoryBean;
+import com.buession.logging.mongodb.spring.MongoDatabaseFactoryBean;
 import com.buession.logging.mongodb.spring.MongoHandlerFactoryBean;
+import com.buession.logging.mongodb.spring.MongoMappingContextFactoryBean;
+import com.buession.logging.mongodb.spring.MongoTemplateFactoryBean;
 import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.MongoProperties;
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.MongoCredential;
+import com.mongodb.client.MongoClient;
+import com.mongodb.connection.ConnectionPoolSettings;
+import com.mongodb.connection.SocketSettings;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * MongoDb 日志处理器自动配置类
@@ -54,31 +75,134 @@ public class MongoLogHandlerConfiguration extends AbstractLogHandlerConfiguratio
 		super(logProperties.getMongo());
 	}
 
+	@Bean(name = "logMongoDbMongoClient")
+	public MongoClientFactoryBean mongoClientFactoryBean() {
+		final MongoClientFactoryBean mongoClientFactoryBean = new MongoClientFactoryBean();
+
+		propertyMapper.from(handlerProperties::getHost).to(mongoClientFactoryBean::setHost);
+		propertyMapper.from(handlerProperties::getPort).to(mongoClientFactoryBean::setPort);
+		propertyMapper.from(handlerProperties::getUrl).whenHasText().as(ConnectionString::new)
+				.to(mongoClientFactoryBean::setConnectionString);
+		propertyMapper.from(handlerProperties::getReplicaSetName).to(mongoClientFactoryBean::setReplicaSet);
+
+		if(handlerProperties.getUsername() != null && handlerProperties.getPassword() != null){
+			final String database =
+					handlerProperties.getAuthenticationDatabase() ==
+							null ? handlerProperties.getDatabaseName() : handlerProperties.getAuthenticationDatabase();
+			final MongoCredential credential = MongoCredential.createCredential(handlerProperties.getUsername(),
+					database, handlerProperties.getPassword().toCharArray());
+
+			mongoClientFactoryBean.setCredential(new MongoCredential[]{credential});
+		}
+
+		final MongoClientSettings.Builder mongoClientSettingsBuilder = MongoClientSettings.builder();
+
+		propertyMapper.from(handlerProperties::getReadPreference).as(ReadPreference::getValue)
+				.to(mongoClientSettingsBuilder::readPreference);
+		propertyMapper.from(handlerProperties::getReadConcern).as(
+				ReadConcern::getValue).to(mongoClientSettingsBuilder::readConcern);
+		propertyMapper.from(handlerProperties::getWriteConcern).as(
+				WriteConcern::getValue).to(mongoClientSettingsBuilder::writeConcern);
+		propertyMapper.from(handlerProperties::getUuidRepresentation)
+				.to(mongoClientSettingsBuilder::uuidRepresentation);
+
+		mongoClientSettingsBuilder.applyToSocketSettings(($builder)->{
+			final SocketSettings.Builder socketBuilder = SocketSettings.builder();
+
+			if(handlerProperties.getConnectionTimeout() != null){
+				socketBuilder.connectTimeout((int) handlerProperties.getConnectionTimeout().toMillis(),
+						TimeUnit.MILLISECONDS);
+			}
+			if(handlerProperties.getReadTimeout() != null){
+				socketBuilder.readTimeout((int) handlerProperties.getReadTimeout().toMillis(), TimeUnit.MILLISECONDS);
+			}
+
+			$builder.applySettings(socketBuilder.build());
+		}).applyToConnectionPoolSettings(($builder)->{
+			if(handlerProperties.getPool() != null){
+				final ConnectionPoolSettings.Builder poolBuilder = ConnectionPoolSettings.builder();
+
+				if(handlerProperties.getPool().getMinSize() > 0){
+					poolBuilder.minSize(handlerProperties.getPool().getMinSize());
+				}
+				if(handlerProperties.getPool().getMaxSize() > 0){
+					poolBuilder.minSize(handlerProperties.getPool().getMaxSize());
+				}
+				if(handlerProperties.getPool().getMaxWaitTime() != null){
+					poolBuilder.maxWaitTime(handlerProperties.getPool().getMaxWaitTime().toMillis(),
+							TimeUnit.MILLISECONDS);
+				}
+				if(handlerProperties.getPool().getMaxConnectionLifeTime() != null){
+					poolBuilder.maxConnectionLifeTime(handlerProperties.getPool().getMaxConnectionLifeTime().toMillis(),
+							TimeUnit.MILLISECONDS);
+				}
+				if(handlerProperties.getPool().getMaxConnectionIdleTime() != null){
+					poolBuilder.maxConnectionIdleTime(handlerProperties.getPool().getMaxConnectionIdleTime().toMillis(),
+							TimeUnit.MILLISECONDS);
+				}
+				if(handlerProperties.getPool().getMaintenanceInitialDelay() != null){
+					poolBuilder.maintenanceInitialDelay(
+							handlerProperties.getPool().getMaintenanceInitialDelay().toMillis(),
+							TimeUnit.MILLISECONDS);
+				}
+				if(handlerProperties.getPool().getMaintenanceFrequency() != null){
+					poolBuilder.maintenanceFrequency(handlerProperties.getPool().getMaintenanceFrequency().toMillis(),
+							TimeUnit.MILLISECONDS);
+				}
+				if(handlerProperties.getPool().getMaxConnecting() > 0){
+					poolBuilder.maxConnecting(handlerProperties.getPool().getMaxConnecting());
+				}
+
+				$builder.applySettings(poolBuilder.build());
+			}
+		});
+
+		return mongoClientFactoryBean;
+	}
+
+	@Bean(name = "logMongoDbMongoDatabase")
+	public MongoDatabaseFactoryBean mongoDatabaseFactoryBean(
+			@Qualifier("logMongoDbMongoClient") ObjectProvider<MongoClient> mongoClient) {
+		final MongoDatabaseFactoryBean mongoDatabaseFactoryBean = new MongoDatabaseFactoryBean();
+
+		mongoClient.ifUnique(mongoDatabaseFactoryBean::setMongoClient);
+		propertyMapper.from(handlerProperties::getDatabaseName).to(mongoDatabaseFactoryBean::setDatabaseName);
+
+		return mongoDatabaseFactoryBean;
+	}
+
+	@Bean(name = "logMongoDbMongoMappingContext")
+	public MongoMappingContextFactoryBean mongoMappingContextFactoryBean() {
+		final MongoMappingContextFactoryBean mongoMappingContextFactoryBean = new MongoMappingContextFactoryBean();
+
+		propertyMapper.from(handlerProperties::getAutoIndexCreation)
+				.to(mongoMappingContextFactoryBean::setAutoIndexCreation);
+		propertyMapper.from(handlerProperties::getFieldNamingStrategy).as(BeanUtils::instantiateClass)
+				.to(mongoMappingContextFactoryBean::setFieldNamingStrategy);
+
+		return mongoMappingContextFactoryBean;
+	}
+
+	@Bean(name = "logMongoDbMongoTemplate")
+	public MongoTemplateFactoryBean mongoTemplateFactoryBean(
+			@Qualifier("logMongoDbMongoDatabase") ObjectProvider<MongoDatabaseFactory> mongoDatabaseFactory,
+			@Qualifier("logMongoDbMongoMappingContext") ObjectProvider<MongoMappingContext> mongoMappingContext) {
+		final MongoTemplateFactoryBean mongoTemplateFactoryBean = new MongoTemplateFactoryBean();
+
+		mongoDatabaseFactory.ifUnique(mongoTemplateFactoryBean::setMongoDatabaseFactory);
+		mongoMappingContext.ifUnique(mongoTemplateFactoryBean::setMongoMappingContext);
+
+		return mongoTemplateFactoryBean;
+	}
+
 	@Bean
-	@Override
-	public MongoHandlerFactoryBean logHandlerFactoryBean() {
+	public MongoHandlerFactoryBean logHandlerFactoryBean(
+			@Qualifier("logMongoDbMongoTemplate") ObjectProvider<MongoTemplate> mongoTemplate) {
 		final MongoHandlerFactoryBean logHandlerFactoryBean = new MongoHandlerFactoryBean();
 
-		propertyMapper.from(handlerProperties::getHost).to(logHandlerFactoryBean::setHost);
-		propertyMapper.from(handlerProperties::getPort).to(logHandlerFactoryBean::setPort);
-		propertyMapper.from(handlerProperties::getUsername).to(logHandlerFactoryBean::setUsername);
-		propertyMapper.from(handlerProperties::getPassword).to(logHandlerFactoryBean::setPassword);
-		propertyMapper.from(handlerProperties::getUrl).to(logHandlerFactoryBean::setUrl);
-		propertyMapper.from(handlerProperties::getReplicaSetName).to(logHandlerFactoryBean::setReplicaSetName);
-		propertyMapper.from(handlerProperties::getDatabaseName).to(logHandlerFactoryBean::setDatabaseName);
-		propertyMapper.from(handlerProperties::getAuthenticationDatabase)
-				.to(logHandlerFactoryBean::setAuthenticationDatabase);
+		mongoTemplate.ifUnique(logHandlerFactoryBean::setMongoTemplate);
+
 		propertyMapper.from(handlerProperties::getCollectionName).to(logHandlerFactoryBean::setCollectionName);
-		propertyMapper.from(handlerProperties::getConnectionTimeout).to(logHandlerFactoryBean::setConnectionTimeout);
-		propertyMapper.from(handlerProperties::getReadTimeout).to(logHandlerFactoryBean::setReadTimeout);
-		propertyMapper.from(handlerProperties::getUuidRepresentation).to(logHandlerFactoryBean::setUuidRepresentation);
-		propertyMapper.from(handlerProperties::getAutoIndexCreation).to(logHandlerFactoryBean::setAutoIndexCreation);
-		propertyMapper.from(handlerProperties::getFieldNamingStrategy)
-				.to(logHandlerFactoryBean::setFieldNamingStrategy);
-		propertyMapper.from(handlerProperties::getReadPreference).to(logHandlerFactoryBean::setReadPreference);
-		propertyMapper.from(handlerProperties::getReadConcern).to(logHandlerFactoryBean::setReadConcern);
-		propertyMapper.from(handlerProperties::getWriteConcern).to(logHandlerFactoryBean::setWriteConcern);
-		propertyMapper.from(handlerProperties::getPool).to(logHandlerFactoryBean::setPoolConfiguration);
 
 		return logHandlerFactoryBean;
 	}

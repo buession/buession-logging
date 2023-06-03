@@ -26,15 +26,21 @@ package com.buession.logging.springboot.autoconfigure.elasticsearch;
 
 import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.elasticsearch.spring.ElasticsearchLogHandlerFactoryBean;
+import com.buession.logging.elasticsearch.spring.ElasticsearchRestTemplateFactoryBean;
+import com.buession.logging.elasticsearch.spring.RestHighLevelClientFactoryBean;
 import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.ElasticsearchProperties;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 
 /**
  * Elasticsearch 日志处理器自动配置类
@@ -50,22 +56,43 @@ import org.springframework.context.annotation.Configuration;
 public class ElasticsearchLogHandlerConfiguration
 		extends AbstractLogHandlerConfiguration<ElasticsearchProperties, ElasticsearchLogHandlerFactoryBean> {
 
-	public ElasticsearchLogHandlerConfiguration(LogProperties logProperties){
+	public ElasticsearchLogHandlerConfiguration(LogProperties logProperties) {
 		super(logProperties.getElasticsearch());
 	}
 
+	@Bean(name = "loggingElasticsearchRestHighLevelClient")
+	public RestHighLevelClientFactoryBean restHighLevelClientFactoryBean() {
+		final RestHighLevelClientFactoryBean restHighLevelClientFactoryBean = new RestHighLevelClientFactoryBean();
+
+		propertyMapper.from(handlerProperties::getUrls).to(restHighLevelClientFactoryBean::setUrls);
+		propertyMapper.from(handlerProperties::getHost).to(restHighLevelClientFactoryBean::setHost);
+		propertyMapper.from(handlerProperties::getPort).to(restHighLevelClientFactoryBean::setPort);
+		propertyMapper.from(handlerProperties::getUsername).to(restHighLevelClientFactoryBean::setUsername);
+		propertyMapper.from(handlerProperties::getPassword).to(restHighLevelClientFactoryBean::setPassword);
+		propertyMapper.from(handlerProperties::getConnectionTimeout)
+				.to(restHighLevelClientFactoryBean::setConnectionTimeout);
+		propertyMapper.from(handlerProperties::getReadTimeout).to(restHighLevelClientFactoryBean::setReadTimeout);
+
+		return restHighLevelClientFactoryBean;
+	}
+
+	@Bean(name = "loggingElasticsearchElasticsearchRestTemplate")
+	public ElasticsearchRestTemplateFactoryBean elasticsearchRestTemplateFactoryBean(
+			@Qualifier("loggingElasticsearchRestHighLevelClient") ObjectProvider<RestHighLevelClient> restHighLevelClient) {
+		final ElasticsearchRestTemplateFactoryBean elasticsearchRestTemplateFactoryBean =
+				new ElasticsearchRestTemplateFactoryBean();
+
+		restHighLevelClient.ifUnique(elasticsearchRestTemplateFactoryBean::setClient);
+
+		return elasticsearchRestTemplateFactoryBean;
+	}
+
 	@Bean
-	@Override
-	public ElasticsearchLogHandlerFactoryBean logHandlerFactoryBean(){
+	public ElasticsearchLogHandlerFactoryBean logHandlerFactoryBean(
+			@Qualifier("loggingElasticsearchElasticsearchRestTemplate") ObjectProvider<ElasticsearchRestTemplate> restTemplateFactory) {
 		final ElasticsearchLogHandlerFactoryBean logHandlerFactoryBean = new ElasticsearchLogHandlerFactoryBean();
 
-		propertyMapper.from(handlerProperties::getUrls).to(logHandlerFactoryBean::setUrls);
-		propertyMapper.from(handlerProperties::getHost).to(logHandlerFactoryBean::setHost);
-		propertyMapper.from(handlerProperties::getPort).to(logHandlerFactoryBean::setPort);
-		propertyMapper.from(handlerProperties::getUsername).to(logHandlerFactoryBean::setUsername);
-		propertyMapper.from(handlerProperties::getPassword).to(logHandlerFactoryBean::setPassword);
-		propertyMapper.from(handlerProperties::getConnectionTimeout).to(logHandlerFactoryBean::setConnectionTimeout);
-		propertyMapper.from(handlerProperties::getReadTimeout).to(logHandlerFactoryBean::setReadTimeout);
+		restTemplateFactory.ifUnique(logHandlerFactoryBean::setRestTemplate);
 		propertyMapper.from(handlerProperties::getIndexName).to(logHandlerFactoryBean::setIndexName);
 
 		return logHandlerFactoryBean;

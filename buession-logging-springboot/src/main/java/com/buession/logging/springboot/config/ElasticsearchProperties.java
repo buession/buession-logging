@@ -24,7 +24,7 @@
  */
 package com.buession.logging.springboot.config;
 
-import com.buession.logging.elasticsearch.spring.ElasticsearchLogHandlerFactoryBean;
+import com.buession.logging.elasticsearch.spring.RestHighLevelClientFactory;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -43,7 +43,7 @@ public class ElasticsearchProperties implements HandlerProperties, Serializable 
 	/**
 	 * Elasticsearch URL 地址
 	 */
-	private List<String> urls = ElasticsearchLogHandlerFactoryBean.DEFAULT_URLS;
+	private List<String> urls = RestHighLevelClientFactory.DEFAULT_URLS;
 
 	/**
 	 * Elasticsearch 地址
@@ -53,7 +53,7 @@ public class ElasticsearchProperties implements HandlerProperties, Serializable 
 	/**
 	 * Elasticsearch 端口
 	 */
-	private int port = ElasticsearchLogHandlerFactoryBean.DEFAULT_PORT;
+	private int port = RestHighLevelClientFactory.DEFAULT_PORT;
 
 	/**
 	 * 用户名
@@ -68,12 +68,12 @@ public class ElasticsearchProperties implements HandlerProperties, Serializable 
 	/**
 	 * 连接超时
 	 */
-	private Duration connectionTimeout = ElasticsearchLogHandlerFactoryBean.DEFAULT_CONNECTION_TIMEOUT;
+	private Duration connectionTimeout = RestHighLevelClientFactory.DEFAULT_CONNECTION_TIMEOUT;
 
 	/**
 	 * 读取超时
 	 */
-	private Duration readTimeout = ElasticsearchLogHandlerFactoryBean.DEFAULT_READ_TIMEOUT;
+	private Duration readTimeout = RestHighLevelClientFactory.DEFAULT_READ_TIMEOUT;
 
 	/**
 	 * 索引名称
@@ -85,7 +85,7 @@ public class ElasticsearchProperties implements HandlerProperties, Serializable 
 	 *
 	 * @return Elasticsearch URL 地址
 	 */
-	public List<String> getUrls(){
+	public List<String> getUrls() {
 		return urls;
 	}
 
@@ -95,7 +95,7 @@ public class ElasticsearchProperties implements HandlerProperties, Serializable 
 	 * @param urls
 	 * 		Elasticsearch URL 地址
 	 */
-	public void setUrls(List<String> urls){
+	public void setUrls(List<String> urls) {
 		this.urls = urls;
 	}
 
@@ -104,7 +104,7 @@ public class ElasticsearchProperties implements HandlerProperties, Serializable 
 	 *
 	 * @return Elasticsearch 地址
 	 */
-	public String getHost(){
+	public String getHost() {
 		return host;
 	}
 
@@ -114,7 +114,7 @@ public class ElasticsearchProperties implements HandlerProperties, Serializable 
 	 * @param host
 	 * 		Elasticsearch 地址
 	 */
-	public void setHost(String host){
+	public void setHost(String host) {
 		this.host = host;
 	}
 
@@ -123,7 +123,7 @@ public class ElasticsearchProperties implements HandlerProperties, Serializable 
 	 *
 	 * @return Elasticsearch 端口
 	 */
-	public int getPort(){
+	public int getPort() {
 		return port;
 	}
 
@@ -133,7 +133,7 @@ public class ElasticsearchProperties implements HandlerProperties, Serializable 
 	 * @param port
 	 * 		Elasticsearch 端口
 	 */
-	public void setPort(int port){
+	public void setPort(int port) {
 		this.port = port;
 	}
 
@@ -142,7 +142,7 @@ public class ElasticsearchProperties implements HandlerProperties, Serializable 
 	 *
 	 * @return Elasticsearch 用户名
 	 */
-	public String getUsername(){
+	public String getUsername() {
 		return username;
 	}
 
@@ -152,7 +152,7 @@ public class ElasticsearchProperties implements HandlerProperties, Serializable 
 	 * @param username
 	 * 		Elasticsearch 用户名
 	 */
-	public void setUsername(String username){
+	public void setUsername(String username) {
 		this.username = username;
 	}
 
@@ -161,7 +161,7 @@ public class ElasticsearchProperties implements HandlerProperties, Serializable 
 	 *
 	 * @return Elasticsearch 密码
 	 */
-	public String getPassword(){
+	public String getPassword() {
 		return password;
 	}
 
@@ -171,7 +171,7 @@ public class ElasticsearchProperties implements HandlerProperties, Serializable 
 	 * @param password
 	 * 		Elasticsearch 密码
 	 */
-	public void setPassword(String password){
+	public void setPassword(String password) {
 		this.password = password;
 	}
 
@@ -180,7 +180,7 @@ public class ElasticsearchProperties implements HandlerProperties, Serializable 
 	 *
 	 * @return 连接超时
 	 */
-	public Duration getConnectionTimeout(){
+	public Duration getConnectionTimeout() {
 		return connectionTimeout;
 	}
 
@@ -190,7 +190,7 @@ public class ElasticsearchProperties implements HandlerProperties, Serializable 
 	 * @param connectionTimeout
 	 * 		连接超时
 	 */
-	public void setConnectionTimeout(Duration connectionTimeout){
+	public void setConnectionTimeout(Duration connectionTimeout) {
 		this.connectionTimeout = connectionTimeout;
 	}
 
@@ -199,7 +199,7 @@ public class ElasticsearchProperties implements HandlerProperties, Serializable 
 	 *
 	 * @return 读取超时
 	 */
-	public Duration getReadTimeout(){
+	public Duration getReadTimeout() {
 		return readTimeout;
 	}
 
@@ -209,7 +209,7 @@ public class ElasticsearchProperties implements HandlerProperties, Serializable 
 	 * @param readTimeout
 	 * 		读取超时
 	 */
-	public void setReadTimeout(Duration readTimeout){
+	public void setReadTimeout(Duration readTimeout) {
 		this.readTimeout = readTimeout;
 	}
 
@@ -218,7 +218,7 @@ public class ElasticsearchProperties implements HandlerProperties, Serializable 
 	 *
 	 * @return 索引名称
 	 */
-	public String getIndexName(){
+	public String getIndexName() {
 		return indexName;
 	}
 
@@ -228,7 +228,7 @@ public class ElasticsearchProperties implements HandlerProperties, Serializable 
 	 * @param indexName
 	 * 		索引名称
 	 */
-	public void setIndexName(String indexName){
+	public void setIndexName(String indexName) {
 		this.indexName = indexName;
 	}
 

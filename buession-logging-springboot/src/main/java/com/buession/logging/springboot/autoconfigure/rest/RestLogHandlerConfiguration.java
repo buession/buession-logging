@@ -56,7 +56,6 @@ public class RestLogHandlerConfiguration extends AbstractLogHandlerConfiguration
 	}
 
 	@Bean
-	@Override
 	public RestLogHandlerFactoryBean logHandlerFactoryBean() {
 		final RestLogHandlerFactoryBean logHandlerFactoryBean = new RestLogHandlerFactoryBean();
 

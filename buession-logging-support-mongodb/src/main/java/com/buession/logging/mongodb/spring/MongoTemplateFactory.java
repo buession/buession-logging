@@ -41,58 +41,46 @@ import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 
 /**
+ * {@link MongoTemplate} 工厂
+ *
  * @author Yong.Teng
  * @since 0.0.1
  */
-class MongoTemplateFactory {
+public class MongoTemplateFactory {
 
-	private final com.buession.logging.mongodb.spring.MongoDatabaseFactory mongoDatabaseFactory;
+	private MongoDatabaseFactory mongoDatabaseFactory;
 
-	private final Boolean autoIndexCreation;
+	private MongoMappingContext mongoMappingContext;
 
-	private final Class<? extends FieldNamingStrategy> fieldNamingStrategy;
+	public MongoDatabaseFactory getMongoDatabaseFactory() {
+		return mongoDatabaseFactory;
+	}
 
-	private final MongoCustomConversions conversions;
-
-	MongoTemplateFactory(final com.buession.logging.mongodb.spring.MongoDatabaseFactory mongoDatabaseFactory,
-						 final Boolean autoIndexCreation,
-						 final Class<? extends FieldNamingStrategy> fieldNamingStrategy) {
+	public void setMongoDatabaseFactory(MongoDatabaseFactory mongoDatabaseFactory) {
 		this.mongoDatabaseFactory = mongoDatabaseFactory;
-		this.autoIndexCreation = autoIndexCreation;
-		this.fieldNamingStrategy = fieldNamingStrategy;
-		conversions =
-				new MongoCustomConversions(
-						ListBuilder.create().add(new BusinessTypeConverter()).add(new EventConverter()).build());
 	}
 
-	public MongoTemplate createMongoTemplate() {
-		final MongoDatabaseFactory mongoDatabaseFactory = this.mongoDatabaseFactory.createMongoDatabaseFactory();
-		final MongoConverter mongoConverter = createMongoConverter(mongoDatabaseFactory);
-
-		return new MongoTemplate(mongoDatabaseFactory, mongoConverter);
+	public MongoMappingContext getMongoMappingContext() {
+		return mongoMappingContext;
 	}
 
-	protected MongoMappingContext createMongoMappingContext() {
-		final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
-		final MongoMappingContext context = new MongoMappingContext();
-
-		propertyMapper.from(autoIndexCreation).to(context::setAutoIndexCreation);
-		propertyMapper.from(fieldNamingStrategy).as(BeanUtils::instantiateClass).to(context::setFieldNamingStrategy);
-
-		context.setSimpleTypeHolder(conversions.getSimpleTypeHolder());
-		context.afterPropertiesSet();
-
-		return context;
+	public void setMongoMappingContext(MongoMappingContext mongoMappingContext) {
+		this.mongoMappingContext = mongoMappingContext;
 	}
 
-	private MongoConverter createMongoConverter(final MongoDatabaseFactory factory) {
-		final MongoMappingContext mappingContext = createMongoMappingContext();
-		final DbRefResolver dbRefResolver = new DefaultDbRefResolver(factory);
-		final DefaultMongoTypeMapper typeMapper = new DefaultMongoTypeMapper(null, mappingContext);
-		final MappingMongoConverter converter = new MappingMongoConverter(dbRefResolver, mappingContext);
+	protected MongoTemplate createMongoTemplate() {
+		return new MongoTemplate(mongoDatabaseFactory, createMongoConverter());
+	}
+
+	protected MongoConverter createMongoConverter() {
+		final DbRefResolver dbRefResolver = new DefaultDbRefResolver(mongoDatabaseFactory);
+		final DefaultMongoTypeMapper typeMapper = new DefaultMongoTypeMapper(null, mongoMappingContext);
+		final MappingMongoConverter converter = new MappingMongoConverter(dbRefResolver, mongoMappingContext);
+		final MongoCustomConversions conversions = new MongoCustomConversions(
+				ListBuilder.create().add(new BusinessTypeConverter()).add(new EventConverter()).build());
 
 		converter.setCustomConversions(conversions);
-		converter.setCodecRegistryProvider(factory);
+		converter.setCodecRegistryProvider(mongoDatabaseFactory);
 		converter.setTypeMapper(typeMapper);
 		converter.afterPropertiesSet();
 

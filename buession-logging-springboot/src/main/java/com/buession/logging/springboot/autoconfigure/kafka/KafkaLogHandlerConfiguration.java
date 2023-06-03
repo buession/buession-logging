@@ -26,15 +26,20 @@ package com.buession.logging.springboot.autoconfigure.kafka;
 
 import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.kafka.spring.KafkaLogHandlerFactoryBean;
+import com.buession.logging.kafka.spring.KafkaTemplateFactoryBean;
+import com.buession.logging.kafka.spring.ProducerFactoryBean;
 import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.KafkaProperties;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.core.KafkaTemplate;
 
 /**
  * Kafka 日志处理器自动配置类
@@ -54,25 +59,46 @@ public class KafkaLogHandlerConfiguration extends AbstractLogHandlerConfiguratio
 		super(logProperties.getKafka());
 	}
 
+	@Bean(name = "loggingKafkaProducerFactory")
+	public ProducerFactoryBean producerFactoryBean() {
+		final ProducerFactoryBean producerFactoryBean = new ProducerFactoryBean();
+
+		propertyMapper.from(handlerProperties::getBootstrapServers).to(producerFactoryBean::setBootstrapServers);
+		propertyMapper.from(handlerProperties::getClientId).to(producerFactoryBean::setClientId);
+		propertyMapper.from(handlerProperties::getTransactionIdPrefix)
+				.to(producerFactoryBean::setTransactionIdPrefix);
+		propertyMapper.from(handlerProperties::getAcks).to(producerFactoryBean::setAcks);
+		propertyMapper.from(handlerProperties::getBatchSize).to(producerFactoryBean::setBatchSize);
+		propertyMapper.from(handlerProperties::getBufferMemory).to(producerFactoryBean::setBufferMemory);
+		propertyMapper.from(handlerProperties::getCompressionType).to(producerFactoryBean::setCompressionType);
+		propertyMapper.from(handlerProperties::getRetries).to(producerFactoryBean::setRetries);
+		propertyMapper.from(handlerProperties::getSslConfiguration).to(producerFactoryBean::setSslConfiguration);
+		propertyMapper.from(handlerProperties::getSecurityConfiguration)
+				.to(producerFactoryBean::setSecurityConfiguration);
+		propertyMapper.from(handlerProperties::getTransactionIdPrefix).to(producerFactoryBean::setTransactionIdPrefix);
+		propertyMapper.from(handlerProperties::getProperties).to(producerFactoryBean::setProperties);
+
+		return producerFactoryBean;
+	}
+
+	@Bean(name = "loggingKafkaKafkaTemplate")
+	public KafkaTemplateFactoryBean kafkaTemplateFactoryBean(@Qualifier("loggingKafkaProducerFactory")
+																	 ObjectProvider<org.springframework.kafka.core.ProducerFactory> producerFactory) {
+		final KafkaTemplateFactoryBean kafkaTemplateFactoryBean = new KafkaTemplateFactoryBean();
+
+		producerFactory.ifUnique(kafkaTemplateFactoryBean::setProducerFactory);
+
+		return kafkaTemplateFactoryBean;
+	}
+
 	@Bean
-	@Override
-	public KafkaLogHandlerFactoryBean logHandlerFactoryBean() {
+	public KafkaLogHandlerFactoryBean logHandlerFactoryBean(
+			@Qualifier("loggingKafkaKafkaTemplate") ObjectProvider<KafkaTemplate> kafkaTemplate) {
 		final KafkaLogHandlerFactoryBean logHandlerFactoryBean = new KafkaLogHandlerFactoryBean();
 
-		propertyMapper.from(handlerProperties::getBootstrapServers).to(logHandlerFactoryBean::setBootstrapServers);
-		propertyMapper.from(handlerProperties::getClientId).to(logHandlerFactoryBean::setClientId);
+		kafkaTemplate.ifUnique(logHandlerFactoryBean::setKafkaTemplate);
+
 		propertyMapper.from(handlerProperties::getTopic).to(logHandlerFactoryBean::setTopic);
-		propertyMapper.from(handlerProperties::getTransactionIdPrefix)
-				.to(logHandlerFactoryBean::setTransactionIdPrefix);
-		propertyMapper.from(handlerProperties::getAcks).to(logHandlerFactoryBean::setAcks);
-		propertyMapper.from(handlerProperties::getBatchSize).to(logHandlerFactoryBean::setBatchSize);
-		propertyMapper.from(handlerProperties::getBufferMemory).to(logHandlerFactoryBean::setBufferMemory);
-		propertyMapper.from(handlerProperties::getCompressionType).to(logHandlerFactoryBean::setCompressionType);
-		propertyMapper.from(handlerProperties::getRetries).to(logHandlerFactoryBean::setRetries);
-		propertyMapper.from(handlerProperties::getSslConfiguration).to(logHandlerFactoryBean::setSslConfiguration);
-		propertyMapper.from(handlerProperties::getSecurityConfiguration)
-				.to(logHandlerFactoryBean::setSecurityConfiguration);
-		propertyMapper.from(handlerProperties::getProperties).to(logHandlerFactoryBean::setProperties);
 
 		return logHandlerFactoryBean;
 	}

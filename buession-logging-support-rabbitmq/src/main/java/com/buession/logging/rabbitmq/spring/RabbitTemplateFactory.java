@@ -25,41 +25,63 @@
 package com.buession.logging.rabbitmq.spring;
 
 import com.buession.core.converter.mapper.PropertyMapper;
+import com.buession.logging.rabbitmq.core.Retry;
 import com.buession.logging.rabbitmq.core.Template;
 import com.buession.logging.rabbitmq.support.RabbitRetryTemplateCustomizer;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.retry.backoff.ExponentialBackOffPolicy;
+import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 
 import java.time.Duration;
+import java.util.List;
 
 /**
  * @author Yong.Teng
  * @since 0.0.1
  */
-class RabbitTemplateFactory {
+public class RabbitTemplateFactory {
 
-	private final ConnectionFactory connectionFactory;
+	private org.springframework.amqp.rabbit.connection.ConnectionFactory connectionFactory;
 
 	/**
 	 * Template 配置
 	 */
-	private final Template template;
+	private Template template;
 
 	/**
 	 * Whether to enable publisher returns.
 	 */
-	private final boolean publisherReturns;
+	private boolean publisherReturns;
 
-	public RabbitTemplateFactory(final ConnectionFactory connectionFactory,
-								 final Template template, final boolean publisherReturns){
+	public ConnectionFactory getConnectionFactory() {
+		return connectionFactory;
+	}
+
+	public void setConnectionFactory(ConnectionFactory connectionFactory) {
 		this.connectionFactory = connectionFactory;
+	}
+
+	public Template getTemplate() {
+		return template;
+	}
+
+	public void setTemplate(Template template) {
 		this.template = template;
+	}
+
+	public boolean isPublisherReturns() {
+		return publisherReturns;
+	}
+
+	public void setPublisherReturns(boolean publisherReturns) {
 		this.publisherReturns = publisherReturns;
 	}
 
-	public RabbitTemplate createRabbitTemplate() throws Exception{
+	protected RabbitTemplate createRabbitTemplate() {
 		final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
-		final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory.createConnectionFactory());
+		final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
 
 		rabbitTemplate.setMandatory(determineMandatoryFlag());
 
@@ -74,15 +96,50 @@ class RabbitTemplateFactory {
 		return rabbitTemplate;
 	}
 
-	private RetryTemplate createRetryTemplate(){
+	protected RetryTemplate createRetryTemplate() {
 		final RetryTemplateFactory retryTemplateFactory = new RetryTemplateFactory(template.getRetryCustomizers());
 		return retryTemplateFactory.createRetryTemplate(template.getRetry(),
 				RabbitRetryTemplateCustomizer.Target.SENDER);
 	}
 
-	private boolean determineMandatoryFlag(){
+	protected boolean determineMandatoryFlag() {
 		Boolean mandatory = template.getMandatory();
 		return mandatory != null ? mandatory : publisherReturns;
+	}
+
+	static class RetryTemplateFactory {
+
+		private final List<RabbitRetryTemplateCustomizer> customizers;
+
+		RetryTemplateFactory(final List<RabbitRetryTemplateCustomizer> customizers) {
+			this.customizers = customizers;
+		}
+
+		RetryTemplate createRetryTemplate(Retry properties, RabbitRetryTemplateCustomizer.Target target) {
+			final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
+			final RetryTemplate retryTemplate = new RetryTemplate();
+
+			final SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
+			propertyMapper.from(properties::getMaxAttempts).to(retryPolicy::setMaxAttempts);
+			retryTemplate.setRetryPolicy(retryPolicy);
+
+			final ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
+			propertyMapper.from(properties::getInitialInterval).as(Duration::toMillis)
+					.to(backOffPolicy::setInitialInterval);
+			propertyMapper.from(properties::getMultiplier).to(backOffPolicy::setMultiplier);
+			propertyMapper.from(properties::getMaxInterval).as(Duration::toMillis)
+					.to(backOffPolicy::setMaxInterval);
+			retryTemplate.setBackOffPolicy(backOffPolicy);
+
+			if(customizers != null){
+				for(RabbitRetryTemplateCustomizer customizer : customizers){
+					customizer.customize(target, retryTemplate);
+				}
+			}
+
+			return retryTemplate;
+		}
+
 	}
 
 }

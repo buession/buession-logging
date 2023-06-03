@@ -24,14 +24,9 @@
  */
 package com.buession.logging.elasticsearch.spring;
 
-import com.buession.core.builder.ListBuilder;
-import com.buession.core.utils.Assert;
 import com.buession.logging.elasticsearch.handler.ElasticsearchLogHandler;
 import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
-
-import java.time.Duration;
-import java.util.List;
 
 /**
  * Elasticsearch 日志处理器 {@link ElasticsearchLogHandler} 工厂 Bean 基类
@@ -41,185 +36,19 @@ import java.util.List;
  */
 public class ElasticsearchLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<ElasticsearchLogHandler> {
 
-	public final static List<String> DEFAULT_URLS = ListBuilder.of("http://localhost:9200");
-
-	public final static int DEFAULT_PORT = RestHighLevelClientFactory.DEFAULT_PORT;
-
-	public final static Duration DEFAULT_CONNECTION_TIMEOUT = Duration.ofSeconds(1);
-
-	public final static Duration DEFAULT_READ_TIMEOUT = Duration.ofSeconds(30);
-
-	/**
-	 * Elasticsearch URL 地址
-	 */
-	private List<String> urls = DEFAULT_URLS;
-
-	/**
-	 * Elasticsearch 地址
-	 */
-	private String host;
-
-	/**
-	 * Elasticsearch 端口
-	 */
-	private int port = DEFAULT_PORT;
-
-	/**
-	 * 用户名
-	 */
-	private String username;
-
-	/**
-	 * 密码
-	 */
-	private String password;
-
-	/**
-	 * 连接超时
-	 */
-	private Duration connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
-
-	/**
-	 * 读取超时
-	 */
-	private Duration readTimeout = DEFAULT_READ_TIMEOUT;
+	private ElasticsearchRestTemplate restTemplate;
 
 	/**
 	 * 索引名称
 	 */
 	private String indexName;
 
-	/**
-	 * 返回 Elasticsearch URL 地址
-	 *
-	 * @return Elasticsearch URL 地址
-	 */
-	public List<String> getUrls(){
-		return urls;
+	public ElasticsearchRestTemplate getRestTemplate() {
+		return restTemplate;
 	}
 
-	/**
-	 * 设置 Elasticsearch URL 地址
-	 *
-	 * @param urls
-	 * 		Elasticsearch URL 地址
-	 */
-	public void setUrls(List<String> urls){
-		this.urls = urls;
-	}
-
-	/**
-	 * 返回 Elasticsearch 地址
-	 *
-	 * @return Elasticsearch 地址
-	 */
-	public String getHost(){
-		return host;
-	}
-
-	/**
-	 * 设置 Elasticsearch 地址
-	 *
-	 * @param host
-	 * 		Elasticsearch 地址
-	 */
-	public void setHost(String host){
-		this.host = host;
-	}
-
-	/**
-	 * 返回 Elasticsearch 端口
-	 *
-	 * @return Elasticsearch 端口
-	 */
-	public int getPort(){
-		return port;
-	}
-
-	/**
-	 * 设置 Elasticsearch 端口
-	 *
-	 * @param port
-	 * 		Elasticsearch 端口
-	 */
-	public void setPort(int port){
-		this.port = port;
-	}
-
-	/**
-	 * 返回 Elasticsearch 用户名
-	 *
-	 * @return Elasticsearch 用户名
-	 */
-	public String getUsername(){
-		return username;
-	}
-
-	/**
-	 * 设置 Elasticsearch 用户名
-	 *
-	 * @param username
-	 * 		Elasticsearch 用户名
-	 */
-	public void setUsername(String username){
-		this.username = username;
-	}
-
-	/**
-	 * 返回 Elasticsearch 密码
-	 *
-	 * @return Elasticsearch 密码
-	 */
-	public String getPassword(){
-		return password;
-	}
-
-	/**
-	 * 设置 Elasticsearch 密码
-	 *
-	 * @param password
-	 * 		Elasticsearch 密码
-	 */
-	public void setPassword(String password){
-		this.password = password;
-	}
-
-	/**
-	 * 返回连接超时
-	 *
-	 * @return 连接超时
-	 */
-	public Duration getConnectionTimeout(){
-		return connectionTimeout;
-	}
-
-	/**
-	 * 设置连接超时
-	 *
-	 * @param connectionTimeout
-	 * 		连接超时
-	 */
-	public void setConnectionTimeout(Duration connectionTimeout){
-		this.connectionTimeout = connectionTimeout;
-	}
-
-	/**
-	 * 返回读取超时
-	 *
-	 * @return 读取超时
-	 */
-	public Duration getReadTimeout(){
-		return readTimeout;
-	}
-
-	/**
-	 * 设置读取超时
-	 *
-	 * @param readTimeout
-	 * 		读取超时
-	 */
-	public void setReadTimeout(Duration readTimeout){
-		this.readTimeout = readTimeout;
+	public void setRestTemplate(ElasticsearchRestTemplate restTemplate) {
+		this.restTemplate = restTemplate;
 	}
 
 	/**
@@ -227,7 +56,7 @@ public class ElasticsearchLogHandlerFactoryBean extends BaseLogHandlerFactoryBea
 	 *
 	 * @return 索引名称
 	 */
-	public String getIndexName(){
+	public String getIndexName() {
 		return indexName;
 	}
 
@@ -237,21 +66,12 @@ public class ElasticsearchLogHandlerFactoryBean extends BaseLogHandlerFactoryBea
 	 * @param indexName
 	 * 		索引名称
 	 */
-	public void setIndexName(String indexName){
+	public void setIndexName(String indexName) {
 		this.indexName = indexName;
 	}
 
 	@Override
-	public void afterPropertiesSet() throws Exception{
-		Assert.isEmpty(urls, "Elasticsearch urls cloud not be empty or null.");
-		Assert.isBlank(indexName, "Index name cloud not be blank, empty or null.");
-
-		final RestHighLevelClientFactory restHighLevelClientFactory = new RestHighLevelClientFactory(urls, host, port);
-		final ElasticsearchRestTemplateFactory elasticsearchRestTemplateFactory =
-				new ElasticsearchRestTemplateFactory(restHighLevelClientFactory);
-		final ElasticsearchRestTemplate restTemplate =
-				elasticsearchRestTemplateFactory.createElasticsearchRestTemplate();
-
+	public void afterPropertiesSet() throws Exception {
 		logHandler = new ElasticsearchLogHandler(restTemplate, indexName);
 	}
 

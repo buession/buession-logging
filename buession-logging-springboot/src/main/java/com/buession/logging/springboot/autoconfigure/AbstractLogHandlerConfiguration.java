@@ -41,13 +41,13 @@ import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
  * @since 0.0.1
  */
 public abstract class AbstractLogHandlerConfiguration<P extends HandlerProperties,
-		T extends BaseLogHandlerFactoryBean<? extends LogHandler>> implements LogHandlerConfiguration<T> {
+		T extends BaseLogHandlerFactoryBean<? extends LogHandler>> {
 
 	protected final P handlerProperties;
 
 	protected final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 
-	public AbstractLogHandlerConfiguration(final P handlerProperties){
+	public AbstractLogHandlerConfiguration(final P handlerProperties) {
 		this.handlerProperties = handlerProperties;
 	}
 

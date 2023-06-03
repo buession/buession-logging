@@ -38,89 +38,311 @@ import java.time.Duration;
  * @author Yong.Teng
  * @since 0.0.1
  */
-class ConnectionFactory {
+public class ConnectionFactory {
+
+	public final static String DEFAULT_HOST = "localhost";
+
+	public final static String DEFAULT_USERNAME = "guest";
+
+	public final static String DEFAULT_PASSWORD = "guest";
+
+	public final static String DEFAULT_VIRTUAL_HOST = "/";
+
+	public final static Duration DEFAULT_CONNECTION_TIMEOUT = Duration.ofSeconds(1);
+
+	public final static int DEFAULT_REQUESTED_CHANNEL_MAX = 2047;
 
 	/**
 	 * RabbitMQ 地址
 	 */
-	private final String host;
+	private String host = DEFAULT_HOST;
 
 	/**
 	 * RabbitMQ 端口
 	 */
-	private final int port;
+	private int port;
 
 	/**
 	 * 用户名
 	 */
-	private final String username;
+	private String username = DEFAULT_USERNAME;
 
 	/**
 	 * 密码
 	 */
-	private final String password;
+	private String password = DEFAULT_PASSWORD;
 
 	/**
 	 * 虚拟机
 	 */
-	private final String virtualHost;
+	private String virtualHost = DEFAULT_VIRTUAL_HOST;
 
 	/**
 	 * 连接超时
 	 */
-	private final Duration connectionTimeout;
+	private Duration connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
 
 	/**
 	 * SSL 配置
 	 */
-	private final SslConfiguration sslConfiguration;
+	private SslConfiguration sslConfiguration;
 
 	/**
 	 * Requested heartbeat timeout; zero for none. If a duration suffix is not specified,
 	 * seconds will be used.
 	 */
-	private final Duration requestedHeartbeat;
+	private Duration requestedHeartbeat;
 
 	/**
 	 * Number of channels per connection requested by the client. Use 0 for unlimited.
 	 */
-	private final int requestedChannelMax;
+	private int requestedChannelMax = DEFAULT_REQUESTED_CHANNEL_MAX;
 
 	/**
 	 * Whether to enable publisher returns.
 	 */
-	private final boolean publisherReturns;
+	private boolean publisherReturns;
 
 	/**
 	 * Type of publisher confirms to use.
 	 */
-	private final CachingConnectionFactory.ConfirmType publisherConfirmType;
+	private CachingConnectionFactory.ConfirmType publisherConfirmType;
 
 	/**
 	 * 缓存配置
 	 */
-	private final Cache cache;
+	private Cache cache;
 
-	ConnectionFactory(final String host, final int port, final String username, final String password,
-					  final String virtualHost, final Duration connectionTimeout,
-					  final SslConfiguration sslConfiguration, final Duration requestedHeartbeat,
-					  final int requestedChannelMax, final boolean publisherReturns,
-					  final CachingConnectionFactory.ConfirmType publisherConfirmType, final Cache cache){
+	/**
+	 * 返回 RabbitMQ 地址
+	 *
+	 * @return RabbitMQ 地址
+	 */
+	public String getHost() {
+		return host;
+	}
+
+	/**
+	 * 设置 RabbitMQ 地址
+	 *
+	 * @param host
+	 * 		RabbitMQ 地址
+	 */
+	public void setHost(String host) {
 		this.host = host;
+	}
+
+	/**
+	 * 返回 RabbitMQ 端口
+	 *
+	 * @return RabbitMQ 端口
+	 */
+	public int getPort() {
+		return port;
+	}
+
+	/**
+	 * 设置 RabbitMQ 端口
+	 *
+	 * @param port
+	 * 		RabbitMQ 端口
+	 */
+	public void setPort(int port) {
 		this.port = port;
+	}
+
+	/**
+	 * 返回用户名
+	 *
+	 * @return 用户名
+	 */
+	public String getUsername() {
+		return username;
+	}
+
+	/**
+	 * 设置用户名
+	 *
+	 * @param username
+	 * 		用户名
+	 */
+	public void setUsername(String username) {
 		this.username = username;
+	}
+
+	/**
+	 * 返回密码
+	 *
+	 * @return 密码
+	 */
+	public String getPassword() {
+		return password;
+	}
+
+	/**
+	 * 设置密码
+	 *
+	 * @param password
+	 * 		密码
+	 */
+	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	/**
+	 * 返回虚拟机
+	 *
+	 * @return 虚拟机
+	 */
+	public String getVirtualHost() {
+		return virtualHost;
+	}
+
+	/**
+	 * 设置虚拟机
+	 *
+	 * @param virtualHost
+	 * 		虚拟机
+	 */
+	public void setVirtualHost(String virtualHost) {
 		this.virtualHost = virtualHost;
+	}
+
+	/**
+	 * 返回连接超时
+	 *
+	 * @return 连接超时
+	 */
+	public Duration getConnectionTimeout() {
+		return connectionTimeout;
+	}
+
+	/**
+	 * 设置连接超时
+	 *
+	 * @param connectionTimeout
+	 * 		连接超时
+	 */
+	public void setConnectionTimeout(Duration connectionTimeout) {
 		this.connectionTimeout = connectionTimeout;
+	}
+
+	/**
+	 * 返回 SSL 配置
+	 *
+	 * @return SSL 配置
+	 */
+	public SslConfiguration getSslConfiguration() {
+		return sslConfiguration;
+	}
+
+	/**
+	 * 设置 SSL 配置
+	 *
+	 * @param sslConfiguration
+	 * 		SSL 配置
+	 */
+	public void setSslConfiguration(SslConfiguration sslConfiguration) {
 		this.sslConfiguration = sslConfiguration;
+	}
+
+	/**
+	 * Return requested heartbeat timeout.
+	 *
+	 * @return Requested heartbeat timeout.
+	 */
+	public Duration getRequestedHeartbeat() {
+		return requestedHeartbeat;
+	}
+
+	/**
+	 * Sets requested heartbeat timeout.
+	 *
+	 * @param requestedHeartbeat
+	 * 		Requested heartbeat timeout
+	 */
+	public void setRequestedHeartbeat(Duration requestedHeartbeat) {
 		this.requestedHeartbeat = requestedHeartbeat;
+	}
+
+	/**
+	 * Return number of channels per connection requested by the client. Use 0 for unlimited.
+	 *
+	 * @return Number of channels per connection requested by the client.
+	 */
+	public int getRequestedChannelMax() {
+		return requestedChannelMax;
+	}
+
+	/**
+	 * Sets number of channels per connection requested by the client.
+	 *
+	 * @param requestedChannelMax
+	 * 		Number of channels per connection requested by the client.
+	 */
+	public void setRequestedChannelMax(int requestedChannelMax) {
 		this.requestedChannelMax = requestedChannelMax;
+	}
+
+	/**
+	 * Return whether to enable publisher returns.
+	 *
+	 * @return Whether to enable publisher returns.
+	 */
+	public boolean isPublisherReturns() {
+		return publisherReturns;
+	}
+
+	/**
+	 * Sets enable publisher returns.
+	 *
+	 * @param publisherReturns
+	 * 		Whether to enable publisher returns.
+	 */
+	public void setPublisherReturns(boolean publisherReturns) {
 		this.publisherReturns = publisherReturns;
+	}
+
+	/**
+	 * Return type of publisher confirms to use.
+	 *
+	 * @return Type of publisher confirms to use.
+	 */
+	public CachingConnectionFactory.ConfirmType getPublisherConfirmType() {
+		return publisherConfirmType;
+	}
+
+	/**
+	 * Sets type of publisher confirms to use.
+	 *
+	 * @param publisherConfirmType
+	 * 		Type of publisher confirms to use.
+	 */
+	public void setPublisherConfirmType(
+			CachingConnectionFactory.ConfirmType publisherConfirmType) {
 		this.publisherConfirmType = publisherConfirmType;
+	}
+
+	/**
+	 * 返回缓存配置
+	 *
+	 * @return 缓存配置
+	 */
+	public Cache getCache() {
+		return cache;
+	}
+
+	/**
+	 * 设置缓存配置
+	 *
+	 * @param cache
+	 * 		缓存配置
+	 */
+	public void setCache(Cache cache) {
 		this.cache = cache;
 	}
 
-	public org.springframework.amqp.rabbit.connection.ConnectionFactory createConnectionFactory() throws Exception{
+	public org.springframework.amqp.rabbit.connection.ConnectionFactory createConnectionFactory() throws Exception {
 		final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 		final com.rabbitmq.client.ConnectionFactory rabbitConnectionFactory = createRabbitConnectionFactory();
 		final CachingConnectionFactory connectionFactory = new CachingConnectionFactory(rabbitConnectionFactory);
@@ -141,7 +363,7 @@ class ConnectionFactory {
 		return connectionFactory;
 	}
 
-	private com.rabbitmq.client.ConnectionFactory createRabbitConnectionFactory() throws Exception{
+	private com.rabbitmq.client.ConnectionFactory createRabbitConnectionFactory() throws Exception {
 		final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 		final RabbitConnectionFactoryBean factory = new RabbitConnectionFactoryBean();
 
@@ -156,7 +378,8 @@ class ConnectionFactory {
 
 		if(sslConfiguration != null && sslConfiguration.isEnabled()){
 			factory.setUseSSL(true);
-			propertyMapper.from(sslConfiguration::getAlgorithms).as((algorithms)->StringUtils.join(algorithms, ','))
+			propertyMapper.from(sslConfiguration::getAlgorithms)
+					.as((algorithms)->StringUtils.join(algorithms, ','))
 					.to(factory::setSslAlgorithm);
 			propertyMapper.from(sslConfiguration::getKeyStoreType).to(factory::setKeyStoreType);
 			propertyMapper.from(sslConfiguration::getKeyStorePath).to(factory::setKeyStore);
@@ -174,7 +397,7 @@ class ConnectionFactory {
 		return factory.getObject();
 	}
 
-	protected int determinePort(){
+	protected int determinePort() {
 		if(port > 0){
 			return port;
 		}

@@ -32,6 +32,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Kafka 日志处理器
  *
@@ -60,7 +63,7 @@ public class KafkaLogHandler implements LogHandler {
 	 * @param topic
 	 * 		Topic 名称
 	 */
-	public KafkaLogHandler(final KafkaTemplate<?, Object> kafkaTemplate, final String topic){
+	public KafkaLogHandler(final KafkaTemplate<?, Object> kafkaTemplate, final String topic) {
 		Assert.isNull(kafkaTemplate, "KafkaTemplate is null.");
 		Assert.isBlank(topic, "Topic name is blank, empty or null.");
 		this.kafkaTemplate = kafkaTemplate;
@@ -68,9 +71,69 @@ public class KafkaLogHandler implements LogHandler {
 	}
 
 	@Override
-	public Status handle(final LogData logData){
+	public Status handle(final LogData logData) {
+		final Map<String, Object> data = new HashMap<>();
+
+		if(logData.getPrincipal() != null){
+			data.put("principal", logData.getPrincipal());
+		}
+		if(logData.getDateTime() != null){
+			data.put("dateTime", logData.getDateTime());
+		}
+		if(logData.getBusinessType() != null){
+			data.put("businessType", logData.getBusinessType().toString());
+		}
+		if(logData.getEvent() != null){
+			data.put("event", logData.getEvent().toString());
+		}
+		if(logData.getDescription() != null){
+			data.put("description", logData.getDescription());
+		}
+		if(logData.getUrl() != null){
+			data.put("url", logData.getUrl());
+		}
+		if(logData.getRequestMethod() != null){
+			data.put("requestMethod", logData.getRequestMethod());
+		}
+		if(logData.getRequestParameters() != null){
+			data.put("requestParameters", logData.getRequestParameters());
+		}
+		if(logData.getRequestBody() != null){
+			data.put("requestBody", logData.getRequestBody());
+		}
+		if(logData.getResponseBody() != null){
+			data.put("responseBody", logData.getResponseBody());
+		}
+		if(logData.getClientIp() != null){
+			data.put("clientIp", logData.getClientIp());
+		}
+		if(logData.getRemoteAddr() != null){
+			data.put("remoteAddr", logData.getRemoteAddr());
+		}
+		if(logData.getUserAgent() != null){
+			data.put("userAgent", logData.getUserAgent());
+		}
+		if(logData.getOperatingSystem() != null){
+			data.put("operatingSystem", logData.getOperatingSystem());
+		}
+		if(logData.getDeviceType() != null){
+			data.put("deviceType", logData.getDeviceType());
+		}
+		if(logData.getBrowser() != null){
+			data.put("browser", logData.getBrowser());
+		}
+		if(logData.getLocation() != null){
+			data.put("location", logData.getLocation());
+		}
+		if(logData.getStatus() != null){
+			data.put("status", logData.getStatus());
+		}
+		if(logData.getExtra() != null){
+			data.put("extra", logData.getExtra());
+		}
+
 		try{
-			kafkaTemplate.send(topic, logData);
+			kafkaTemplate.send(topic, data);
 			return Status.SUCCESS;
 		}catch(Exception e){
 			if(logger.isErrorEnabled()){

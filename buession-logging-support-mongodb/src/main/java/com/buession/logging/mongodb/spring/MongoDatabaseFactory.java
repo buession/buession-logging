@@ -24,25 +24,39 @@
  */
 package com.buession.logging.mongodb.spring;
 
+import com.mongodb.client.MongoClient;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
 /**
+ * {@link org.springframework.data.mongodb.MongoDatabaseFactory} 工厂
+ *
  * @author Yong.Teng
  * @since 0.0.1
  */
-class MongoDatabaseFactory {
+public class MongoDatabaseFactory {
 
-	private final MongoClientFactory mongoClientFactory;
+	private MongoClient mongoClient;
 
-	private final String databaseName;
+	private String databaseName;
 
-	MongoDatabaseFactory(final MongoClientFactory mongoClientFactory, final String databaseName){
-		this.mongoClientFactory = mongoClientFactory;
+	public MongoClient getMongoClient() {
+		return mongoClient;
+	}
+
+	public void setMongoClient(MongoClient mongoClient) {
+		this.mongoClient = mongoClient;
+	}
+
+	public String getDatabaseName() {
+		return databaseName;
+	}
+
+	public void setDatabaseName(String databaseName) {
 		this.databaseName = databaseName;
 	}
 
-	public org.springframework.data.mongodb.MongoDatabaseFactory createMongoDatabaseFactory(){
-		return new SimpleMongoClientDatabaseFactory(mongoClientFactory.createMongoClient(), databaseName);
+	protected org.springframework.data.mongodb.MongoDatabaseFactory createMongoDatabaseFactory() {
+		return new SimpleMongoClientDatabaseFactory(mongoClient, databaseName);
 	}
 
 }

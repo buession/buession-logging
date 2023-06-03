@@ -22,8 +22,32 @@
  * | Copyright @ 2013-2023 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
+package com.buession.logging.aop.servlet.aopalliance.interceptor;
+
+import com.buession.aop.aopalliance.AbstractAopAllianceAnnotationsMethodInterceptor;
+import com.buession.aop.interceptor.AnnotationMethodInterceptor;
+import com.buession.aop.resolver.SpringAnnotationResolver;
+import com.buession.logging.aop.servlet.interceptor.*;
+
+import java.util.ArrayDeque;
+import java.util.Collection;
+
 /**
  * @author Yong.Teng
  * @since 0.0.1
  */
-package com.buession.logging.mongodb.support;
+public class ServletAopAllianceAnnotationsMethodInterceptor extends AbstractAopAllianceAnnotationsMethodInterceptor {
+
+	public ServletAopAllianceAnnotationsMethodInterceptor() {
+		super();
+
+		final Collection<AnnotationMethodInterceptor> methodInterceptors = new ArrayDeque<>(2);
+		final SpringAnnotationResolver springAnnotationResolver = new SpringAnnotationResolver();
+
+		methodInterceptors.add(new ServletLogAnnotationMethodInterceptor(springAnnotationResolver));
+		methodInterceptors.add(new ServletAuditLogAnnotationMethodInterceptor(springAnnotationResolver));
+
+		setMethodInterceptors(methodInterceptors);
+	}
+
+}

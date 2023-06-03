@@ -44,7 +44,6 @@ import com.buession.logging.jdbc.support.LoggingJdbcDaoSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,22 +104,7 @@ public class JdbcLogHandler implements LogHandler {
 	 * 		数据表名称
 	 */
 	public JdbcLogHandler(final JdbcTemplate jdbcTemplate, final String tableName) {
-		this(jdbcTemplate, null, tableName);
-	}
-
-	/**
-	 * 构造函数
-	 *
-	 * @param jdbcTemplate
-	 *        {@link JdbcTemplate}
-	 * @param transactionTemplate
-	 * 		The {@link TransactionTemplate}
-	 * @param tableName
-	 * 		数据表名称
-	 */
-	public JdbcLogHandler(final JdbcTemplate jdbcTemplate, final TransactionTemplate transactionTemplate,
-						  final String tableName) {
-		this(jdbcTemplate, transactionTemplate, tableName, null);
+		this(jdbcTemplate, tableName, null);
 	}
 
 	/**
@@ -135,29 +119,11 @@ public class JdbcLogHandler implements LogHandler {
 	 */
 	public JdbcLogHandler(final JdbcTemplate jdbcTemplate, final String tableName,
 						  final FieldConfiguration fieldConfiguration) {
-		this(jdbcTemplate, tableName);
-		setFieldConfiguration(fieldConfiguration);
-	}
-
-	/**
-	 * 构造函数
-	 *
-	 * @param jdbcTemplate
-	 *        {@link JdbcTemplate}
-	 * @param transactionTemplate
-	 * 		The {@link TransactionTemplate}
-	 * @param tableName
-	 * 		数据表名称
-	 * @param fieldConfiguration
-	 * 		字段配置
-	 */
-	public JdbcLogHandler(final JdbcTemplate jdbcTemplate, final TransactionTemplate transactionTemplate,
-						  final String tableName, final FieldConfiguration fieldConfiguration) {
 		Assert.isNull(jdbcTemplate, "JdbcTemplate is null.");
 		Assert.isBlank(tableName, "Table name is blank, empty or null.");
 		this.tableName = tableName;
 		setFieldConfiguration(fieldConfiguration);
-		daoSupport = new LoggingJdbcDaoSupport(jdbcTemplate, transactionTemplate, buildLogSql());
+		daoSupport = new LoggingJdbcDaoSupport(jdbcTemplate, buildLogSql());
 	}
 
 	/**

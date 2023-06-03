@@ -24,144 +24,27 @@
  */
 package com.buession.logging.mongodb.spring;
 
-import com.buession.core.converter.mapper.PropertyMapper;
-import com.mongodb.Block;
-import com.mongodb.ConnectionString;
-import com.mongodb.MongoClientSettings;
-import com.mongodb.MongoCredential;
-import com.mongodb.MongoDriverInformation;
-import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClient;
-import com.mongodb.connection.ClusterSettings;
 import org.bson.UuidRepresentation;
 
-import java.util.Collections;
-import java.util.function.BiFunction;
+import java.time.Duration;
 
 /**
+ * {@link MongoClient} 工厂
+ *
  * @author Yong.Teng
  * @since 0.0.1
  */
-class MongoClientFactory {
+public class MongoClientFactory extends org.springframework.data.mongodb.core.MongoClientFactoryBean {
 
 	public final static int DEFAULT_PORT = 27017;
 
-	/**
-	 * MongoDB 主机地址
-	 */
-	private final String host;
+	public final static String DEFAULT_URL = "mongodb://localhost/test";
 
-	/**
-	 * MongoDB 端口
-	 */
-	private final int port;
+	public final static Duration DEFAULT_CONNECTION_TIMEOUT = Duration.ofSeconds(1);
 
-	/**
-	 * 用户名
-	 */
-	private final String username;
+	public final static Duration DEFAULT_READ_TIMEOUT = Duration.ofSeconds(3);
 
-	/**
-	 * 密码
-	 */
-	private final char[] password;
-
-	/**
-	 * Mongo database URI.
-	 */
-	private final String url;
-
-	/**
-	 * 副本集名称
-	 */
-	private final String replicaSetName;
-
-	/**
-	 * 数据库名称
-	 */
-	private final String databaseName;
-
-	/**
-	 * 认证数据库名称
-	 */
-	private final String authenticationDatabase;
-
-	/**
-	 * Representation to use when converting a UUID to a BSON binary value.
-	 */
-	private final UuidRepresentation uuidRepresentation;
-
-	private final MongoClientSettings clientSettings;
-
-	private final BiFunction<MongoClientSettings, MongoDriverInformation, MongoClient> clientCreator;
-
-	MongoClientFactory(final String host, final int port, final String username, final char[] password,
-					   final String url, final String replicaSetName, final String databaseName,
-					   final String authenticationDatabase, final UuidRepresentation uuidRepresentation,
-					   final MongoClientSettings clientSettings,
-					   final BiFunction<MongoClientSettings, MongoDriverInformation, MongoClient> clientCreator) {
-		this.host = host;
-		this.port = port;
-		this.username = username;
-		this.password = password;
-		this.url = url;
-		this.replicaSetName = replicaSetName;
-		this.databaseName = databaseName;
-		this.authenticationDatabase = authenticationDatabase;
-		this.uuidRepresentation = uuidRepresentation;
-		this.clientSettings = clientSettings;
-		this.clientCreator = clientCreator;
-	}
-
-	public MongoClient createMongoClient() {
-		final MongoClientSettings targetSettings = computeClientSettings(clientSettings);
-		return clientCreator.apply(targetSettings, driverInformation());
-	}
-
-	private MongoClientSettings computeClientSettings(final MongoClientSettings settings) {
-		final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
-		final MongoClientSettings.Builder settingsBuilder = settings != null ? MongoClientSettings.builder(settings)
-				: MongoClientSettings.builder();
-
-		propertyMapper.from(uuidRepresentation).to(settingsBuilder::uuidRepresentation);
-		applyHostAndPort(settingsBuilder);
-
-		propertyMapper.from(replicaSetName).whenHasText()
-				.as((v)->(Block<ClusterSettings.Builder>) builder->builder.requiredReplicaSetName(replicaSetName))
-				.to(settingsBuilder::applyToClusterSettings);
-
-		return settingsBuilder.build();
-	}
-
-	private void applyHostAndPort(final MongoClientSettings.Builder builder) {
-		if(hasCustomAddress()){
-			int port = this.port > 0 ? this.port : DEFAULT_PORT;
-			final ServerAddress serverAddress = new ServerAddress(host, port);
-
-			builder.applyToClusterSettings((cluster)->cluster.hosts(Collections.singletonList(serverAddress)));
-			applyCredentials(builder);
-			return;
-		}
-
-		builder.applyConnectionString(new ConnectionString(url));
-	}
-
-	private void applyCredentials(final MongoClientSettings.Builder builder) {
-		if(username != null && password != null){
-			final String database = authenticationDatabase == null ? databaseName : authenticationDatabase;
-			final MongoCredential credential = MongoCredential.createCredential(username, database, password);
-
-			builder.credential(credential);
-		}
-	}
-
-	private boolean hasCustomAddress() {
-		return host != null;
-	}
-
-	private static MongoDriverInformation driverInformation() {
-		final MongoDriverInformation.Builder mongoDriverInformationBuilder = MongoDriverInformation.builder();
-		return mongoDriverInformationBuilder.driverName("buession-logging").build();
-	}
+	public final static UuidRepresentation DEFAULT_UUID_REPRESENTATION = UuidRepresentation.JAVA_LEGACY;
 
 }

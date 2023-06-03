@@ -22,16 +22,8 @@
  * | Copyright @ 2013-2023 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.mongodb.support;
-
-import com.buession.core.Customizer;
-import com.mongodb.MongoClientSettings;
-
 /**
  * @author Yong.Teng
  * @since 0.0.1
  */
-@FunctionalInterface
-public interface MongoClientSettingsBuilderCustomizer extends Customizer<Object, MongoClientSettings.Builder> {
-
-}
+package com.buession.logging.aop.aspect;

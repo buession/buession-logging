@@ -22,53 +22,53 @@
  * | Copyright @ 2013-2023 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.rabbitmq.spring;
+package com.buession.logging.mongodb.spring;
 
 import com.buession.core.converter.mapper.PropertyMapper;
-import com.buession.logging.rabbitmq.core.Retry;
-import com.buession.logging.rabbitmq.support.RabbitRetryTemplateCustomizer;
-import org.springframework.retry.backoff.ExponentialBackOffPolicy;
-import org.springframework.retry.policy.SimpleRetryPolicy;
-import org.springframework.retry.support.RetryTemplate;
-
-import java.time.Duration;
-import java.util.List;
+import org.springframework.data.mapping.model.FieldNamingStrategy;
+import org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy;
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 
 /**
+ * {@link MongoMappingContext} 工厂
+ *
  * @author Yong.Teng
  * @since 0.0.1
  */
-class RetryTemplateFactory {
+public class MongoMappingContextFactory {
 
-	private final List<RabbitRetryTemplateCustomizer> customizers;
+	public final static Class<? extends FieldNamingStrategy> DEFAULT_FIELD_NAMING_STRATEGY =
+			SnakeCaseFieldNamingStrategy.class;
 
-	RetryTemplateFactory(final List<RabbitRetryTemplateCustomizer> customizers){
-		this.customizers = customizers;
+	private Boolean autoIndexCreation;
+
+	private FieldNamingStrategy fieldNamingStrategy;
+
+	public Boolean getAutoIndexCreation() {
+		return autoIndexCreation;
 	}
 
-	RetryTemplate createRetryTemplate(Retry properties, RabbitRetryTemplateCustomizer.Target target){
+	public void setAutoIndexCreation(Boolean autoIndexCreation) {
+		this.autoIndexCreation = autoIndexCreation;
+	}
+
+	public FieldNamingStrategy getFieldNamingStrategy() {
+		return fieldNamingStrategy;
+	}
+
+	public void setFieldNamingStrategy(FieldNamingStrategy fieldNamingStrategy) {
+		this.fieldNamingStrategy = fieldNamingStrategy;
+	}
+
+	protected MongoMappingContext createMongoMappingContext() {
 		final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
-		final RetryTemplate retryTemplate = new RetryTemplate();
+		final MongoMappingContext mappingContext = new MongoMappingContext();
 
-		final SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
-		propertyMapper.from(properties::getMaxAttempts).to(retryPolicy::setMaxAttempts);
-		retryTemplate.setRetryPolicy(retryPolicy);
+		propertyMapper.from(getAutoIndexCreation()).to(mappingContext::setAutoIndexCreation);
+		propertyMapper.from(getFieldNamingStrategy()).to(mappingContext::setFieldNamingStrategy);
+		//mappingContext.setSimpleTypeHolder(conversions.getSimpleTypeHolder());
 
-		final ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
-		propertyMapper.from(properties::getInitialInterval).as(Duration::toMillis)
-				.to(backOffPolicy::setInitialInterval);
-		propertyMapper.from(properties::getMultiplier).to(backOffPolicy::setMultiplier);
-		propertyMapper.from(properties::getMaxInterval).as(Duration::toMillis)
-				.to(backOffPolicy::setMaxInterval);
-		retryTemplate.setBackOffPolicy(backOffPolicy);
-
-		if(customizers != null){
-			for(RabbitRetryTemplateCustomizer customizer : customizers){
-				customizer.customize(target, retryTemplate);
-			}
-		}
-
-		return retryTemplate;
+		return mappingContext;
 	}
 
 }

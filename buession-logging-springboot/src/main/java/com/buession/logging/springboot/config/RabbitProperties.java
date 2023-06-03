@@ -27,7 +27,7 @@ package com.buession.logging.springboot.config;
 import com.buession.logging.core.SslConfiguration;
 import com.buession.logging.rabbitmq.core.Cache;
 import com.buession.logging.rabbitmq.core.Template;
-import com.buession.logging.rabbitmq.spring.RabbitLogHandlerFactoryBean;
+import com.buession.logging.rabbitmq.spring.ConnectionFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 
 import java.io.Serializable;
@@ -46,7 +46,7 @@ public class RabbitProperties implements HandlerProperties, Serializable {
 	/**
 	 * RabbitMQ 地址
 	 */
-	private String host = RabbitLogHandlerFactoryBean.DEFAULT_HOST;
+	private String host = ConnectionFactory.DEFAULT_HOST;
 
 	/**
 	 * RabbitMQ 端口
@@ -56,22 +56,22 @@ public class RabbitProperties implements HandlerProperties, Serializable {
 	/**
 	 * 用户名
 	 */
-	private String username = RabbitLogHandlerFactoryBean.DEFAULT_USERNAME;
+	private String username = ConnectionFactory.DEFAULT_USERNAME;
 
 	/**
 	 * 密码
 	 */
-	private String password = RabbitLogHandlerFactoryBean.DEFAULT_PASSWORD;
+	private String password = ConnectionFactory.DEFAULT_PASSWORD;
 
 	/**
 	 * 虚拟机
 	 */
-	private String virtualHost;
+	private String virtualHost = ConnectionFactory.DEFAULT_VIRTUAL_HOST;
 
 	/**
 	 * 连接超时
 	 */
-	private Duration connectionTimeout = Duration.ofSeconds(1);
+	private Duration connectionTimeout = ConnectionFactory.DEFAULT_CONNECTION_TIMEOUT;
 
 	/**
 	 * SSL 配置
@@ -87,7 +87,7 @@ public class RabbitProperties implements HandlerProperties, Serializable {
 	/**
 	 * Number of channels per connection requested by the client. Use 0 for unlimited.
 	 */
-	private int requestedChannelMax = RabbitLogHandlerFactoryBean.DEFAULT_REQUESTED_CHANNEL_MAX;
+	private int requestedChannelMax = ConnectionFactory.DEFAULT_REQUESTED_CHANNEL_MAX;
 
 	/**
 	 * Whether to enable publisher returns.

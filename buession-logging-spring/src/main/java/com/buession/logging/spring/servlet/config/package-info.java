@@ -22,22 +22,8 @@
  * | Copyright @ 2013-2023 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.springboot.autoconfigure;
-
-import com.buession.logging.core.handler.LogHandler;
-import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
-
 /**
- * 日志处理器自动配置类接口
- *
- * @param <T>
- *        {@link BaseLogHandlerFactoryBean} 实例
- *
  * @author Yong.Teng
  * @since 0.0.1
  */
-public interface LogHandlerConfiguration<T extends BaseLogHandlerFactoryBean<? extends LogHandler>> {
-
-	T logHandlerFactoryBean();
-
-}
+package com.buession.logging.spring.servlet.config;

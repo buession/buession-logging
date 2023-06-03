@@ -24,22 +24,43 @@
  */
 package com.buession.logging.elasticsearch.spring;
 
+import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 
 /**
+ * {@link ElasticsearchRestTemplate} 工厂
+ *
  * @author Yong.Teng
  * @since 0.0.1
  */
-class ElasticsearchRestTemplateFactory {
+public class ElasticsearchRestTemplateFactory {
 
-	private final RestHighLevelClientFactory restHighLevelClientFactory;
+	/**
+	 * {@link RestHighLevelClient}
+	 */
+	private RestHighLevelClient client;
 
-	ElasticsearchRestTemplateFactory(final RestHighLevelClientFactory restHighLevelClientFactory){
-		this.restHighLevelClientFactory = restHighLevelClientFactory;
+	/**
+	 * 返回 {@link RestHighLevelClient}
+	 *
+	 * @return {@link RestHighLevelClient}
+	 */
+	public RestHighLevelClient getClient() {
+		return client;
 	}
 
-	public ElasticsearchRestTemplate createElasticsearchRestTemplate(){
-		return new ElasticsearchRestTemplate(restHighLevelClientFactory.createRestHighLevelClient());
+	/**
+	 * 设置 {@link RestHighLevelClient}
+	 *
+	 * @param client
+	 *        {@link RestHighLevelClient}
+	 */
+	public void setClient(RestHighLevelClient client) {
+		this.client = client;
+	}
+
+	protected ElasticsearchRestTemplate createElasticsearchRestTemplate() {
+		return new ElasticsearchRestTemplate(client);
 	}
 
 }

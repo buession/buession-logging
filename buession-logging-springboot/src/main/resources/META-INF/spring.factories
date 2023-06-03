@@ -6,4 +6,5 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.buession.logging.springboot.autoconfigure.mongo.MongoLogHandlerConfiguration, \
   com.buession.logging.springboot.autoconfigure.rabbit.RabbitLogHandlerConfiguration, \
   com.buession.logging.springboot.autoconfigure.rest.RestLogHandlerConfiguration, \
-  com.buession.logging.springboot.autoconfigure.LogConfiguration
+  com.buession.logging.springboot.autoconfigure.LogConfiguration, \
+  com.buession.logging.springboot.autoconfigure.AnnotationProcessorConfiguration

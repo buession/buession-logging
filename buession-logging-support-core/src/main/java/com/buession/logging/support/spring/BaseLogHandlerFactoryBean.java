@@ -31,7 +31,8 @@ import org.springframework.beans.factory.InitializingBean;
 /**
  * 日志处理器 {@link LogHandler} 工厂 Bean 基类
  *
- * @param <T>日志处理器类型
+ * @param <T>
+ * 		日志处理器类型
  *
  * @author Yong.Teng
  * @since 0.0.1
@@ -45,13 +46,13 @@ public abstract class BaseLogHandlerFactoryBean<T extends LogHandler> extends Lo
 	protected T logHandler;
 
 	@Override
-	public T getObject() throws Exception{
+	public T getObject() throws Exception {
 		return logHandler;
 	}
 
 	@Override
-	public Class<? extends LogHandler> getObjectType(){
+	public Class<? extends LogHandler> getObjectType() {
 		return logHandler.getClass();
 	}
-
+	
 }

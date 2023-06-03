@@ -22,33 +22,24 @@
  * | Copyright @ 2013-2023 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.jdbc.spring;
+package com.buession.logging.aop.servlet.interceptor;
 
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
-
-import javax.sql.DataSource;
+import com.buession.aop.resolver.AnnotationResolver;
+import com.buession.logging.aop.interceptor.AbstractAuditLogAnnotationMethodInterceptor;
+import com.buession.logging.aop.servlet.handler.ServletAuditLogAnnotationHandler;
 
 /**
  * @author Yong.Teng
  * @since 0.0.1
  */
-class TransactionTemplateFactory {
+public class ServletAuditLogAnnotationMethodInterceptor extends AbstractAuditLogAnnotationMethodInterceptor {
 
-	private final DataSource dataSource;
-
-	TransactionTemplateFactory(final DataSource dataSource){
-		this.dataSource = dataSource;
+	public ServletAuditLogAnnotationMethodInterceptor() {
+		super(new ServletAuditLogAnnotationHandler());
 	}
 
-	public TransactionTemplate createTransactionTemplate(){
-		final DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(dataSource);
-		transactionManager.afterPropertiesSet();
-
-		final TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-		transactionTemplate.afterPropertiesSet();
-
-		return transactionTemplate;
+	public ServletAuditLogAnnotationMethodInterceptor(AnnotationResolver resolver) {
+		super(new ServletAuditLogAnnotationHandler(), resolver);
 	}
 
 }
