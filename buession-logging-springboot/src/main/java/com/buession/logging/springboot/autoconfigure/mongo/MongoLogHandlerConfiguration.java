@@ -24,6 +24,7 @@
  */
 package com.buession.logging.springboot.autoconfigure.mongo;
 
+import com.buession.core.validator.Validate;
 import com.buession.dao.mongodb.core.ReadConcern;
 import com.buession.dao.mongodb.core.ReadPreference;
 import com.buession.dao.mongodb.core.WriteConcern;
@@ -78,10 +79,13 @@ public class MongoLogHandlerConfiguration extends AbstractLogHandlerConfiguratio
 	public MongoClientFactoryBean mongoClientFactoryBean() {
 		final MongoClientFactoryBean mongoClientFactoryBean = new MongoClientFactoryBean();
 
-		propertyMapper.from(handlerProperties::getHost).to(mongoClientFactoryBean::setHost);
-		propertyMapper.from(handlerProperties::getPort).to(mongoClientFactoryBean::setPort);
-		propertyMapper.from(handlerProperties::getUrl).whenHasText().as(ConnectionString::new)
-				.to(mongoClientFactoryBean::setConnectionString);
+		if(Validate.hasText(handlerProperties.getUrl())){
+			propertyMapper.from(handlerProperties::getUrl).as(ConnectionString::new)
+					.to(mongoClientFactoryBean::setConnectionString);
+		}else{
+			propertyMapper.from(handlerProperties::getHost).to(mongoClientFactoryBean::setHost);
+			propertyMapper.from(handlerProperties::getPort).to(mongoClientFactoryBean::setPort);
+		}
 		propertyMapper.from(handlerProperties::getReplicaSetName).to(mongoClientFactoryBean::setReplicaSet);
 
 		if(handlerProperties.getUsername() != null && handlerProperties.getPassword() != null){
@@ -165,7 +169,13 @@ public class MongoLogHandlerConfiguration extends AbstractLogHandlerConfiguratio
 		final MongoDatabaseFactoryBean mongoDatabaseFactoryBean = new MongoDatabaseFactoryBean();
 
 		mongoClient.ifUnique(mongoDatabaseFactoryBean::setMongoClient);
-		propertyMapper.from(handlerProperties::getDatabaseName).to(mongoDatabaseFactoryBean::setDatabaseName);
+
+		if(Validate.hasText(handlerProperties.getDatabaseName())){
+			mongoDatabaseFactoryBean.setDatabaseName(handlerProperties.getDatabaseName());
+		}else{
+			String database = new ConnectionString(handlerProperties.getUrl()).getDatabase();
+			mongoDatabaseFactoryBean.setDatabaseName(database);
+		}
 
 		return mongoDatabaseFactoryBean;
 	}
