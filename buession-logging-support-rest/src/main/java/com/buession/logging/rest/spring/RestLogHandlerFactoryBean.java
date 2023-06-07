@@ -66,16 +66,16 @@ public class RestLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<RestLog
 	 */
 	private RequestBodyBuilder requestBodyBuilder = new JsonRequestBodyBuilder();
 
-	static{
+	static {
 		NATIVE_HTTPCLIENT_TYPES.put("org.apache.http.client.HttpClient", "com.buession.httpclient.ApacheHttpClient");
 		NATIVE_HTTPCLIENT_TYPES.put("okhttp3.OkHttpClient", "com.buession.httpclient.OkHttpHttpClient");
 	}
 
-	public ClassLoader getClassLoader(){
+	public ClassLoader getClassLoader() {
 		return classLoader;
 	}
 
-	public void setClassLoader(ClassLoader classLoader){
+	public void setClassLoader(ClassLoader classLoader) {
 		this.classLoader = classLoader;
 	}
 
@@ -84,7 +84,7 @@ public class RestLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<RestLog
 	 *
 	 * @return Rest Url
 	 */
-	public String getUrl(){
+	public String getUrl() {
 		return url;
 	}
 
@@ -94,7 +94,7 @@ public class RestLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<RestLog
 	 * @param url
 	 * 		Rest Url
 	 */
-	public void setUrl(String url){
+	public void setUrl(String url) {
 		this.url = url;
 	}
 
@@ -103,7 +103,7 @@ public class RestLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<RestLog
 	 *
 	 * @return 请求方式 {@link RequestMethod}
 	 */
-	public RequestMethod getRequestMethod(){
+	public RequestMethod getRequestMethod() {
 		return requestMethod;
 	}
 
@@ -113,7 +113,7 @@ public class RestLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<RestLog
 	 * @param requestMethod
 	 * 		请求方式 {@link RequestMethod}
 	 */
-	public void setRequestMethod(RequestMethod requestMethod){
+	public void setRequestMethod(RequestMethod requestMethod) {
 		this.requestMethod = requestMethod;
 	}
 
@@ -122,7 +122,7 @@ public class RestLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<RestLog
 	 *
 	 * @return 请求体构建器
 	 */
-	public RequestBodyBuilder getRequestBodyBuilder(){
+	public RequestBodyBuilder getRequestBodyBuilder() {
 		return requestBodyBuilder;
 	}
 
@@ -132,12 +132,12 @@ public class RestLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<RestLog
 	 * @param requestBodyBuilder
 	 * 		请求体构建器
 	 */
-	public void setRequestBodyBuilder(RequestBodyBuilder requestBodyBuilder){
+	public void setRequestBodyBuilder(RequestBodyBuilder requestBodyBuilder) {
 		this.requestBodyBuilder = requestBodyBuilder;
 	}
 
 	@Override
-	public void afterPropertiesSet() throws Exception{
+	public void afterPropertiesSet() throws Exception {
 		Assert.isBlank(url, "Rest url cloud not be blank, empty or null.");
 
 		final Class<? extends HttpClient> httpClientType = findHttpClientType();
@@ -151,14 +151,15 @@ public class RestLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<RestLog
 	}
 
 	@SuppressWarnings({"unchecked"})
-	private Class<? extends HttpClient> findHttpClientType(){
+	private Class<? extends HttpClient> findHttpClientType() {
 		if(this.httpClientType != null){
 			return this.httpClientType;
 		}
 
 		for(Map.Entry<String, String> e : NATIVE_HTTPCLIENT_TYPES.entrySet()){
 			try{
-				this.httpClientType = (Class<? extends HttpClient>) ClassUtils.forName(e.getKey(), classLoader);
+				ClassUtils.forName(e.getKey(), classLoader);
+				this.httpClientType = (Class<? extends HttpClient>) ClassUtils.forName(e.getValue(), classLoader);
 				return this.httpClientType;
 			}catch(Exception ex){
 				// Swallow and continue
