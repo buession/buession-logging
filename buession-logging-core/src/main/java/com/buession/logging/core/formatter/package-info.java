@@ -22,67 +22,8 @@
  * | Copyright @ 2013-2023 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.aspectj.handler;
-
-import com.buession.aop.handler.AbstractAnnotationHandler;
-import com.buession.core.utils.Assert;
-import com.buession.logging.core.BusinessType;
-import com.buession.logging.core.Event;
-import com.buession.logging.core.LogData;
-import com.buession.logging.annotation.AuditLog;
-import com.buession.logging.core.mgt.LogManager;
-import com.buession.logging.core.request.Request;
-
 /**
  * @author Yong.Teng
  * @since 0.0.1
  */
-public abstract class AbstractAuditLogAnnotationHandler extends AbstractAnnotationHandler<AuditLog>
-		implements AuditLogAnnotationHandler {
-
-	private LogManager logManager;
-
-	public AbstractAuditLogAnnotationHandler() {
-		super(AuditLog.class);
-	}
-
-	public AbstractAuditLogAnnotationHandler(LogManager logManager) {
-		this();
-		setLogManager(logManager);
-	}
-
-	public LogManager getLogManager() {
-		return logManager;
-	}
-
-	public void setLogManager(LogManager logManager) {
-		Assert.isNull(logManager, "LogManager cloud not be null.");
-		this.logManager = logManager;
-	}
-
-	protected void doExecute(final AuditLog log, final Request request) {
-		final LogData logData = new LogData();
-
-		//logData.setPrincipal();
-		logData.setBusinessType(new BusinessType() {
-
-			@Override
-			public String toString() {
-				return log.businessType();
-			}
-
-		});
-		logData.setEvent(new Event() {
-
-			@Override
-			public String toString() {
-				return log.event();
-			}
-
-		});
-		logData.setDescription(log.description());
-
-		logManager.save(logData, request);
-	}
-
-}
+package com.buession.logging.core.formatter;

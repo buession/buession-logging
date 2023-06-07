@@ -53,8 +53,7 @@ import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 @ConditionalOnMissingBean(LogHandler.class)
 @ConditionalOnClass({ElasticsearchLogHandlerFactoryBean.class})
 @ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "elasticsearch.enabled", havingValue = "true")
-public class ElasticsearchLogHandlerConfiguration
-		extends AbstractLogHandlerConfiguration<ElasticsearchProperties, ElasticsearchLogHandlerFactoryBean> {
+public class ElasticsearchLogHandlerConfiguration extends AbstractLogHandlerConfiguration<ElasticsearchProperties> {
 
 	public ElasticsearchLogHandlerConfiguration(LogProperties logProperties) {
 		super(logProperties.getElasticsearch());

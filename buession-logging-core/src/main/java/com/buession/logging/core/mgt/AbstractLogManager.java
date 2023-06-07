@@ -35,6 +35,7 @@ import com.buession.logging.core.OperatingSystem;
 import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.core.handler.PrincipalHandler;
 import com.buession.logging.core.request.Request;
+import com.buession.logging.core.request.RequestContext;
 import com.buession.web.utils.useragentutils.UserAgent;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import org.slf4j.Logger;
@@ -52,6 +53,11 @@ import java.util.Date;
 public abstract class AbstractLogManager implements LogManager {
 
 	/**
+	 * {@link RequestContext}
+	 */
+	private RequestContext requestContext;
+
+	/**
 	 * 用户凭证处理器
 	 */
 	private PrincipalHandler<?> principalHandler;
@@ -67,6 +73,16 @@ public abstract class AbstractLogManager implements LogManager {
 	private Resolver geoResolver;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
+
+	@Override
+	public RequestContext getRequestContext() {
+		return requestContext;
+	}
+
+	@Override
+	public void setRequestContext(RequestContext requestContext) {
+		this.requestContext = requestContext;
+	}
 
 	@Override
 	public PrincipalHandler<?> getPrincipalHandler() {
@@ -99,7 +115,9 @@ public abstract class AbstractLogManager implements LogManager {
 	}
 
 	@Override
-	public Status save(final LogData logData, final Request request) {
+	public Status save(final LogData logData) {
+		final Request request = requestContext.createRequest();
+
 		//logData.setPrincipal(null);
 		logData.setDateTime(new Date());
 		//logData.setBusinessType(null);

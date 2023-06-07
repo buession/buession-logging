@@ -22,71 +22,35 @@
  * | Copyright @ 2013-2023 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.aspectj.handler;
-
-import com.buession.aop.handler.AbstractAnnotationHandler;
-import com.buession.core.utils.Assert;
-import com.buession.logging.core.BusinessType;
-import com.buession.logging.core.Event;
-import com.buession.logging.core.LogData;
-import com.buession.logging.annotation.Log;
-import com.buession.logging.core.mgt.LogManager;
-import com.buession.logging.core.request.Request;
+package com.buession.logging.core.request;
 
 /**
  * @author Yong.Teng
  * @since 0.0.1
  */
-public abstract class AbstractLogAnnotationHandler extends AbstractAnnotationHandler<Log>
-		implements LogAnnotationHandler {
+public class ServletRequestContext extends AbstractRequestContext {
 
-	private LogManager logManager;
-
-	public AbstractLogAnnotationHandler() {
-		super(Log.class);
+	/**
+	 * 构造函数
+	 */
+	public ServletRequestContext() {
+		super();
 	}
 
-	public AbstractLogAnnotationHandler(LogManager logManager) {
-		this();
-		setLogManager(logManager);
+	/**
+	 * 构造函数
+	 *
+	 * @param clientIpHeaderName
+	 * 		客户端 IP 请求头名称
+	 */
+	public ServletRequestContext(String clientIpHeaderName) {
+		super(clientIpHeaderName);
 	}
 
-	public LogManager getLogManager() {
-		return logManager;
-	}
-
-	public void setLogManager(LogManager logManager) {
-		Assert.isNull(logManager, "LogManager cloud not be null.");
-		this.logManager = logManager;
-	}
-
-	protected void doExecute(final Log log, final Request request) {
-		final LogData logData = new LogData();
-
-		//logData.setPrincipal();
-		logData.setBusinessType(new BusinessType() {
-
-			@Override
-			public String toString() {
-				return log.businessType();
-			}
-
-		});
-		logData.setEvent(new Event() {
-
-			@Override
-			public String toString() {
-				return log.event();
-			}
-
-		});
-		logData.setDescription(log.description());
-
-		if(log.isSaveRequestData()){
-			logData.setRequestBody(request.getRequestBody());
-		}
-
-		logManager.save(logData, request);
+	@Override
+	public Request createRequest() {
+		return new ServletRequest(getClientIpHeaderName());
 	}
 
 }
+

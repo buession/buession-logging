@@ -27,9 +27,7 @@ package com.buession.logging.kafka.handler;
 import com.buession.core.utils.Assert;
 import com.buession.lang.Status;
 import com.buession.logging.core.LogData;
-import com.buession.logging.core.handler.LogHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.buession.logging.core.handler.AbstractLogHandler;
 import org.springframework.kafka.core.KafkaTemplate;
 
 import java.util.HashMap;
@@ -41,7 +39,7 @@ import java.util.Map;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class KafkaLogHandler implements LogHandler {
+public class KafkaLogHandler extends AbstractLogHandler {
 
 	/**
 	 * {@link KafkaTemplate}
@@ -52,8 +50,6 @@ public class KafkaLogHandler implements LogHandler {
 	 * Topic 名称
 	 */
 	private final String topic;
-
-	private final static Logger logger = LoggerFactory.getLogger(KafkaLogHandler.class);
 
 	/**
 	 * 构造函数
@@ -71,8 +67,8 @@ public class KafkaLogHandler implements LogHandler {
 	}
 
 	@Override
-	public Status handle(final LogData logData) {
-		final Map<String, Object> data = new HashMap<>();
+	protected Status doHandle(final LogData logData) throws Exception {
+		final Map<String, Object> data = new HashMap<>(18);
 
 		if(logData.getPrincipal() != null){
 			data.put("principal", logData.getPrincipal());
@@ -129,15 +125,8 @@ public class KafkaLogHandler implements LogHandler {
 			data.put("extra", logData.getExtra());
 		}
 
-		try{
-			kafkaTemplate.send(topic, data);
-			return Status.SUCCESS;
-		}catch(Exception e){
-			if(logger.isErrorEnabled()){
-				logger.error("Save log data failure: {}", e.getMessage());
-			}
-			return Status.FAILURE;
-		}
+		kafkaTemplate.send(topic, data);
+		return Status.SUCCESS;
 	}
 
 }

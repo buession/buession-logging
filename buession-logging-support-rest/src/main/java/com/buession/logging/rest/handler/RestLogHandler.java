@@ -30,12 +30,10 @@ import com.buession.httpclient.core.RequestBody;
 import com.buession.httpclient.core.Response;
 import com.buession.lang.Status;
 import com.buession.logging.core.LogData;
-import com.buession.logging.core.handler.LogHandler;
+import com.buession.logging.core.handler.AbstractLogHandler;
 import com.buession.logging.rest.core.JsonRequestBodyBuilder;
 import com.buession.logging.rest.core.RequestBodyBuilder;
 import com.buession.logging.rest.core.RequestMethod;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Rest 日志处理器
@@ -43,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class RestLogHandler implements LogHandler {
+public class RestLogHandler extends AbstractLogHandler {
 
 	/**
 	 * Http 客户端 {@link HttpClient}
@@ -65,8 +63,6 @@ public class RestLogHandler implements LogHandler {
 	 */
 	private RequestBodyBuilder requestBodyBuilder = new JsonRequestBodyBuilder();
 
-	private final static Logger logger = LoggerFactory.getLogger(RestLogHandler.class);
-
 	/**
 	 * 构造函数
 	 *
@@ -75,7 +71,7 @@ public class RestLogHandler implements LogHandler {
 	 * @param url
 	 * 		Rest Url
 	 */
-	public RestLogHandler(final HttpClient httpClient, final String url){
+	public RestLogHandler(final HttpClient httpClient, final String url) {
 		this(httpClient, url, RequestMethod.POST);
 	}
 
@@ -89,7 +85,7 @@ public class RestLogHandler implements LogHandler {
 	 * @param requestMethod
 	 * 		请求方式 {@link RequestMethod}
 	 */
-	public RestLogHandler(final HttpClient httpClient, final String url, final RequestMethod requestMethod){
+	public RestLogHandler(final HttpClient httpClient, final String url, final RequestMethod requestMethod) {
 		Assert.isNull(httpClient, "HttpClient is null.");
 		Assert.isBlank(url, "Rest url is blank, empty or null.");
 		this.httpClient = httpClient;
@@ -103,7 +99,7 @@ public class RestLogHandler implements LogHandler {
 	 * @param requestMethod
 	 * 		请求方式 {@link RequestMethod}
 	 */
-	public void setRequestMethod(RequestMethod requestMethod){
+	public void setRequestMethod(RequestMethod requestMethod) {
 		this.requestMethod = requestMethod == null ? RequestMethod.POST : requestMethod;
 	}
 
@@ -113,28 +109,21 @@ public class RestLogHandler implements LogHandler {
 	 * @param requestBodyBuilder
 	 * 		请求体构建器
 	 */
-	public void setRequestBodyBuilder(RequestBodyBuilder requestBodyBuilder){
+	public void setRequestBodyBuilder(RequestBodyBuilder requestBodyBuilder) {
 		this.requestBodyBuilder = requestBodyBuilder;
 	}
 
 	@Override
-	public Status handle(final LogData logData){
+	protected Status doHandle(final LogData logData) throws Exception {
 		final RequestBody<?> requestBody = requestBodyBuilder.build(logData);
 		Response response;
 
-		try{
-			if(requestMethod == RequestMethod.PUT){
-				response = httpClient.put(url, requestBody);
-			}else{
-				response = httpClient.post(url, requestBody);
-			}
-			return response != null && response.isSuccessful() ? Status.SUCCESS : Status.FAILURE;
-		}catch(Exception e){
-			if(logger.isErrorEnabled()){
-				logger.error("Save log data failure: {}", e.getMessage());
-			}
-			return Status.FAILURE;
+		if(requestMethod == RequestMethod.PUT){
+			response = httpClient.put(url, requestBody);
+		}else{
+			response = httpClient.post(url, requestBody);
 		}
+		return response != null && response.isSuccessful() ? Status.SUCCESS : Status.FAILURE;
 	}
 
 }

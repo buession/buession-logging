@@ -25,23 +25,18 @@
 package com.buession.logging.springboot.autoconfigure;
 
 import com.buession.core.converter.mapper.PropertyMapper;
-import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.springboot.config.HandlerProperties;
-import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
 
 /**
  * 日志处理器自动配置类抽象类
  *
  * @param <P>
  * 		Handler 配置
- * @param <T>
- *        {@link BaseLogHandlerFactoryBean}
  *
  * @author Yong.Teng
  * @since 0.0.1
  */
-public abstract class AbstractLogHandlerConfiguration<P extends HandlerProperties,
-		T extends BaseLogHandlerFactoryBean<? extends LogHandler>> {
+public abstract class AbstractLogHandlerConfiguration<P extends HandlerProperties> {
 
 	protected final P handlerProperties;
 

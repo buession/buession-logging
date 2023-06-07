@@ -52,8 +52,7 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnMissingBean(LogHandler.class)
 @ConditionalOnClass({RabbitLogHandlerFactoryBean.class})
 @ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "rabbit.enabled", havingValue = "true")
-public class RabbitLogHandlerConfiguration extends AbstractLogHandlerConfiguration<RabbitProperties,
-		RabbitLogHandlerFactoryBean> {
+public class RabbitLogHandlerConfiguration extends AbstractLogHandlerConfiguration<RabbitProperties> {
 
 	public RabbitLogHandlerConfiguration(LogProperties logProperties) {
 		super(logProperties.getRabbit());

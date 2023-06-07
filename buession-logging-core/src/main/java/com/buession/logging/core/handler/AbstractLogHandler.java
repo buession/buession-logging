@@ -22,33 +22,33 @@
  * | Copyright @ 2013-2023 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.aspectj.reactive.handler;
+package com.buession.logging.core.handler;
 
-import com.buession.aop.MethodInvocation;
-import com.buession.logging.aspectj.handler.AbstractAuditLogAnnotationHandler;
-import com.buession.logging.annotation.AuditLog;
-import com.buession.logging.core.mgt.LogManager;
-import com.buession.logging.core.request.ReactiveRequest;
-import com.buession.logging.core.request.Request;
-import com.buession.web.reactive.context.request.ReactiveRequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
+import com.buession.lang.Status;
+import com.buession.logging.core.LogData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class ReactiveAuditLogAnnotationHandler extends AbstractAuditLogAnnotationHandler {
+public abstract class AbstractLogHandler implements LogHandler {
 
-	public ReactiveAuditLogAnnotationHandler(LogManager logManager) {
-		super(logManager);
-	}
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Override
-	public void execute(MethodInvocation mi, AuditLog log) {
-		ReactiveRequestAttributes requestAttributes = (ReactiveRequestAttributes) RequestContextHolder.getRequestAttributes();
-		Request request = new ReactiveRequest(requestAttributes.getRequest());
-
-		doExecute(log, request);
+	public Status handle(final LogData logData) {
+		try{
+			return doHandle(logData);
+		}catch(Exception e){
+			if(logger.isErrorEnabled()){
+				logger.error("Save log data failure: {}", e.getMessage(), e);
+			}
+			return Status.FAILURE;
+		}
 	}
+
+	protected abstract Status doHandle(final LogData logData) throws Exception;
 
 }

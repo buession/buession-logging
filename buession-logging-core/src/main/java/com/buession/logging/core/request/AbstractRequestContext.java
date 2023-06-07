@@ -22,28 +22,52 @@
  * | Copyright @ 2013-2023 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.jdbc.formatter;
-
-import java.util.Date;
+package com.buession.logging.core.request;
 
 /**
- * 默认 {@link DateTimeFormatter}
- *
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class DefaultDateTimeFormatter implements DateTimeFormatter {
+public abstract class AbstractRequestContext implements RequestContext {
 
-	private final static java.time.format.DateTimeFormatter FORMATTER = java.time.format.DateTimeFormatter.ofPattern(
-			"yyyy-MM-dd HH:mm:ss");
+	/**
+	 * 客户端 IP 请求头名称
+	 */
+	private String clientIpHeaderName;
 
-	@Override
-	public Object format(final Date date) {
-		if(date == null){
-			return null;
-		}
-		
-		return FORMATTER.format(date.toInstant());
+	/**
+	 * 构造函数
+	 */
+	public AbstractRequestContext() {
+	}
+
+	/**
+	 * 构造函数
+	 *
+	 * @param clientIpHeaderName
+	 * 		客户端 IP 请求头名称
+	 */
+	public AbstractRequestContext(final String clientIpHeaderName) {
+		this.clientIpHeaderName = clientIpHeaderName;
+	}
+
+	/**
+	 * 返回客户端 IP 请求头名称
+	 *
+	 * @return 客户端 IP 请求头名称
+	 */
+	public String getClientIpHeaderName() {
+		return clientIpHeaderName;
+	}
+
+	/**
+	 * 设置客户端 IP 请求头名称
+	 *
+	 * @param clientIpHeaderName
+	 * 		客户端 IP 请求头名称
+	 */
+	public void setClientIpHeaderName(String clientIpHeaderName) {
+		this.clientIpHeaderName = clientIpHeaderName;
 	}
 
 }

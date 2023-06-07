@@ -24,6 +24,7 @@
  */
 package com.buession.logging.spring;
 
+import com.buession.core.utils.Assert;
 import com.buession.logging.core.mgt.LogManager;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -53,6 +54,8 @@ public class LogManagerFactoryBean extends LogManagerFactory implements FactoryB
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		Assert.isNull(getRequestContext(), "RequestContext is null.");
+
 		logManager = createLogManager();
 	}
 

@@ -26,12 +26,11 @@ package com.buession.logging.jdbc.spring;
 
 import com.buession.core.converter.mapper.PropertyMapper;
 import com.buession.core.id.IdGenerator;
-import com.buession.logging.jdbc.formatter.DateTimeFormatter;
-import com.buession.logging.jdbc.formatter.DefaultDateTimeFormatter;
+import com.buession.logging.core.formatter.DateTimeFormatter;
 import com.buession.logging.jdbc.formatter.DefaultGeoFormatter;
-import com.buession.logging.jdbc.formatter.GeoFormatter;
+import com.buession.logging.core.formatter.GeoFormatter;
 import com.buession.logging.jdbc.formatter.JsonMapFormatter;
-import com.buession.logging.jdbc.formatter.MapFormatter;
+import com.buession.logging.core.formatter.MapFormatter;
 import com.buession.logging.jdbc.handler.JdbcLogHandler;
 import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -43,8 +42,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * @since 0.0.1
  */
 public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLogHandler> {
-
-	public final static DateTimeFormatter DEFAULT_DATETIME_FORMATTER = new DefaultDateTimeFormatter();
 
 	public final static MapFormatter DEFAULT_REQUEST_PARAMETERS_FORMATTER = new JsonMapFormatter();
 
@@ -68,14 +65,14 @@ public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLog
 	private IdGenerator<?> idGenerator;
 
 	/**
-	 * 日期时间格式化对象
+	 * 日期时间格式
 	 */
-	private DateTimeFormatter dateTimeFormatter = DEFAULT_DATETIME_FORMATTER;
+	private String dateTimeFormat;
 
 	/**
 	 * 请求参数格式化为字符串
 	 */
-	private MapFormatter requestParametersFormatter = DEFAULT_REQUEST_PARAMETERS_FORMATTER;
+	private MapFormatter<Object> requestParametersFormatter = DEFAULT_REQUEST_PARAMETERS_FORMATTER;
 
 	/**
 	 * Geo 格式化
@@ -85,7 +82,7 @@ public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLog
 	/**
 	 * 附加参数格式化为字符串
 	 */
-	private MapFormatter extraFormatter = DEFAULT_EXTRA_FORMATTER;
+	private MapFormatter<Object> extraFormatter = DEFAULT_EXTRA_FORMATTER;
 
 	/**
 	 * 返回 {@link JdbcTemplate}
@@ -145,22 +142,22 @@ public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLog
 	}
 
 	/**
-	 * 返回日期时间格式化对象
+	 * 返回日期时间格式
 	 *
-	 * @return 日期时间格式化对象
+	 * @return 日期时间格式
 	 */
-	public DateTimeFormatter getDateTimeFormatter() {
-		return dateTimeFormatter;
+	public String getDateTimeFormat() {
+		return dateTimeFormat;
 	}
 
 	/**
-	 * 设置日期时间格式化对象
+	 * 设置日期时间格式
 	 *
-	 * @param dateTimeFormatter
-	 * 		日期时间格式化对象
+	 * @param dateTimeFormat
+	 * 		日期时间格式
 	 */
-	public void setDateTimeFormatter(DateTimeFormatter dateTimeFormatter) {
-		this.dateTimeFormatter = dateTimeFormatter;
+	public void setDateTimeFormat(String dateTimeFormat) {
+		this.dateTimeFormat = dateTimeFormat;
 	}
 
 	/**
@@ -168,7 +165,7 @@ public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLog
 	 *
 	 * @return 请求参数格式化为字符串
 	 */
-	public MapFormatter getRequestParametersFormatter() {
+	public MapFormatter<?> getRequestParametersFormatter() {
 		return requestParametersFormatter;
 	}
 
@@ -178,7 +175,7 @@ public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLog
 	 * @param requestParametersFormatter
 	 * 		请求参数格式化为字符串
 	 */
-	public void setRequestParametersFormatter(MapFormatter requestParametersFormatter) {
+	public void setRequestParametersFormatter(MapFormatter<Object> requestParametersFormatter) {
 		this.requestParametersFormatter = requestParametersFormatter;
 	}
 
@@ -206,7 +203,7 @@ public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLog
 	 *
 	 * @return 附加参数格式化为字符串
 	 */
-	public MapFormatter getExtraFormatter() {
+	public MapFormatter<?> getExtraFormatter() {
 		return extraFormatter;
 	}
 
@@ -216,7 +213,7 @@ public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLog
 	 * @param extraFormatter
 	 * 		附加参数格式化为字符串
 	 */
-	public void setExtraFormatter(MapFormatter extraFormatter) {
+	public void setExtraFormatter(MapFormatter<Object> extraFormatter) {
 		this.extraFormatter = extraFormatter;
 	}
 
@@ -227,7 +224,8 @@ public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLog
 		logHandler = new JdbcLogHandler(jdbcTemplate, sql);
 
 		propertyMapper.from(idGenerator).to(logHandler::setIdGenerator);
-		propertyMapper.from(dateTimeFormatter).to(logHandler::setDateTimeFormatter);
+		propertyMapper.from(dateTimeFormat).whenHasText().as(DateTimeFormatter::new)
+				.to(logHandler::setDateTimeFormatter);
 		propertyMapper.from(requestParametersFormatter).to(logHandler::setRequestParametersFormatter);
 		propertyMapper.from(geoFormatter).to(logHandler::setGeoFormatter);
 		propertyMapper.from(extraFormatter).to(logHandler::setExtraFormatter);

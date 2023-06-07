@@ -24,13 +24,69 @@
  */
 package com.buession.logging.aspectj.handler;
 
+import com.buession.aop.MethodInvocation;
+import com.buession.aop.handler.AbstractAnnotationHandler;
+import com.buession.core.utils.Assert;
 import com.buession.logging.annotation.Log;
-import com.buession.web.aop.handler.WebAnnotationHandler;
+import com.buession.logging.core.BusinessType;
+import com.buession.logging.core.Event;
+import com.buession.logging.core.LogData;
+import com.buession.logging.core.mgt.LogManager;
 
 /**
  * @author Yong.Teng
  * @since 0.0.1
  */
-public interface LogAnnotationHandler extends WebAnnotationHandler<Log> {
+public class LogAnnotationHandler extends AbstractAnnotationHandler<Log> {
+
+	private LogManager logManager;
+
+	public LogAnnotationHandler() {
+		super(Log.class);
+	}
+
+	public LogAnnotationHandler(LogManager logManager) {
+		this();
+		setLogManager(logManager);
+	}
+
+	public LogManager getLogManager() {
+		return logManager;
+	}
+
+	public void setLogManager(LogManager logManager) {
+		Assert.isNull(logManager, "LogManager cloud not be null.");
+		this.logManager = logManager;
+	}
+
+	@Override
+	public void execute(MethodInvocation mi, Log log) {
+		final LogData logData = new LogData();
+
+		//logData.setPrincipal();
+		logData.setBusinessType(new BusinessType() {
+
+			@Override
+			public String toString() {
+				return log.businessType();
+			}
+
+		});
+		logData.setEvent(new Event() {
+
+			@Override
+			public String toString() {
+				return log.event();
+			}
+
+		});
+		logData.setDescription(log.description());
+
+		if(log.isSaveRequestData()){
+			//logData.setRequestBody(request.getRequestBody());
+		}
+
+		logManager.save(logData);
+	}
 
 }

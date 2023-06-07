@@ -29,7 +29,7 @@ import com.buession.lang.Status;
 import com.buession.logging.core.LogData;
 import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.core.handler.PrincipalHandler;
-import com.buession.logging.core.request.Request;
+import com.buession.logging.core.request.RequestContext;
 
 /**
  * 日志管理器
@@ -38,6 +38,21 @@ import com.buession.logging.core.request.Request;
  * @since 0.0.1
  */
 public interface LogManager {
+
+	/**
+	 * 返回 {@link RequestContext} 实例
+	 *
+	 * @return {@link RequestContext} 实例
+	 */
+	RequestContext getRequestContext();
+
+	/**
+	 * 设置 {@link RequestContext} 实例
+	 *
+	 * @param requestContext
+	 *        {@link RequestContext} 实例
+	 */
+	void setRequestContext(RequestContext requestContext);
 
 	/**
 	 * 返回用户凭证处理器
@@ -89,11 +104,9 @@ public interface LogManager {
 	 *
 	 * @param logData
 	 * 		日志数据
-	 * @param request
-	 * 		请求对象
 	 *
 	 * @return 执行结果
 	 */
-	Status save(final LogData logData, final Request request);
+	Status save(final LogData logData);
 
 }

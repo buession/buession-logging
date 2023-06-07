@@ -52,8 +52,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @ConditionalOnMissingBean(LogHandler.class)
 @ConditionalOnClass({JdbcLogHandlerFactoryBean.class})
 @ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "jdbc.enabled", havingValue = "true")
-public class JdbcLogHandlerConfiguration extends AbstractLogHandlerConfiguration<JdbcProperties,
-		JdbcLogHandlerFactoryBean> {
+public class JdbcLogHandlerConfiguration extends AbstractLogHandlerConfiguration<JdbcProperties> {
 
 	public JdbcLogHandlerConfiguration(LogProperties logProperties) {
 		super(logProperties.getJdbc());
@@ -82,8 +81,7 @@ public class JdbcLogHandlerConfiguration extends AbstractLogHandlerConfiguration
 		propertyMapper.from(handlerProperties::getSql).to(logHandlerFactoryBean::setSql);
 		propertyMapper.from(handlerProperties::getIdGenerator).as(BeanUtils::instantiateClass)
 				.to(logHandlerFactoryBean::setIdGenerator);
-		propertyMapper.from(handlerProperties::getDateTimeFormatter).as(BeanUtils::instantiateClass)
-				.to(logHandlerFactoryBean::setDateTimeFormatter);
+		propertyMapper.from(handlerProperties::getDateTimeFormat).to(logHandlerFactoryBean::setDateTimeFormat);
 		propertyMapper.from(handlerProperties::getRequestParametersFormatter).as(BeanUtils::instantiateClass)
 				.to(logHandlerFactoryBean::setRequestParametersFormatter);
 		propertyMapper.from(handlerProperties::getExtraFormatter).as(BeanUtils::instantiateClass)

@@ -31,8 +31,6 @@ import com.buession.logging.aspectj.handler.LogAnnotationHandler;
 import com.buession.logging.aspectj.interceptor.AuditLogAnnotationMethodInterceptor;
 import com.buession.logging.aspectj.interceptor.LogAnnotationMethodInterceptor;
 import com.buession.logging.aspectj.interceptor.LogAspectAnnotationsMethodInterceptor;
-import com.buession.logging.aspectj.servlet.handler.ServletAuditLogAnnotationHandler;
-import com.buession.logging.aspectj.servlet.handler.ServletLogAnnotationHandler;
 import com.buession.logging.core.mgt.LogManager;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
@@ -71,8 +69,8 @@ public class ServletLogAnnotationAspect implements LogAnnotationAspect {
 	protected static LogAspectAnnotationsMethodInterceptor createLogAspectAnnotationsMethodInterceptor(
 			LogManager logManager) {
 		final Collection<AnnotationMethodInterceptor> methodInterceptors = new ArrayDeque<>(2);
-		final LogAnnotationHandler logAnnotationHandler = new ServletLogAnnotationHandler(logManager);
-		final AuditLogAnnotationHandler auditLogAnnotationHandler = new ServletAuditLogAnnotationHandler(logManager);
+		final LogAnnotationHandler logAnnotationHandler = new LogAnnotationHandler(logManager);
+		final AuditLogAnnotationHandler auditLogAnnotationHandler = new AuditLogAnnotationHandler(logManager);
 
 		methodInterceptors.add(new LogAnnotationMethodInterceptor(logAnnotationHandler));
 		methodInterceptors.add(new AuditLogAnnotationMethodInterceptor(auditLogAnnotationHandler));

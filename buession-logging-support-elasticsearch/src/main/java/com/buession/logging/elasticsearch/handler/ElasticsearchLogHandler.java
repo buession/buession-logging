@@ -29,9 +29,7 @@ import com.buession.core.id.SnowflakeIdGenerator;
 import com.buession.core.utils.Assert;
 import com.buession.lang.Status;
 import com.buession.logging.core.LogData;
-import com.buession.logging.core.handler.LogHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.buession.logging.core.handler.AbstractLogHandler;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.IndexOperations;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
@@ -42,7 +40,7 @@ import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class ElasticsearchLogHandler implements LogHandler {
+public class ElasticsearchLogHandler extends AbstractLogHandler {
 
 	/**
 	 * {@link ElasticsearchRestTemplate}
@@ -58,8 +56,6 @@ public class ElasticsearchLogHandler implements LogHandler {
 	 */
 	private IdGenerator<?> idGenerator = new SnowflakeIdGenerator();
 
-	private final static Logger logger = LoggerFactory.getLogger(ElasticsearchLogHandler.class);
-
 	/**
 	 * 构造函数
 	 *
@@ -68,7 +64,7 @@ public class ElasticsearchLogHandler implements LogHandler {
 	 * @param indexName
 	 * 		索引名称
 	 */
-	public ElasticsearchLogHandler(final ElasticsearchRestTemplate restTemplate, final String indexName){
+	public ElasticsearchLogHandler(final ElasticsearchRestTemplate restTemplate, final String indexName) {
 		Assert.isNull(restTemplate, "ElasticsearchRestTemplate cloud not be null.");
 		Assert.isNull(indexName, "Index name cloud not be blank, empty or null.");
 
@@ -85,25 +81,18 @@ public class ElasticsearchLogHandler implements LogHandler {
 	 * @param idGenerator
 	 * 		ID 生成器
 	 */
-	public void setIdGenerator(IdGenerator<?> idGenerator){
+	public void setIdGenerator(IdGenerator<?> idGenerator) {
 		Assert.isNull(idGenerator, "IdGenerator cloud not be null.");
 		this.idGenerator = idGenerator;
 	}
 
 	@Override
-	public Status handle(final LogData logData){
-		try{
-			restTemplate.save(logData, indexCoordinates);
-			return Status.SUCCESS;
-		}catch(Exception e){
-			if(logger.isErrorEnabled()){
-				logger.error("Save log data failure: {}", e.getMessage());
-			}
-			return Status.FAILURE;
-		}
+	protected Status doHandle(final LogData logData) throws Exception {
+		restTemplate.save(logData, indexCoordinates);
+		return Status.SUCCESS;
 	}
 
-	protected void createIndex(){
+	protected void createIndex() {
 		if(indexOperations.exists() == false){
 			indexOperations.create();
 		}

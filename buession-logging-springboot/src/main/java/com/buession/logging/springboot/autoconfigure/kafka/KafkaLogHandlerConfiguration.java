@@ -52,8 +52,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 @ConditionalOnMissingBean(LogHandler.class)
 @ConditionalOnClass({KafkaLogHandlerFactoryBean.class})
 @ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "kafka.enabled", havingValue = "true")
-public class KafkaLogHandlerConfiguration extends AbstractLogHandlerConfiguration<KafkaProperties,
-		KafkaLogHandlerFactoryBean> {
+public class KafkaLogHandlerConfiguration extends AbstractLogHandlerConfiguration<KafkaProperties> {
 
 	public KafkaLogHandlerConfiguration(LogProperties logProperties) {
 		super(logProperties.getKafka());

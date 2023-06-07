@@ -31,6 +31,7 @@ import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.core.handler.PrincipalHandler;
 import com.buession.logging.core.mgt.DefaultLogManager;
 import com.buession.logging.core.mgt.LogManager;
+import com.buession.logging.core.request.RequestContext;
 
 /**
  * 日志工厂
@@ -39,6 +40,11 @@ import com.buession.logging.core.mgt.LogManager;
  * @since 0.0.1
  */
 public class LogManagerFactory {
+
+	/**
+	 * {@link RequestContext}
+	 */
+	private RequestContext requestContext;
 
 	/**
 	 * 客户端 IP 请求头名称
@@ -59,6 +65,25 @@ public class LogManagerFactory {
 	 * Geo 解析器
 	 */
 	private Resolver geoResolver;
+
+	/**
+	 * 返回 {@link RequestContext} 实例
+	 *
+	 * @return {@link RequestContext} 实例
+	 */
+	public RequestContext getRequestContext() {
+		return requestContext;
+	}
+
+	/**
+	 * 设置 {@link RequestContext} 实例
+	 *
+	 * @param requestContext
+	 *        {@link RequestContext} 实例
+	 */
+	public void setRequestContext(RequestContext requestContext) {
+		this.requestContext = requestContext;
+	}
 
 	/**
 	 * 返回客户端 IP 请求头名称
@@ -139,6 +164,8 @@ public class LogManagerFactory {
 	protected LogManager createLogManager() {
 		final LogManager logManager = new DefaultLogManager();
 
+		logManager.setRequestContext(requestContext);
+		logManager.setGeoResolver(geoResolver);
 		logManager.setPrincipalHandler(principalHandler);
 		logManager.setLogHandler(logHandler);
 		logManager.setGeoResolver(geoResolver);

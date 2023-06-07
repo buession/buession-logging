@@ -30,16 +30,13 @@ import com.buession.core.utils.Assert;
 import com.buession.core.utils.StringUtils;
 import com.buession.lang.Status;
 import com.buession.logging.core.LogData;
-import com.buession.logging.core.handler.LogHandler;
-import com.buession.logging.jdbc.formatter.DateTimeFormatter;
-import com.buession.logging.jdbc.formatter.DefaultDateTimeFormatter;
+import com.buession.logging.core.handler.AbstractLogHandler;
+import com.buession.logging.core.formatter.DateTimeFormatter;
 import com.buession.logging.jdbc.formatter.DefaultGeoFormatter;
-import com.buession.logging.jdbc.formatter.GeoFormatter;
+import com.buession.logging.core.formatter.GeoFormatter;
 import com.buession.logging.jdbc.formatter.JsonMapFormatter;
-import com.buession.logging.jdbc.formatter.MapFormatter;
+import com.buession.logging.core.formatter.MapFormatter;
 import com.buession.logging.jdbc.support.LoggingJdbcDaoSupport;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.HashMap;
@@ -51,7 +48,7 @@ import java.util.Map;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class JdbcLogHandler implements LogHandler {
+public class JdbcLogHandler extends AbstractLogHandler {
 
 	private final String sql;
 
@@ -63,12 +60,12 @@ public class JdbcLogHandler implements LogHandler {
 	/**
 	 * 日期时间格式化对象
 	 */
-	private DateTimeFormatter dateTimeFormatter = new DefaultDateTimeFormatter();
+	private DateTimeFormatter dateTimeFormatter = new DateTimeFormatter();
 
 	/**
 	 * 请求参数格式化为字符串
 	 */
-	private MapFormatter requestParametersFormatter = new JsonMapFormatter();
+	private MapFormatter<Object> requestParametersFormatter = new JsonMapFormatter();
 
 	/**
 	 * Geo 格式化
@@ -78,11 +75,9 @@ public class JdbcLogHandler implements LogHandler {
 	/**
 	 * 附加参数格式化为字符串
 	 */
-	private MapFormatter extraFormatter = new JsonMapFormatter();
+	private MapFormatter<Object> extraFormatter = new JsonMapFormatter();
 
 	private final LoggingJdbcDaoSupport daoSupport;
-
-	private final static Logger logger = LoggerFactory.getLogger(JdbcLogHandler.class);
 
 	/**
 	 * 构造函数
@@ -126,7 +121,7 @@ public class JdbcLogHandler implements LogHandler {
 	 * @param requestParametersFormatter
 	 * 		请求参数格式化为字符串
 	 */
-	public void setRequestParametersFormatter(MapFormatter requestParametersFormatter) {
+	public void setRequestParametersFormatter(MapFormatter<Object> requestParametersFormatter) {
 		this.requestParametersFormatter = requestParametersFormatter;
 	}
 
@@ -146,21 +141,14 @@ public class JdbcLogHandler implements LogHandler {
 	 * @param extraFormatter
 	 * 		附加参数格式化为字符串
 	 */
-	public void setExtraFormatter(MapFormatter extraFormatter) {
+	public void setExtraFormatter(MapFormatter<Object> extraFormatter) {
 		this.extraFormatter = extraFormatter;
 	}
 
 	@Override
-	public Status handle(final LogData logData) {
-		try{
-			daoSupport.execute(buildData(logData));
-			return Status.SUCCESS;
-		}catch(Exception e){
-			if(logger.isErrorEnabled()){
-				logger.error("Save log data failure: {}", e.getMessage());
-			}
-			return Status.FAILURE;
-		}
+	protected Status doHandle(final LogData logData) throws Exception {
+		daoSupport.execute(buildData(logData));
+		return Status.SUCCESS;
 	}
 
 	private Map<String, Object> buildData(final LogData logData) {

@@ -22,17 +22,19 @@
  * | Copyright @ 2013-2023 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.jdbc.formatter;
-
-import java.util.Map;
+package com.buession.logging.core.request;
 
 /**
- * {@link Map} 数据格式化为字符串
- *
  * @author Yong.Teng
  * @since 0.0.1
  */
-@FunctionalInterface
-public interface MapFormatter extends Formatter<Map<String, Object>, String> {
+public interface RequestContext {
+
+	/**
+	 * 创建 {@link Request} 实例
+	 *
+	 * @return {@link Request} 实例
+	 */
+	Request createRequest();
 
 }

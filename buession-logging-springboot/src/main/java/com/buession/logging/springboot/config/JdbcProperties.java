@@ -26,14 +26,10 @@ package com.buession.logging.springboot.config;
 
 import com.buession.core.id.IdGenerator;
 import com.buession.jdbc.datasource.config.PoolConfiguration;
-import com.buession.logging.jdbc.core.FieldConfiguration;
-import com.buession.logging.jdbc.formatter.DateTimeFormatter;
-import com.buession.logging.jdbc.formatter.DefaultDateTimeFormatter;
 import com.buession.logging.jdbc.formatter.DefaultGeoFormatter;
-import com.buession.logging.jdbc.formatter.GeoFormatter;
+import com.buession.logging.core.formatter.GeoFormatter;
 import com.buession.logging.jdbc.formatter.JsonMapFormatter;
-import com.buession.logging.jdbc.formatter.MapFormatter;
-import com.buession.logging.jdbc.spring.JdbcLogHandlerFactoryBean;
+import com.buession.logging.core.formatter.MapFormatter;
 
 import java.io.Serializable;
 
@@ -83,14 +79,14 @@ public class JdbcProperties implements HandlerProperties, Serializable {
 	private Class<? extends IdGenerator<?>> idGenerator;
 
 	/**
-	 * 日期时间格式化对象
+	 * 日期时间格式
 	 */
-	private Class<? extends DateTimeFormatter> dateTimeFormatter = DefaultDateTimeFormatter.class;
+	private String dateTimeFormat;
 
 	/**
 	 * 请求参数格式化为字符串
 	 */
-	private Class<? extends MapFormatter> requestParametersFormatter = JsonMapFormatter.class;
+	private Class<? extends MapFormatter<Object>> requestParametersFormatter = JsonMapFormatter.class;
 
 	/**
 	 * Geo 格式化
@@ -100,7 +96,7 @@ public class JdbcProperties implements HandlerProperties, Serializable {
 	/**
 	 * 附加参数格式化为字符串
 	 */
-	private Class<? extends MapFormatter> extraFormatter = JsonMapFormatter.class;
+	private Class<? extends MapFormatter<Object>> extraFormatter = JsonMapFormatter.class;
 
 	/**
 	 * 返回数据库驱动类名
@@ -236,22 +232,22 @@ public class JdbcProperties implements HandlerProperties, Serializable {
 	}
 
 	/**
-	 * 返回日期时间格式化对象
+	 * 返回日期时间格式
 	 *
-	 * @return 日期时间格式化对象
+	 * @return 日期时间格式
 	 */
-	public Class<? extends DateTimeFormatter> getDateTimeFormatter() {
-		return dateTimeFormatter;
+	public String getDateTimeFormat() {
+		return dateTimeFormat;
 	}
 
 	/**
-	 * 设置日期时间格式化对象
+	 * 设置日期时间格式
 	 *
-	 * @param dateTimeFormatter
-	 * 		日期时间格式化对象
+	 * @param dateTimeFormat
+	 * 		日期时间格式
 	 */
-	public void setDateTimeFormatter(Class<? extends DateTimeFormatter> dateTimeFormatter) {
-		this.dateTimeFormatter = dateTimeFormatter;
+	public void setDateTimeFormat(String dateTimeFormat) {
+		this.dateTimeFormat = dateTimeFormat;
 	}
 
 	/**
@@ -259,7 +255,7 @@ public class JdbcProperties implements HandlerProperties, Serializable {
 	 *
 	 * @return 请求参数格式化为字符串
 	 */
-	public Class<? extends MapFormatter> getRequestParametersFormatter() {
+	public Class<? extends MapFormatter<Object>> getRequestParametersFormatter() {
 		return requestParametersFormatter;
 	}
 
@@ -269,7 +265,7 @@ public class JdbcProperties implements HandlerProperties, Serializable {
 	 * @param requestParametersFormatter
 	 * 		请求参数格式化为字符串
 	 */
-	public void setRequestParametersFormatter(Class<? extends MapFormatter> requestParametersFormatter) {
+	public void setRequestParametersFormatter(Class<? extends MapFormatter<Object>> requestParametersFormatter) {
 		this.requestParametersFormatter = requestParametersFormatter;
 	}
 
@@ -297,7 +293,7 @@ public class JdbcProperties implements HandlerProperties, Serializable {
 	 *
 	 * @return 附加参数格式化为字符串
 	 */
-	public Class<? extends MapFormatter> getExtraFormatter() {
+	public Class<? extends MapFormatter<Object>> getExtraFormatter() {
 		return extraFormatter;
 	}
 
@@ -307,7 +303,7 @@ public class JdbcProperties implements HandlerProperties, Serializable {
 	 * @param extraFormatter
 	 * 		附加参数格式化为字符串
 	 */
-	public void setExtraFormatter(Class<? extends MapFormatter> extraFormatter) {
+	public void setExtraFormatter(Class<? extends MapFormatter<Object>> extraFormatter) {
 		this.extraFormatter = extraFormatter;
 	}
 

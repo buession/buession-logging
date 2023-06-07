@@ -50,8 +50,7 @@ import java.io.File;
 @ConditionalOnMissingBean(LogHandler.class)
 @ConditionalOnClass({FileLogHandlerFactoryBean.class})
 @ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "file.enabled", havingValue = "true")
-public class FileLogHandlerConfiguration extends AbstractLogHandlerConfiguration<FileProperties,
-		FileLogHandlerFactoryBean> {
+public class FileLogHandlerConfiguration extends AbstractLogHandlerConfiguration<FileProperties> {
 
 	public FileLogHandlerConfiguration(LogProperties logProperties) {
 		super(logProperties.getFile());

@@ -22,8 +22,20 @@
  * | Copyright @ 2013-2023 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
+package com.buession.logging.core.formatter;
+
+import java.util.Map;
+
 /**
+ * {@link Map} 数据格式化为字符串
+ *
+ * @param <T>
+ * 		值类型
+ *
  * @author Yong.Teng
  * @since 0.0.1
  */
-package com.buession.logging.aspectj.servlet.handler;
+@FunctionalInterface
+public interface MapFormatter<T> extends Formatter<Map<String, T>, String> {
+
+}

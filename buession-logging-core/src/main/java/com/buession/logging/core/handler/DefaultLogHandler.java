@@ -26,8 +26,6 @@ package com.buession.logging.core.handler;
 
 import com.buession.lang.Status;
 import com.buession.logging.core.LogData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 默认日志处理器
@@ -35,12 +33,10 @@ import org.slf4j.LoggerFactory;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class DefaultLogHandler implements LogHandler {
-
-	private final static Logger logger = LoggerFactory.getLogger(DefaultLogHandler.class);
+public class DefaultLogHandler extends AbstractLogHandler {
 
 	@Override
-	public Status handle(final LogData logData){
+	protected Status doHandle(final LogData logData) {
 		logger.info(logData.toString());
 		return Status.SUCCESS;
 	}

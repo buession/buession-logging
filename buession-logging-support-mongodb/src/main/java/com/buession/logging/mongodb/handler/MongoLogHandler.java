@@ -27,9 +27,7 @@ package com.buession.logging.mongodb.handler;
 import com.buession.core.utils.Assert;
 import com.buession.lang.Status;
 import com.buession.logging.core.LogData;
-import com.buession.logging.core.handler.LogHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.buession.logging.core.handler.AbstractLogHandler;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 /**
@@ -38,7 +36,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class MongoLogHandler implements LogHandler {
+public class MongoLogHandler extends AbstractLogHandler {
 
 	/**
 	 * {@link MongoTemplate}
@@ -50,8 +48,6 @@ public class MongoLogHandler implements LogHandler {
 	 */
 	private final String collectionName;
 
-	private final static Logger logger = LoggerFactory.getLogger(MongoLogHandler.class);
-
 	/**
 	 * 构造函数
 	 *
@@ -60,7 +56,7 @@ public class MongoLogHandler implements LogHandler {
 	 * @param collectionName
 	 * 		Collection 名称
 	 */
-	public MongoLogHandler(final MongoTemplate mongoTemplate, final String collectionName){
+	public MongoLogHandler(final MongoTemplate mongoTemplate, final String collectionName) {
 		Assert.isNull(mongoTemplate, "MongoTemplate is null.");
 		Assert.isBlank(collectionName, "Collection name is blank, empty or null.");
 		this.mongoTemplate = mongoTemplate;
@@ -68,16 +64,9 @@ public class MongoLogHandler implements LogHandler {
 	}
 
 	@Override
-	public Status handle(final LogData logData){
-		try{
-			mongoTemplate.save(logData, collectionName);
-			return Status.SUCCESS;
-		}catch(Exception e){
-			if(logger.isErrorEnabled()){
-				logger.error("Save log data failure: {}", e.getMessage());
-			}
-			return Status.FAILURE;
-		}
+	protected Status doHandle(final LogData logData) throws Exception {
+		mongoTemplate.save(logData, collectionName);
+		return Status.SUCCESS;
 	}
 
 }

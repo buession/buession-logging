@@ -28,13 +28,10 @@ import com.buession.core.utils.Assert;
 import com.buession.io.file.File;
 import com.buession.lang.Status;
 import com.buession.logging.core.LogData;
-import com.buession.logging.core.handler.LogHandler;
+import com.buession.logging.core.handler.AbstractLogHandler;
 import com.buession.logging.file.formatter.DefaultFormatter;
 import com.buession.logging.file.formatter.Formatter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 /**
@@ -43,7 +40,7 @@ import java.nio.file.Path;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class FileLogHandler implements LogHandler {
+public class FileLogHandler extends AbstractLogHandler {
 
 	/**
 	 * 日志文件对象
@@ -55,15 +52,13 @@ public class FileLogHandler implements LogHandler {
 	 */
 	private Formatter formatter = new DefaultFormatter();
 
-	private final static Logger logger = LoggerFactory.getLogger(FileLogHandler.class);
-
 	/**
 	 * 构造函数
 	 *
 	 * @param file
 	 * 		日志文件对象 {@link java.io.File}
 	 */
-	public FileLogHandler(final java.io.File file){
+	public FileLogHandler(final java.io.File file) {
 		Assert.isNull(file, "Log file cloud not be null.");
 		this.file = new File(file);
 	}
@@ -74,7 +69,7 @@ public class FileLogHandler implements LogHandler {
 	 * @param path
 	 * 		日志文件对象路径 {@link Path}
 	 */
-	public FileLogHandler(final Path path){
+	public FileLogHandler(final Path path) {
 		Assert.isNull(path, "Log file path cloud not be null.");
 		this.file = new File(path.toFile());
 	}
@@ -85,7 +80,7 @@ public class FileLogHandler implements LogHandler {
 	 * @param path
 	 * 		日志文件对象路径
 	 */
-	public FileLogHandler(final String path){
+	public FileLogHandler(final String path) {
 		Assert.isBlank(path, "Log file path cloud not be null or empty.");
 		this.file = new File(path);
 	}
@@ -98,7 +93,7 @@ public class FileLogHandler implements LogHandler {
 	 * @param formatter
 	 * 		日志格式化
 	 */
-	public FileLogHandler(final java.io.File file, final Formatter formatter){
+	public FileLogHandler(final java.io.File file, final Formatter formatter) {
 		this(file);
 		Assert.isNull(formatter, "Formatter is null.");
 		this.formatter = formatter;
@@ -112,7 +107,7 @@ public class FileLogHandler implements LogHandler {
 	 * @param formatter
 	 * 		日志格式化
 	 */
-	public FileLogHandler(final Path path, final Formatter formatter){
+	public FileLogHandler(final Path path, final Formatter formatter) {
 		this(path);
 		Assert.isNull(formatter, "Formatter is null.");
 		this.formatter = formatter;
@@ -126,23 +121,16 @@ public class FileLogHandler implements LogHandler {
 	 * @param formatter
 	 * 		日志格式化
 	 */
-	public FileLogHandler(final String path, final Formatter formatter){
+	public FileLogHandler(final String path, final Formatter formatter) {
 		this(path);
 		Assert.isNull(formatter, "Formatter is null.");
 		this.formatter = formatter;
 	}
 
 	@Override
-	public Status handle(final LogData logData){
-		try{
-			file.write(formatter.format(logData), true);
-			return Status.SUCCESS;
-		}catch(IOException e){
-			if(logger.isErrorEnabled()){
-				logger.error("Save log data failure: {}", e.getMessage());
-			}
-			return Status.FAILURE;
-		}
+	protected Status doHandle(final LogData logData) throws Exception {
+		file.write(formatter.format(logData), true);
+		return Status.SUCCESS;
 	}
 
 }

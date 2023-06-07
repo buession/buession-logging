@@ -27,9 +27,7 @@ package com.buession.logging.rabbitmq.handler;
 import com.buession.core.utils.Assert;
 import com.buession.lang.Status;
 import com.buession.logging.core.LogData;
-import com.buession.logging.core.handler.LogHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.buession.logging.core.handler.AbstractLogHandler;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -42,7 +40,7 @@ import org.springframework.amqp.support.converter.MessageConverter;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class RabbitLogHandler implements LogHandler {
+public class RabbitLogHandler extends AbstractLogHandler {
 
 	/**
 	 * {@link RabbitTemplate}
@@ -64,8 +62,6 @@ public class RabbitLogHandler implements LogHandler {
 	 */
 	private String routingKey;
 
-	private final static Logger logger = LoggerFactory.getLogger(RabbitLogHandler.class);
-
 	/**
 	 * 构造函数
 	 *
@@ -74,7 +70,7 @@ public class RabbitLogHandler implements LogHandler {
 	 * @param messageConverter
 	 *        {@link MessageConverter}
 	 */
-	public RabbitLogHandler(final RabbitTemplate rabbitTemplate, final MessageConverter messageConverter){
+	public RabbitLogHandler(final RabbitTemplate rabbitTemplate, final MessageConverter messageConverter) {
 		Assert.isNull(rabbitTemplate, "RabbitTemplate is null.");
 		Assert.isNull(messageConverter, "MessageConverter is null.");
 		this.rabbitTemplate = rabbitTemplate;
@@ -86,7 +82,7 @@ public class RabbitLogHandler implements LogHandler {
 	 *
 	 * @return Exchange 名称
 	 */
-	public String getExchange(){
+	public String getExchange() {
 		return exchange;
 	}
 
@@ -96,7 +92,7 @@ public class RabbitLogHandler implements LogHandler {
 	 * @param exchange
 	 * 		Exchange 名称
 	 */
-	public void setExchange(String exchange){
+	public void setExchange(String exchange) {
 		this.exchange = exchange;
 	}
 
@@ -105,7 +101,7 @@ public class RabbitLogHandler implements LogHandler {
 	 *
 	 * @return Routing key 名称
 	 */
-	public String getRoutingKey(){
+	public String getRoutingKey() {
 		return routingKey;
 	}
 
@@ -115,25 +111,18 @@ public class RabbitLogHandler implements LogHandler {
 	 * @param routingKey
 	 * 		Routing key 名称
 	 */
-	public void setRoutingKey(String routingKey){
+	public void setRoutingKey(String routingKey) {
 		this.routingKey = routingKey;
 	}
 
 	@Override
-	public Status handle(final LogData logData){
-		try{
-			final Message message = createMessage(logData);
-			rabbitTemplate.send(exchange, routingKey, message);
-			return Status.SUCCESS;
-		}catch(Exception e){
-			if(logger.isErrorEnabled()){
-				logger.error("Save log data failure: {}", e.getMessage());
-			}
-			return Status.FAILURE;
-		}
+	protected Status doHandle(final LogData logData) throws Exception {
+		final Message message = createMessage(logData);
+		rabbitTemplate.send(exchange, routingKey, message);
+		return Status.SUCCESS;
 	}
 
-	private Message createMessage(final LogData logData){
+	private Message createMessage(final LogData logData) {
 		try{
 			return messageConverter.toMessage(logData, new MessageProperties());
 		}catch(MessageConversionException e){

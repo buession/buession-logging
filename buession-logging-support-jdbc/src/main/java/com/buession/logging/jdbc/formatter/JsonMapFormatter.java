@@ -24,6 +24,7 @@
  */
 package com.buession.logging.jdbc.formatter;
 
+import com.buession.logging.core.formatter.MapFormatter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -35,10 +36,10 @@ import java.util.Map;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class JsonMapFormatter implements MapFormatter {
+public class JsonMapFormatter implements MapFormatter<Object> {
 
 	@Override
-	public String format(final Map<String, Object> requestParameters){
+	public String format(final Map<String, Object> requestParameters) {
 		if(requestParameters == null){
 			return null;
 		}else{

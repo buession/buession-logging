@@ -68,8 +68,7 @@ import java.util.concurrent.TimeUnit;
 @ConditionalOnMissingBean(LogHandler.class)
 @ConditionalOnClass({MongoHandlerFactoryBean.class})
 @ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "mongo.enabled", havingValue = "true")
-public class MongoLogHandlerConfiguration extends AbstractLogHandlerConfiguration<MongoProperties,
-		MongoHandlerFactoryBean> {
+public class MongoLogHandlerConfiguration extends AbstractLogHandlerConfiguration<MongoProperties> {
 
 	public MongoLogHandlerConfiguration(LogProperties logProperties) {
 		super(logProperties.getMongo());

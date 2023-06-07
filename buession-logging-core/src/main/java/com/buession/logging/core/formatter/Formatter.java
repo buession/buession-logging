@@ -22,7 +22,7 @@
  * | Copyright @ 2013-2023 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.jdbc.formatter;
+package com.buession.logging.core.formatter;
 
 /**
  * 日志参数数据格式化

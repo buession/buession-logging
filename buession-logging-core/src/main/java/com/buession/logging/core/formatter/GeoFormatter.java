@@ -22,8 +22,17 @@
  * | Copyright @ 2013-2023 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
+package com.buession.logging.core.formatter;
+
+import com.buession.lang.Geo;
+
 /**
+ * Geo 格式化
+ *
  * @author Yong.Teng
  * @since 0.0.1
  */
-package com.buession.logging.aspectj.reactive.handler;
+@FunctionalInterface
+public interface GeoFormatter extends Formatter<Geo, String> {
+
+}

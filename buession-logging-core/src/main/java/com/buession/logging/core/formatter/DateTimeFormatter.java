@@ -22,17 +22,56 @@
  * | Copyright @ 2013-2023 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.jdbc.formatter;
+package com.buession.logging.core.formatter;
 
-import com.buession.lang.Geo;
+import com.buession.core.utils.Assert;
+
+import java.time.ZoneId;
+import java.util.Date;
 
 /**
- * Geo 格式化
+ * 对日期时间对象 {@link Date} 格式化为与数据库相匹配的值
  *
  * @author Yong.Teng
  * @since 0.0.1
  */
-@FunctionalInterface
-public interface GeoFormatter extends Formatter<Geo, String> {
+public class DateTimeFormatter implements Formatter<Date, Object> {
+
+	private final String format;
+
+	private java.time.format.DateTimeFormatter formatter;
+
+	public DateTimeFormatter() {
+		this("yyyy-MM-dd HH:mm:ss");
+	}
+
+	public DateTimeFormatter(final String format) {
+		Assert.isNull(format, "Date time format is null.");
+		this.format = format;
+	}
+
+	@Override
+	public Object format(final Date date) {
+		if(date == null){
+			return null;
+		}
+
+		if("T".equals(format)){
+			return date.getTime();
+		}else if("t".equals(format)){
+			return date.getTime() / 1000L;
+		}
+
+		return getDateTimeFormatter().format(date.toInstant());
+	}
+
+	private java.time.format.DateTimeFormatter getDateTimeFormatter() {
+		if(formatter == null){
+			formatter = java.time.format.DateTimeFormatter.ofPattern(format)
+					.withZone(ZoneId.systemDefault());
+		}
+
+		return formatter;
+	}
 
 }

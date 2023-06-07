@@ -25,6 +25,7 @@
 package com.buession.logging.jdbc.formatter;
 
 import com.buession.lang.Geo;
+import com.buession.logging.core.formatter.GeoFormatter;
 
 /**
  * 默认 {@link GeoFormatter}
@@ -35,7 +36,7 @@ import com.buession.lang.Geo;
 public class DefaultGeoFormatter implements GeoFormatter {
 
 	@Override
-	public String format(final Geo geo){
+	public String format(final Geo geo) {
 		return geo == null ? null : geo.toString();
 	}
 

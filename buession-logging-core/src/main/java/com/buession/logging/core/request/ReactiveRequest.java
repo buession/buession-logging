@@ -81,6 +81,17 @@ public class ReactiveRequest extends AbstractRequest {
 		setClientIpHeaderName(clientIpHeaderName);
 	}
 
+	/**
+	 * 构造函数
+	 *
+	 * @param clientIpHeaderName
+	 * 		客户端 IP 请求头名称
+	 */
+	public ReactiveRequest(final String clientIpHeaderName) {
+		this();
+		setClientIpHeaderName(clientIpHeaderName);
+	}
+
 	@Override
 	public String getUrl() {
 		return request.getURI().toString();

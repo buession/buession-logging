@@ -27,8 +27,6 @@ package com.buession.logging.aspectj.servlet.aopalliance.interceptor;
 import com.buession.logging.aspectj.aopalliance.AbstractLogAopAllianceAnnotationsMethodInterceptor;
 import com.buession.logging.aspectj.handler.AuditLogAnnotationHandler;
 import com.buession.logging.aspectj.handler.LogAnnotationHandler;
-import com.buession.logging.aspectj.servlet.handler.ServletAuditLogAnnotationHandler;
-import com.buession.logging.aspectj.servlet.handler.ServletLogAnnotationHandler;
 import com.buession.logging.core.mgt.LogManager;
 
 /**
@@ -44,12 +42,12 @@ public class ServletLogAopAllianceAnnotationsMethodInterceptor extends
 
 	@Override
 	protected LogAnnotationHandler createLogAnnotationHandler(LogManager logManager) {
-		return new ServletLogAnnotationHandler(logManager);
+		return new LogAnnotationHandler(logManager);
 	}
 
 	@Override
 	protected AuditLogAnnotationHandler createAuditLogAnnotationHandler(LogManager logManager) {
-		return new ServletAuditLogAnnotationHandler(logManager);
+		return new AuditLogAnnotationHandler(logManager);
 	}
 
 }

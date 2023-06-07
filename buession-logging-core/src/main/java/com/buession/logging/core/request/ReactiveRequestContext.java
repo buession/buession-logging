@@ -22,33 +22,35 @@
  * | Copyright @ 2013-2023 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.aspectj.reactive.handler;
-
-import com.buession.aop.MethodInvocation;
-import com.buession.logging.aspectj.handler.AbstractLogAnnotationHandler;
-import com.buession.logging.annotation.Log;
-import com.buession.logging.core.mgt.LogManager;
-import com.buession.logging.core.request.ReactiveRequest;
-import com.buession.logging.core.request.Request;
-import com.buession.web.reactive.context.request.ReactiveRequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
+package com.buession.logging.core.request;
 
 /**
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class ReactiveLogAnnotationHandler extends AbstractLogAnnotationHandler {
+public class ReactiveRequestContext extends AbstractRequestContext {
 
-	public ReactiveLogAnnotationHandler(LogManager logManager) {
-		super(logManager);
+	/**
+	 * 构造函数
+	 */
+	public ReactiveRequestContext() {
+		super();
+	}
+
+	/**
+	 * 构造函数
+	 *
+	 * @param clientIpHeaderName
+	 * 		客户端 IP 请求头名称
+	 */
+	public ReactiveRequestContext(String clientIpHeaderName) {
+		super(clientIpHeaderName);
 	}
 
 	@Override
-	public void execute(MethodInvocation mi, Log log) {
-		ReactiveRequestAttributes requestAttributes = (ReactiveRequestAttributes) RequestContextHolder.getRequestAttributes();
-		Request request = new ReactiveRequest(requestAttributes.getRequest());
-
-		doExecute(log, request);
+	public Request createRequest() {
+		return new ReactiveRequest(getClientIpHeaderName());
 	}
 
 }
+

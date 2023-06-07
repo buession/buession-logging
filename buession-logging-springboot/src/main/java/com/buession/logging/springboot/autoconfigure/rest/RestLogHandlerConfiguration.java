@@ -48,8 +48,7 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnMissingBean(LogHandler.class)
 @ConditionalOnClass({RestLogHandlerFactoryBean.class})
 @ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "rest.enabled", havingValue = "true")
-public class RestLogHandlerConfiguration extends AbstractLogHandlerConfiguration<RestProperties,
-		RestLogHandlerFactoryBean> {
+public class RestLogHandlerConfiguration extends AbstractLogHandlerConfiguration<RestProperties> {
 
 	public RestLogHandlerConfiguration(LogProperties logProperties) {
 		super(logProperties.getRest());
