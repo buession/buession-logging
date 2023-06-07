@@ -55,7 +55,7 @@
 
 	<modules>
 		<module>../buession-logging-annotations</module>
-		<module>../buession-logging-aop</module>
+		<module>../buession-logging-aspectj</module>
 		<module>../buession-logging-core</module>
 		<module>../buession-logging-spring</module>
 		<module>../buession-logging-springboot</module>

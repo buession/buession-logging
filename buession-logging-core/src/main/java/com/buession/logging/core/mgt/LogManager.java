@@ -85,7 +85,7 @@ public interface LogManager {
 	void setGeoResolver(Resolver geoResolver);
 
 	/**
-	 * 执行
+	 * 保存日志
 	 *
 	 * @param logData
 	 * 		日志数据
@@ -94,6 +94,6 @@ public interface LogManager {
 	 *
 	 * @return 执行结果
 	 */
-	Status execute(final LogData logData, final Request request);
+	Status save(final LogData logData, final Request request);
 
 }

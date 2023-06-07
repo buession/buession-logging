@@ -25,7 +25,6 @@
 package com.buession.logging.kafka.spring;
 
 import com.buession.core.utils.Assert;
-import com.buession.logging.core.LogData;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -37,13 +36,13 @@ import org.springframework.beans.factory.InitializingBean;
  * @since 0.0.1
  */
 public class ProducerFactoryBean extends ProducerFactory
-		implements FactoryBean<org.springframework.kafka.core.ProducerFactory<String, LogData>>, InitializingBean,
+		implements FactoryBean<org.springframework.kafka.core.ProducerFactory<String, Object>>, InitializingBean,
 		DisposableBean {
 
-	private org.springframework.kafka.core.ProducerFactory<String, LogData> producerFactory;
+	private org.springframework.kafka.core.ProducerFactory<String, Object> producerFactory;
 
 	@Override
-	public org.springframework.kafka.core.ProducerFactory<String, LogData> getObject() throws Exception {
+	public org.springframework.kafka.core.ProducerFactory<String, Object> getObject() throws Exception {
 		return producerFactory;
 	}
 

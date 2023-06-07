@@ -29,7 +29,7 @@ import com.buession.logging.core.handler.DefaultLogHandler;
 import com.buession.logging.core.handler.DefaultPrincipalHandler;
 import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.core.handler.PrincipalHandler;
-import com.buession.logging.spring.LogFactoryBean;
+import com.buession.logging.spring.LogManagerFactoryBean;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -63,18 +63,18 @@ public class LogConfiguration {
 	}
 
 	@Bean
-	public LogFactoryBean logFactoryBean(ObjectProvider<PrincipalHandler<?>> principalHandler,
-										 ObjectProvider<LogHandler> logHandler) {
-		final LogFactoryBean logFactoryBean = new LogFactoryBean();
+	public LogManagerFactoryBean logManagerFactoryBean(ObjectProvider<PrincipalHandler<?>> principalHandler,
+													   ObjectProvider<LogHandler> logHandler) {
+		final LogManagerFactoryBean logManagerFactoryBean = new LogManagerFactoryBean();
 
-		principalHandler.ifUnique(logFactoryBean::setPrincipalHandler);
-		logHandler.ifUnique(logFactoryBean::setLogHandler);
+		principalHandler.ifUnique(logManagerFactoryBean::setPrincipalHandler);
+		logHandler.ifUnique(logManagerFactoryBean::setLogHandler);
 
 		if(Validate.isNotBlank(logProperties.getClientIpHeaderName())){
-			logFactoryBean.setClientIpHeaderName(logProperties.getClientIpHeaderName());
+			logManagerFactoryBean.setClientIpHeaderName(logProperties.getClientIpHeaderName());
 		}
 
-		return logFactoryBean;
+		return logManagerFactoryBean;
 	}
 
 }

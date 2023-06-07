@@ -99,7 +99,7 @@ public abstract class AbstractLogManager implements LogManager {
 	}
 
 	@Override
-	public Status execute(final LogData logData, final Request request) {
+	public Status save(final LogData logData, final Request request) {
 		//logData.setPrincipal(null);
 		logData.setDateTime(new Date());
 		//logData.setBusinessType(null);
@@ -107,9 +107,8 @@ public abstract class AbstractLogManager implements LogManager {
 		//logData.setDescription("");
 		logData.setUrl(request.getUrl());
 		logData.setRequestMethod(request.getRequestMethod());
-		logData.setRequestBody(null);
+		//logData.setRequestBody(null);
 		logData.setRequestParameters(logData.getRequestParameters());
-		logData.setResponseBody(null);
 		logData.setClientIp(request.getClientIp());
 		logData.setRemoteAddr(request.getRemoteAddr());
 		logData.setUserAgent(request.getUserAgent());

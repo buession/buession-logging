@@ -1,0 +1,92 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements.
+ * See the NOTICE file distributed with this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to you under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and limitations under the License.
+ *
+ * =========================================================================================================
+ *
+ * This software consists of voluntary contributions made by many individuals on behalf of the
+ * Apache Software Foundation. For more information on the Apache Software Foundation, please see
+ * <http://www.apache.org/>.
+ *
+ * +-------------------------------------------------------------------------------------------------------+
+ * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
+ * | Author: Yong.Teng <webmaster@buession.com> 													       |
+ * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * +-------------------------------------------------------------------------------------------------------+
+ */
+package com.buession.logging.aspectj.handler;
+
+import com.buession.aop.handler.AbstractAnnotationHandler;
+import com.buession.core.utils.Assert;
+import com.buession.logging.core.BusinessType;
+import com.buession.logging.core.Event;
+import com.buession.logging.core.LogData;
+import com.buession.logging.annotation.Log;
+import com.buession.logging.core.mgt.LogManager;
+import com.buession.logging.core.request.Request;
+
+/**
+ * @author Yong.Teng
+ * @since 0.0.1
+ */
+public abstract class AbstractLogAnnotationHandler extends AbstractAnnotationHandler<Log>
+		implements LogAnnotationHandler {
+
+	private LogManager logManager;
+
+	public AbstractLogAnnotationHandler() {
+		super(Log.class);
+	}
+
+	public AbstractLogAnnotationHandler(LogManager logManager) {
+		this();
+		setLogManager(logManager);
+	}
+
+	public LogManager getLogManager() {
+		return logManager;
+	}
+
+	public void setLogManager(LogManager logManager) {
+		Assert.isNull(logManager, "LogManager cloud not be null.");
+		this.logManager = logManager;
+	}
+
+	protected void doExecute(final Log log, final Request request) {
+		final LogData logData = new LogData();
+
+		//logData.setPrincipal();
+		logData.setBusinessType(new BusinessType() {
+
+			@Override
+			public String toString() {
+				return log.businessType();
+			}
+
+		});
+		logData.setEvent(new Event() {
+
+			@Override
+			public String toString() {
+				return log.event();
+			}
+
+		});
+		logData.setDescription(log.description());
+
+		if(log.isSaveRequestData()){
+			logData.setRequestBody(request.getRequestBody());
+		}
+
+		logManager.save(logData, request);
+	}
+
+}

@@ -337,7 +337,7 @@ public class ProducerFactory {
 		}
 	}
 
-	protected org.springframework.kafka.core.ProducerFactory<String, LogData> createProducerFactory() {
+	protected org.springframework.kafka.core.ProducerFactory<String, Object> createProducerFactory() {
 		final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 		final Properties properties = new Properties();
 

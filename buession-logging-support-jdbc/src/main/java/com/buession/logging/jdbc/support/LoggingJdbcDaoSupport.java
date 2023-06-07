@@ -28,7 +28,7 @@ import com.buession.core.utils.Assert;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 
-import javax.validation.constraints.NotNull;
+import java.util.Map;
 
 /**
  * @author Yong.Teng
@@ -46,8 +46,8 @@ public class LoggingJdbcDaoSupport extends NamedParameterJdbcDaoSupport {
 		setJdbcTemplate(jdbcTemplate);
 	}
 
-	public void execute(final Object[] arguments) {
-		getJdbcTemplate().update(sql, arguments);
+	public void execute(final Map<String, ?> data) {
+		getNamedParameterJdbcTemplate().update(sql, data);
 	}
 
 }

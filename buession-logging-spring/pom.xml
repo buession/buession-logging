@@ -64,7 +64,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.buession.logging</groupId>
-			<artifactId>buession-logging-aop</artifactId>
+			<artifactId>buession-logging-aspectj</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

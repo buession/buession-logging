@@ -24,7 +24,14 @@
  */
 package com.buession.logging.springboot.autoconfigure;
 
+import com.buession.logging.aspectj.reactive.aopalliance.ReactiveLogAttributeSourcePointcutAdvisor;
+import com.buession.logging.aspectj.servlet.aopalliance.ServletLogAttributeSourcePointcutAdvisor;
+import com.buession.logging.core.mgt.LogManager;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -32,19 +39,32 @@ import org.springframework.context.annotation.Configuration;
  * @since 0.0.1
  */
 @Configuration(proxyBeanMethods = false)
+@AutoConfigureAfter({LogConfiguration.class})
 public class AnnotationProcessorConfiguration {
 
 	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-	static class ServletAnnotationProcessorConfiguration
-			extends com.buession.logging.spring.servlet.config.ServletAnnotationProcessorConfiguration {
+	static class Servlet {
+
+		@Bean
+		@ConditionalOnBean(LogManager.class)
+		public ServletLogAttributeSourcePointcutAdvisor logAttributeSourcePointcutAdvisor(
+				ObjectProvider<LogManager> logManager) {
+			return new ServletLogAttributeSourcePointcutAdvisor(logManager.getIfAvailable());
+		}
 
 	}
 
 	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
-	static class ReactiveAnnotationProcessorConfiguration
-			extends com.buession.logging.spring.reactive.config.WebFluxAnnotationProcessorConfiguration {
+	static class Reactive {
+
+		@Bean
+		@ConditionalOnBean(LogManager.class)
+		public ReactiveLogAttributeSourcePointcutAdvisor logAttributeSourcePointcutAdvisor(
+				ObjectProvider<LogManager> logManager) {
+			return new ReactiveLogAttributeSourcePointcutAdvisor(logManager.getIfAvailable());
+		}
 
 	}
 

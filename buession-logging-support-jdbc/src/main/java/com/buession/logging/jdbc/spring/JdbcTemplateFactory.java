@@ -31,8 +31,8 @@ import com.buession.jdbc.datasource.config.HikariPoolConfiguration;
 import com.buession.jdbc.datasource.config.PoolConfiguration;
 import com.buession.jdbc.datasource.config.TomcatPoolConfiguration;
 import org.springframework.beans.BeanUtils;
-import org.springframework.util.ClassUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.util.ClassUtils;
 
 import javax.sql.DataSource;
 import java.util.LinkedHashMap;

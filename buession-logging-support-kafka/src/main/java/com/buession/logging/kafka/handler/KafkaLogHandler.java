@@ -46,7 +46,7 @@ public class KafkaLogHandler implements LogHandler {
 	/**
 	 * {@link KafkaTemplate}
 	 */
-	private final KafkaTemplate<?, Object> kafkaTemplate;
+	private final KafkaTemplate<String, Object> kafkaTemplate;
 
 	/**
 	 * Topic 名称
@@ -63,7 +63,7 @@ public class KafkaLogHandler implements LogHandler {
 	 * @param topic
 	 * 		Topic 名称
 	 */
-	public KafkaLogHandler(final KafkaTemplate<?, Object> kafkaTemplate, final String topic) {
+	public KafkaLogHandler(final KafkaTemplate<String, Object> kafkaTemplate, final String topic) {
 		Assert.isNull(kafkaTemplate, "KafkaTemplate is null.");
 		Assert.isBlank(topic, "Topic name is blank, empty or null.");
 		this.kafkaTemplate = kafkaTemplate;
@@ -100,9 +100,6 @@ public class KafkaLogHandler implements LogHandler {
 		}
 		if(logData.getRequestBody() != null){
 			data.put("requestBody", logData.getRequestBody());
-		}
-		if(logData.getResponseBody() != null){
-			data.put("responseBody", logData.getResponseBody());
 		}
 		if(logData.getClientIp() != null){
 			data.put("clientIp", logData.getClientIp());

@@ -82,9 +82,9 @@ public class KafkaLogHandlerConfiguration extends AbstractLogHandlerConfiguratio
 	}
 
 	@Bean(name = "loggingKafkaKafkaTemplate")
-	public KafkaTemplateFactoryBean kafkaTemplateFactoryBean(@Qualifier("loggingKafkaProducerFactory")
-																	 ObjectProvider<org.springframework.kafka.core.ProducerFactory> producerFactory) {
-		final KafkaTemplateFactoryBean kafkaTemplateFactoryBean = new KafkaTemplateFactoryBean();
+	public KafkaTemplateFactoryBean<String, Object> kafkaTemplateFactoryBean(@Qualifier("loggingKafkaProducerFactory")
+																					 ObjectProvider<org.springframework.kafka.core.ProducerFactory<String, Object>> producerFactory) {
+		final KafkaTemplateFactoryBean<String, Object> kafkaTemplateFactoryBean = new KafkaTemplateFactoryBean<>();
 
 		producerFactory.ifUnique(kafkaTemplateFactoryBean::setProducerFactory);
 
@@ -93,7 +93,7 @@ public class KafkaLogHandlerConfiguration extends AbstractLogHandlerConfiguratio
 
 	@Bean
 	public KafkaLogHandlerFactoryBean logHandlerFactoryBean(
-			@Qualifier("loggingKafkaKafkaTemplate") ObjectProvider<KafkaTemplate> kafkaTemplate) {
+			@Qualifier("loggingKafkaKafkaTemplate") ObjectProvider<KafkaTemplate<String, Object>> kafkaTemplate) {
 		final KafkaLogHandlerFactoryBean logHandlerFactoryBean = new KafkaLogHandlerFactoryBean();
 
 		kafkaTemplate.ifUnique(logHandlerFactoryBean::setKafkaTemplate);

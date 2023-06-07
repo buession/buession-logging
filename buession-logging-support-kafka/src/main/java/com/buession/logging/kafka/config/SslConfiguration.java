@@ -62,25 +62,4 @@ public class SslConfiguration extends com.buession.logging.core.SslConfiguration
 		return properties;
 	}
 
-	public static SslConfiguration from(final com.buession.logging.core.SslConfiguration sslConfiguration) {
-		if(sslConfiguration == null){
-			return null;
-		}
-
-		final SslConfiguration instance = new SslConfiguration();
-		final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
-
-		propertyMapper.from(sslConfiguration::isEnabled).to(instance::setEnabled);
-		propertyMapper.from(sslConfiguration::getProtocol).to(instance::setProtocol);
-		propertyMapper.from(sslConfiguration::getKeyStorePath).to(instance::setKeyStorePath);
-		propertyMapper.from(sslConfiguration::getKeyStoreType).to(instance::setKeyStoreType);
-		propertyMapper.from(sslConfiguration::getKeyPassword).to(instance::setKeyPassword);
-		propertyMapper.from(sslConfiguration::getKeyStorePassword).to(instance::setKeyStorePassword);
-		propertyMapper.from(sslConfiguration::getTrustStorePath).to(instance::setTrustStorePath);
-		propertyMapper.from(sslConfiguration::getTrustStorePassword).to(instance::setTrustStorePassword);
-		propertyMapper.from(sslConfiguration::getAlgorithms).to(instance::setAlgorithms);
-
-		return instance;
-	}
-
 }

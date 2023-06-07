@@ -39,7 +39,7 @@ public class KafkaLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<KafkaL
 	/**
 	 * {@link KafkaTemplate}
 	 */
-	private KafkaTemplate<?, Object> kafkaTemplate;
+	private KafkaTemplate<String, Object> kafkaTemplate;
 
 	/**
 	 * Topic 名称
@@ -51,7 +51,7 @@ public class KafkaLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<KafkaL
 	 *
 	 * @return {@link KafkaTemplate}
 	 */
-	public KafkaTemplate<?, Object> getKafkaTemplate() {
+	public KafkaTemplate<String, Object> getKafkaTemplate() {
 		return kafkaTemplate;
 	}
 
@@ -61,7 +61,7 @@ public class KafkaLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<KafkaL
 	 * @param kafkaTemplate
 	 *        {@link KafkaTemplate}
 	 */
-	public void setKafkaTemplate(KafkaTemplate<?, Object> kafkaTemplate) {
+	public void setKafkaTemplate(KafkaTemplate<String, Object> kafkaTemplate) {
 		this.kafkaTemplate = kafkaTemplate;
 	}
 

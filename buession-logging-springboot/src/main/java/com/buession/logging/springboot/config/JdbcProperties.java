@@ -73,14 +73,9 @@ public class JdbcProperties implements HandlerProperties, Serializable {
 	private PoolConfiguration poolConfiguration;
 
 	/**
-	 * 数据表名称
+	 * SQL
 	 */
-	private String tableName;
-
-	/**
-	 * 字段配置
-	 */
-	private FieldConfiguration fieldConfiguration;
+	private String sql;
 
 	/**
 	 * ID 生成器
@@ -203,41 +198,22 @@ public class JdbcProperties implements HandlerProperties, Serializable {
 	}
 
 	/**
-	 * 返回数据表名称
+	 * 返回 SQL
 	 *
-	 * @return 数据表名称
+	 * @return SQL
 	 */
-	public String getTableName() {
-		return tableName;
+	public String getSql() {
+		return sql;
 	}
 
 	/**
-	 * 设置数据表名称
+	 * 设置 SQL
 	 *
-	 * @param tableName
-	 * 		数据表名称
+	 * @param sql
+	 * 		SQL
 	 */
-	public void setTableName(String tableName) {
-		this.tableName = tableName;
-	}
-
-	/**
-	 * 返回字段配置
-	 *
-	 * @return 字段配置
-	 */
-	public FieldConfiguration getFieldConfiguration() {
-		return fieldConfiguration;
-	}
-
-	/**
-	 * 设置字段配置
-	 *
-	 * @param fieldConfiguration
-	 * 		字段配置
-	 */
-	public void setFieldConfiguration(FieldConfiguration fieldConfiguration) {
-		this.fieldConfiguration = fieldConfiguration;
+	public void setSql(String sql) {
+		this.sql = sql;
 	}
 
 	/**

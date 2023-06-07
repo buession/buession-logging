@@ -25,11 +25,9 @@
 package com.buession.logging.kafka.spring;
 
 import com.buession.core.utils.Assert;
-import com.buession.logging.kafka.core.Constants;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.LoggingProducerListener;
 
 /**
  * {@link KafkaTemplate} 工厂 Bean

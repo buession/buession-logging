@@ -68,6 +68,11 @@ public class LogData implements Serializable {
 	private String description;
 
 	/**
+	 * Trace ID
+	 */
+	private String traceId;
+
+	/**
 	 * 请求地址
 	 */
 	private String url;
@@ -86,11 +91,6 @@ public class LogData implements Serializable {
 	 * 请求体
 	 */
 	private String requestBody;
-
-	/**
-	 * 响应体
-	 */
-	private String responseBody;
 
 	/**
 	 * 客户端 IP
@@ -142,7 +142,7 @@ public class LogData implements Serializable {
 	 *
 	 * @return 用户凭证
 	 */
-	public Principal getPrincipal(){
+	public Principal getPrincipal() {
 		return principal;
 	}
 
@@ -152,7 +152,7 @@ public class LogData implements Serializable {
 	 * @param principal
 	 * 		用户凭证
 	 */
-	public void setPrincipal(Principal principal){
+	public void setPrincipal(Principal principal) {
 		this.principal = principal;
 	}
 
@@ -161,7 +161,7 @@ public class LogData implements Serializable {
 	 *
 	 * @return 日期时间
 	 */
-	public Date getDateTime(){
+	public Date getDateTime() {
 		return dateTime;
 	}
 
@@ -171,7 +171,7 @@ public class LogData implements Serializable {
 	 * @param dateTime
 	 * 		日期时间
 	 */
-	public void setDateTime(Date dateTime){
+	public void setDateTime(Date dateTime) {
 		this.dateTime = dateTime;
 	}
 
@@ -180,7 +180,7 @@ public class LogData implements Serializable {
 	 *
 	 * @return 业务类型
 	 */
-	public BusinessType getBusinessType(){
+	public BusinessType getBusinessType() {
 		return businessType;
 	}
 
@@ -190,7 +190,7 @@ public class LogData implements Serializable {
 	 * @param businessType
 	 * 		业务类型
 	 */
-	public void setBusinessType(BusinessType businessType){
+	public void setBusinessType(BusinessType businessType) {
 		this.businessType = businessType;
 	}
 
@@ -199,7 +199,7 @@ public class LogData implements Serializable {
 	 *
 	 * @return 事件
 	 */
-	public Event getEvent(){
+	public Event getEvent() {
 		return event;
 	}
 
@@ -209,7 +209,7 @@ public class LogData implements Serializable {
 	 * @param event
 	 * 		事件
 	 */
-	public void setEvent(Event event){
+	public void setEvent(Event event) {
 		this.event = event;
 	}
 
@@ -218,7 +218,7 @@ public class LogData implements Serializable {
 	 *
 	 * @return 描述
 	 */
-	public String getDescription(){
+	public String getDescription() {
 		return description;
 	}
 
@@ -228,8 +228,27 @@ public class LogData implements Serializable {
 	 * @param description
 	 * 		描述
 	 */
-	public void setDescription(String description){
+	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	/**
+	 * 返回 Trace ID
+	 *
+	 * @return Trace ID
+	 */
+	public String getTraceId() {
+		return traceId;
+	}
+
+	/**
+	 * 设置 Trace ID
+	 *
+	 * @param traceId
+	 * 		Trace ID
+	 */
+	public void setTraceId(String traceId) {
+		this.traceId = traceId;
 	}
 
 	/**
@@ -237,7 +256,7 @@ public class LogData implements Serializable {
 	 *
 	 * @return 请求地址
 	 */
-	public String getUrl(){
+	public String getUrl() {
 		return url;
 	}
 
@@ -247,7 +266,7 @@ public class LogData implements Serializable {
 	 * @param url
 	 * 		请求地址
 	 */
-	public void setUrl(String url){
+	public void setUrl(String url) {
 		this.url = url;
 	}
 
@@ -256,7 +275,7 @@ public class LogData implements Serializable {
 	 *
 	 * @return 请求方式
 	 */
-	public RequestMethod getRequestMethod(){
+	public RequestMethod getRequestMethod() {
 		return requestMethod;
 	}
 
@@ -266,7 +285,7 @@ public class LogData implements Serializable {
 	 * @param requestMethod
 	 * 		请求方式
 	 */
-	public void setRequestMethod(RequestMethod requestMethod){
+	public void setRequestMethod(RequestMethod requestMethod) {
 		this.requestMethod = requestMethod;
 	}
 
@@ -275,7 +294,7 @@ public class LogData implements Serializable {
 	 *
 	 * @return 请求参数
 	 */
-	public Map<String, Object> getRequestParameters(){
+	public Map<String, Object> getRequestParameters() {
 		return requestParameters;
 	}
 
@@ -285,7 +304,7 @@ public class LogData implements Serializable {
 	 * @param requestParameters
 	 * 		请求参数
 	 */
-	public void setRequestParameters(Map<String, Object> requestParameters){
+	public void setRequestParameters(Map<String, Object> requestParameters) {
 		this.requestParameters = requestParameters;
 	}
 
@@ -294,7 +313,7 @@ public class LogData implements Serializable {
 	 *
 	 * @return 请求体
 	 */
-	public String getRequestBody(){
+	public String getRequestBody() {
 		return requestBody;
 	}
 
@@ -304,27 +323,8 @@ public class LogData implements Serializable {
 	 * @param requestBody
 	 * 		请求体
 	 */
-	public void setRequestBody(String requestBody){
+	public void setRequestBody(String requestBody) {
 		this.requestBody = requestBody;
-	}
-
-	/**
-	 * 返回响应体
-	 *
-	 * @return 响应体
-	 */
-	public String getResponseBody(){
-		return responseBody;
-	}
-
-	/**
-	 * 设置响应体
-	 *
-	 * @param responseBody
-	 * 		响应体
-	 */
-	public void setResponseBody(String responseBody){
-		this.responseBody = responseBody;
 	}
 
 	/**
@@ -332,7 +332,7 @@ public class LogData implements Serializable {
 	 *
 	 * @return 客户端 IP
 	 */
-	public String getClientIp(){
+	public String getClientIp() {
 		return clientIp;
 	}
 
@@ -342,7 +342,7 @@ public class LogData implements Serializable {
 	 * @param clientIp
 	 * 		客户端 IP
 	 */
-	public void setClientIp(String clientIp){
+	public void setClientIp(String clientIp) {
 		this.clientIp = clientIp;
 	}
 
@@ -351,7 +351,7 @@ public class LogData implements Serializable {
 	 *
 	 * @return Remote Addr
 	 */
-	public String getRemoteAddr(){
+	public String getRemoteAddr() {
 		return remoteAddr;
 	}
 
@@ -361,7 +361,7 @@ public class LogData implements Serializable {
 	 * @param remoteAddr
 	 * 		Remote Addr
 	 */
-	public void setRemoteAddr(String remoteAddr){
+	public void setRemoteAddr(String remoteAddr) {
 		this.remoteAddr = remoteAddr;
 	}
 
@@ -370,7 +370,7 @@ public class LogData implements Serializable {
 	 *
 	 * @return User-Agent
 	 */
-	public String getUserAgent(){
+	public String getUserAgent() {
 		return userAgent;
 	}
 
@@ -380,7 +380,7 @@ public class LogData implements Serializable {
 	 * @param userAgent
 	 * 		User-Agent
 	 */
-	public void setUserAgent(String userAgent){
+	public void setUserAgent(String userAgent) {
 		this.userAgent = userAgent;
 	}
 
@@ -389,7 +389,7 @@ public class LogData implements Serializable {
 	 *
 	 * @return 操作系统信息
 	 */
-	public OperatingSystem getOperatingSystem(){
+	public OperatingSystem getOperatingSystem() {
 		return operatingSystem;
 	}
 
@@ -399,7 +399,7 @@ public class LogData implements Serializable {
 	 * @param operatingSystem
 	 * 		操作系统信息
 	 */
-	public void setOperatingSystem(OperatingSystem operatingSystem){
+	public void setOperatingSystem(OperatingSystem operatingSystem) {
 		this.operatingSystem = operatingSystem;
 	}
 
@@ -408,7 +408,7 @@ public class LogData implements Serializable {
 	 *
 	 * @return 设备类型
 	 */
-	public DeviceType getDeviceType(){
+	public DeviceType getDeviceType() {
 		return deviceType;
 	}
 
@@ -418,7 +418,7 @@ public class LogData implements Serializable {
 	 * @param deviceType
 	 * 		设备类型
 	 */
-	public void setDeviceType(DeviceType deviceType){
+	public void setDeviceType(DeviceType deviceType) {
 		this.deviceType = deviceType;
 	}
 
@@ -427,7 +427,7 @@ public class LogData implements Serializable {
 	 *
 	 * @return 浏览器信息
 	 */
-	public Browser getBrowser(){
+	public Browser getBrowser() {
 		return browser;
 	}
 
@@ -437,7 +437,7 @@ public class LogData implements Serializable {
 	 * @param browser
 	 * 		浏览器信息
 	 */
-	public void setBrowser(Browser browser){
+	public void setBrowser(Browser browser) {
 		this.browser = browser;
 	}
 
@@ -446,7 +446,7 @@ public class LogData implements Serializable {
 	 *
 	 * @return 地理位置信息
 	 */
-	public GeoLocation getLocation(){
+	public GeoLocation getLocation() {
 		return location;
 	}
 
@@ -456,7 +456,7 @@ public class LogData implements Serializable {
 	 * @param location
 	 * 		地理位置信息
 	 */
-	public void setLocation(GeoLocation location){
+	public void setLocation(GeoLocation location) {
 		this.location = location;
 	}
 
@@ -465,7 +465,7 @@ public class LogData implements Serializable {
 	 *
 	 * @return 结果
 	 */
-	public Status getStatus(){
+	public Status getStatus() {
 		return status;
 	}
 
@@ -475,7 +475,7 @@ public class LogData implements Serializable {
 	 * @param status
 	 * 		结果
 	 */
-	public void setStatus(Status status){
+	public void setStatus(Status status) {
 		this.status = status;
 	}
 
@@ -484,7 +484,7 @@ public class LogData implements Serializable {
 	 *
 	 * @return 附加参数
 	 */
-	public Map<String, Object> getExtra(){
+	public Map<String, Object> getExtra() {
 		return extra;
 	}
 
@@ -494,23 +494,23 @@ public class LogData implements Serializable {
 	 * @param extra
 	 * 		附加参数
 	 */
-	public void setExtra(Map<String, Object> extra){
+	public void setExtra(Map<String, Object> extra) {
 		this.extra = extra;
 	}
 
 	@Override
-	public String toString(){
+	public String toString() {
 		return new StringJoiner(", ", "LogData => {", "}")
 				.add("principal=" + principal)
 				.add("dateTime=" + dateTime)
 				.add("businessType=" + businessType)
 				.add("event=" + event)
 				.add("description=" + description)
+				.add("traceId=" + traceId)
 				.add("url=" + url)
 				.add("requestMethod=" + requestMethod)
 				.add("requestParameters=" + requestParameters)
 				.add("requestBody=" + requestBody)
-				.add("responseBody=" + responseBody)
 				.add("clientIp=" + clientIp)
 				.add("remoteAddr=" + remoteAddr)
 				.add("userAgent=" + userAgent)

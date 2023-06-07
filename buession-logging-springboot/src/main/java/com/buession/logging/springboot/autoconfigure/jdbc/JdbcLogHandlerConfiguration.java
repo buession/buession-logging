@@ -79,8 +79,7 @@ public class JdbcLogHandlerConfiguration extends AbstractLogHandlerConfiguration
 
 		jdbcTemplate.ifUnique(logHandlerFactoryBean::setJdbcTemplate);
 
-		propertyMapper.from(handlerProperties::getTableName).to(logHandlerFactoryBean::setTableName);
-		propertyMapper.from(handlerProperties::getFieldConfiguration).to(logHandlerFactoryBean::setFieldConfiguration);
+		propertyMapper.from(handlerProperties::getSql).to(logHandlerFactoryBean::setSql);
 		propertyMapper.from(handlerProperties::getIdGenerator).as(BeanUtils::instantiateClass)
 				.to(logHandlerFactoryBean::setIdGenerator);
 		propertyMapper.from(handlerProperties::getDateTimeFormatter).as(BeanUtils::instantiateClass)

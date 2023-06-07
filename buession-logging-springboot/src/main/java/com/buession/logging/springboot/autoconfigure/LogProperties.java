@@ -32,7 +32,6 @@ import com.buession.logging.springboot.config.MongoProperties;
 import com.buession.logging.springboot.config.RabbitProperties;
 import com.buession.logging.springboot.config.RestProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 /**
  * @author Yong.Teng
@@ -51,51 +50,44 @@ public class LogProperties {
 	/**
 	 * Elasticsearch 日志配置
 	 */
-	@NestedConfigurationProperty
-	private ElasticsearchProperties elasticsearch = new ElasticsearchProperties();
+	private ElasticsearchProperties elasticsearch;
 
 	/**
 	 * 文件日志配置
 	 */
-	@NestedConfigurationProperty
-	private FileProperties file = new FileProperties();
+	private FileProperties file;
 
 	/**
 	 * JDBC 日志配置
 	 */
-	@NestedConfigurationProperty
-	private JdbcProperties jdbc = new JdbcProperties();
+	private JdbcProperties jdbc;
 
 	/**
 	 * Kafka 日志配置
 	 */
-	@NestedConfigurationProperty
-	private KafkaProperties kafka = new KafkaProperties();
+	private KafkaProperties kafka;
 
 	/**
 	 * MongoDB 日志配置
 	 */
-	@NestedConfigurationProperty
-	private MongoProperties mongo = new MongoProperties();
+	private MongoProperties mongo;
 
 	/**
 	 * RabbitMQ 日志配置
 	 */
-	@NestedConfigurationProperty
-	private RabbitProperties rabbit = new RabbitProperties();
+	private RabbitProperties rabbit;
 
 	/**
 	 * Rest 日志配置
 	 */
-	@NestedConfigurationProperty
-	private RestProperties rest = new RestProperties();
+	private RestProperties rest;
 
 	/**
 	 * 返回客户端 IP 请求头名称
 	 *
 	 * @return 客户端 IP 请求头名称
 	 */
-	public String getClientIpHeaderName(){
+	public String getClientIpHeaderName() {
 		return clientIpHeaderName;
 	}
 
@@ -105,7 +97,7 @@ public class LogProperties {
 	 * @param clientIpHeaderName
 	 * 		客户端 IP 请求头名称
 	 */
-	public void setClientIpHeaderName(String clientIpHeaderName){
+	public void setClientIpHeaderName(String clientIpHeaderName) {
 		this.clientIpHeaderName = clientIpHeaderName;
 	}
 
@@ -114,7 +106,7 @@ public class LogProperties {
 	 *
 	 * @return Elasticsearch 日志配置
 	 */
-	public ElasticsearchProperties getElasticsearch(){
+	public ElasticsearchProperties getElasticsearch() {
 		return elasticsearch;
 	}
 
@@ -124,7 +116,7 @@ public class LogProperties {
 	 * @param elasticsearch
 	 * 		Elasticsearch 日志配置
 	 */
-	public void setElasticsearch(ElasticsearchProperties elasticsearch){
+	public void setElasticsearch(ElasticsearchProperties elasticsearch) {
 		this.elasticsearch = elasticsearch;
 	}
 
@@ -133,7 +125,7 @@ public class LogProperties {
 	 *
 	 * @return 文件日志配置
 	 */
-	public FileProperties getFile(){
+	public FileProperties getFile() {
 		return file;
 	}
 
@@ -143,7 +135,7 @@ public class LogProperties {
 	 * @param file
 	 * 		文件日志配置
 	 */
-	public void setFile(FileProperties file){
+	public void setFile(FileProperties file) {
 		this.file = file;
 	}
 
@@ -152,7 +144,7 @@ public class LogProperties {
 	 *
 	 * @return JDBC 日志配置
 	 */
-	public JdbcProperties getJdbc(){
+	public JdbcProperties getJdbc() {
 		return jdbc;
 	}
 
@@ -162,7 +154,7 @@ public class LogProperties {
 	 * @param jdbc
 	 * 		JDBC 日志配置
 	 */
-	public void setJdbc(JdbcProperties jdbc){
+	public void setJdbc(JdbcProperties jdbc) {
 		this.jdbc = jdbc;
 	}
 
@@ -171,7 +163,7 @@ public class LogProperties {
 	 *
 	 * @return Kafka 日志配置
 	 */
-	public KafkaProperties getKafka(){
+	public KafkaProperties getKafka() {
 		return kafka;
 	}
 
@@ -181,7 +173,7 @@ public class LogProperties {
 	 * @param kafka
 	 * 		Kafka 日志配置
 	 */
-	public void setKafka(KafkaProperties kafka){
+	public void setKafka(KafkaProperties kafka) {
 		this.kafka = kafka;
 	}
 
@@ -190,7 +182,7 @@ public class LogProperties {
 	 *
 	 * @return MongoDB 日志配置
 	 */
-	public MongoProperties getMongo(){
+	public MongoProperties getMongo() {
 		return mongo;
 	}
 
@@ -200,7 +192,7 @@ public class LogProperties {
 	 * @param mongo
 	 * 		MongoDB 日志配置
 	 */
-	public void setMongo(MongoProperties mongo){
+	public void setMongo(MongoProperties mongo) {
 		this.mongo = mongo;
 	}
 
@@ -209,7 +201,7 @@ public class LogProperties {
 	 *
 	 * @return RabbitMQ 日志配置
 	 */
-	public RabbitProperties getRabbit(){
+	public RabbitProperties getRabbit() {
 		return rabbit;
 	}
 
@@ -219,7 +211,7 @@ public class LogProperties {
 	 * @param rabbit
 	 * 		RabbitMQ 日志配置
 	 */
-	public void setRabbit(RabbitProperties rabbit){
+	public void setRabbit(RabbitProperties rabbit) {
 		this.rabbit = rabbit;
 	}
 
@@ -228,7 +220,7 @@ public class LogProperties {
 	 *
 	 * @return Rest 日志配置
 	 */
-	public RestProperties getRest(){
+	public RestProperties getRest() {
 		return rest;
 	}
 
@@ -238,7 +230,7 @@ public class LogProperties {
 	 * @param rest
 	 * 		Rest 日志配置
 	 */
-	public void setRest(RestProperties rest){
+	public void setRest(RestProperties rest) {
 		this.rest = rest;
 	}
 

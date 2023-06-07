@@ -26,7 +26,6 @@ package com.buession.logging.jdbc.spring;
 
 import com.buession.core.converter.mapper.PropertyMapper;
 import com.buession.core.id.IdGenerator;
-import com.buession.logging.jdbc.core.FieldConfiguration;
 import com.buession.logging.jdbc.formatter.DateTimeFormatter;
 import com.buession.logging.jdbc.formatter.DefaultDateTimeFormatter;
 import com.buession.logging.jdbc.formatter.DefaultGeoFormatter;
@@ -59,14 +58,9 @@ public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLog
 	private JdbcTemplate jdbcTemplate;
 
 	/**
-	 * 数据表名称
+	 * SQL
 	 */
-	private String tableName;
-
-	/**
-	 * 字段配置
-	 */
-	private FieldConfiguration fieldConfiguration;
+	private String sql;
 
 	/**
 	 * ID 生成器
@@ -113,41 +107,22 @@ public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLog
 	}
 
 	/**
-	 * 返回数据表名称
+	 * 返回 SQL
 	 *
-	 * @return 数据表名称
+	 * @return SQL
 	 */
-	public String getTableName() {
-		return tableName;
+	public String getSql() {
+		return sql;
 	}
 
 	/**
-	 * 设置数据表名称
+	 * 设置 SQL
 	 *
-	 * @param tableName
-	 * 		数据表名称
+	 * @param sql
+	 * 		SQL
 	 */
-	public void setTableName(String tableName) {
-		this.tableName = tableName;
-	}
-
-	/**
-	 * 返回字段配置
-	 *
-	 * @return 字段配置
-	 */
-	public FieldConfiguration getFieldConfiguration() {
-		return fieldConfiguration;
-	}
-
-	/**
-	 * 设置字段配置
-	 *
-	 * @param fieldConfiguration
-	 * 		字段配置
-	 */
-	public void setFieldConfiguration(FieldConfiguration fieldConfiguration) {
-		this.fieldConfiguration = fieldConfiguration;
+	public void setSql(String sql) {
+		this.sql = sql;
 	}
 
 	/**
@@ -249,7 +224,7 @@ public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLog
 	public void afterPropertiesSet() throws Exception {
 		final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 
-		logHandler = new JdbcLogHandler(jdbcTemplate, tableName, fieldConfiguration);
+		logHandler = new JdbcLogHandler(jdbcTemplate, sql);
 
 		propertyMapper.from(idGenerator).to(logHandler::setIdGenerator);
 		propertyMapper.from(dateTimeFormatter).to(logHandler::setDateTimeFormatter);
