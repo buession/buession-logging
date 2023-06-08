@@ -118,7 +118,7 @@ public class RabbitLogHandler extends AbstractLogHandler {
 	@Override
 	protected Status doHandle(final LogData logData) throws Exception {
 		final Message message = createMessage(logData);
-		rabbitTemplate.send(exchange, routingKey, message);
+		rabbitTemplate.convertAndSend(exchange, routingKey, message);
 		return Status.SUCCESS;
 	}
 

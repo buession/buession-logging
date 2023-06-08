@@ -55,12 +55,12 @@ public class LogData implements Serializable {
 	/**
 	 * 业务类型
 	 */
-	private BusinessType businessType;
+	private String businessType;
 
 	/**
 	 * 事件
 	 */
-	private Event event;
+	private String event;
 
 	/**
 	 * 描述
@@ -180,7 +180,7 @@ public class LogData implements Serializable {
 	 *
 	 * @return 业务类型
 	 */
-	public BusinessType getBusinessType() {
+	public String getBusinessType() {
 		return businessType;
 	}
 
@@ -190,7 +190,7 @@ public class LogData implements Serializable {
 	 * @param businessType
 	 * 		业务类型
 	 */
-	public void setBusinessType(BusinessType businessType) {
+	public void setBusinessType(String businessType) {
 		this.businessType = businessType;
 	}
 
@@ -199,7 +199,7 @@ public class LogData implements Serializable {
 	 *
 	 * @return 事件
 	 */
-	public Event getEvent() {
+	public String getEvent() {
 		return event;
 	}
 
@@ -209,7 +209,7 @@ public class LogData implements Serializable {
 	 * @param event
 	 * 		事件
 	 */
-	public void setEvent(Event event) {
+	public void setEvent(String event) {
 		this.event = event;
 	}
 

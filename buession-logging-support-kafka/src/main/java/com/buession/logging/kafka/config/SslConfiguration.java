@@ -56,7 +56,7 @@ public class SslConfiguration extends com.buession.logging.core.SslConfiguration
 		propertyMapper.from(this::getTrustStorePath).to(properties.in(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG));
 		propertyMapper.from(this::getTrustStoreType).to(properties.in(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG));
 		propertyMapper.from(this::getTrustStorePassword).to(properties.in(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG));
-		propertyMapper.from(this::getAlgorithms).as((v)->StringUtils.join(v, ','))
+		propertyMapper.from(this::getAlgorithms).as((algorithms)->StringUtils.join(algorithms, ','))
 				.to(properties.in(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG));
 
 		return properties;

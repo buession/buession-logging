@@ -176,10 +176,10 @@ public class JdbcLogHandler extends AbstractLogHandler {
 		data.put("dateTime", dateTimeFormatter.format(logData.getDateTime()).toString());
 
 		// 业务类型字段
-		data.put("businessType", logData.getBusinessType() == null ? null : logData.getBusinessType().toString());
+		data.put("businessType", logData.getBusinessType());
 
 		// 事件字段
-		data.put("event", logData.getEvent() == null ? null : logData.getEvent().toString());
+		data.put("event", logData.getEvent());
 
 		// 描述字段
 		data.put("description", logData.getDescription());

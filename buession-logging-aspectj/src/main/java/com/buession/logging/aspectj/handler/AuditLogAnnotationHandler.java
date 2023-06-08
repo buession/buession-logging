@@ -64,22 +64,8 @@ public class AuditLogAnnotationHandler extends AbstractAnnotationHandler<AuditLo
 		final LogData logData = new LogData();
 
 		//logData.setPrincipal();
-		logData.setBusinessType(new BusinessType() {
-
-			@Override
-			public String toString() {
-				return log.businessType();
-			}
-
-		});
-		logData.setEvent(new Event() {
-
-			@Override
-			public String toString() {
-				return log.event();
-			}
-
-		});
+		logData.setBusinessType(log.businessType());
+		logData.setEvent(log.event());
 		logData.setDescription(log.description());
 
 		logManager.save(logData);

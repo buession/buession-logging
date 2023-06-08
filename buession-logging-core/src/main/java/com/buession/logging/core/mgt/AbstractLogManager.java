@@ -37,11 +37,9 @@ import com.buession.logging.core.handler.PrincipalHandler;
 import com.buession.logging.core.request.Request;
 import com.buession.logging.core.request.RequestContext;
 import com.buession.web.utils.useragentutils.UserAgent;
-import com.maxmind.geoip2.exception.GeoIp2Exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.Date;
 
 /**
@@ -72,7 +70,7 @@ public abstract class AbstractLogManager implements LogManager {
 	 */
 	private Resolver geoResolver;
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Override
 	public RequestContext getRequestContext() {
@@ -169,11 +167,7 @@ public abstract class AbstractLogManager implements LogManager {
 			geoLocation.setDistrict(district);
 
 			logData.setLocation(geoLocation);
-		}catch(IOException e){
-			if(logger.isWarnEnabled()){
-				logger.warn("Parse ip: {} to get location error: {}", logData.getClientIp(), e.getMessage());
-			}
-		}catch(GeoIp2Exception e){
+		}catch(Exception e){
 			if(logger.isWarnEnabled()){
 				logger.warn("Parse ip: {} to get location error: {}", logData.getClientIp(), e.getMessage());
 			}

@@ -28,6 +28,7 @@ import com.buession.logging.kafka.core.Constants;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.LoggingProducerListener;
+import org.springframework.kafka.support.converter.JsonMessageConverter;
 
 /**
  * {@link KafkaTemplate} 工厂
@@ -57,7 +58,7 @@ public class KafkaTemplateFactory<K, V> {
 
 		kafkaTemplate.setDefaultTopic(Constants.DEFAULT_TOPIC);
 		kafkaTemplate.setProducerListener(new LoggingProducerListener<>());
-		//kafkaTemplate.setMessageConverter(new JsonMessageConverter());
+		kafkaTemplate.setMessageConverter(new JsonMessageConverter());
 
 		return kafkaTemplate;
 	}

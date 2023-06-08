@@ -341,7 +341,7 @@ public class ProducerFactory {
 		final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 		final Properties properties = new Properties();
 
-		propertyMapper.from(bootstrapServers).as((bootstrapServer)->StringUtils.join(bootstrapServer, ','))
+		propertyMapper.from(bootstrapServers).as((bootstrapServers)->StringUtils.join(bootstrapServers, ','))
 				.to(properties.in(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
 		propertyMapper.from(clientId).to(properties.in(ProducerConfig.CLIENT_ID_CONFIG));
 		propertyMapper.from(acks).to(properties.in(ProducerConfig.ACKS_CONFIG));
@@ -350,8 +350,10 @@ public class ProducerFactory {
 		propertyMapper.from(compressionType).to(properties.in(ProducerConfig.COMPRESSION_TYPE_CONFIG));
 		propertyMapper.from(retries).to(properties.in(ProducerConfig.RETRIES_CONFIG));
 		propertyMapper.from(transactionIdPrefix).to(properties.in(ProducerConfig.TRANSACTIONAL_ID_CONFIG));
-		propertyMapper.from(StringSerializer.class).to(properties.in(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG));
-		propertyMapper.from(JsonSerializer.class).to(properties.in(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG));
+		propertyMapper.from(StringSerializer.class.getName())
+				.to(properties.in(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG));
+		propertyMapper.from(JsonSerializer.class.getName())
+				.to(properties.in(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG));
 
 		if(sslConfiguration != null){
 			properties.putAll(sslConfiguration.buildProperties());
@@ -365,7 +367,12 @@ public class ProducerFactory {
 			properties.putAll(this.properties);
 		}
 
-		return new DefaultKafkaProducerFactory<>(properties, new StringSerializer(), new JsonSerializer<>());
+		final DefaultKafkaProducerFactory<String, Object> producerFactory =
+				new DefaultKafkaProducerFactory<>(properties);
+
+		propertyMapper.from(transactionIdPrefix).to(producerFactory::setTransactionIdPrefix);
+
+		return producerFactory;
 	}
 
 }

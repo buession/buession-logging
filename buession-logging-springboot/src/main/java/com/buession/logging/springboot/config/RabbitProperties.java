@@ -69,6 +69,16 @@ public class RabbitProperties implements HandlerProperties, Serializable {
 	private String virtualHost = ConnectionFactory.DEFAULT_VIRTUAL_HOST;
 
 	/**
+	 * Exchange 名称
+	 */
+	private String exchange;
+
+	/**
+	 * Routing key 名称
+	 */
+	private String routingKey;
+
+	/**
 	 * 连接超时
 	 */
 	private Duration connectionTimeout = ConnectionFactory.DEFAULT_CONNECTION_TIMEOUT;
@@ -102,12 +112,12 @@ public class RabbitProperties implements HandlerProperties, Serializable {
 	/**
 	 * 缓存配置
 	 */
-	private Cache cache;
+	private Cache cache = new Cache();
 
 	/**
 	 * Template 配置
 	 */
-	private Template template;
+	private Template template = new Template();
 
 	/**
 	 * 返回 RabbitMQ 地址
@@ -202,6 +212,44 @@ public class RabbitProperties implements HandlerProperties, Serializable {
 	 */
 	public void setVirtualHost(String virtualHost) {
 		this.virtualHost = virtualHost;
+	}
+
+	/**
+	 * 返回 Exchange 名称
+	 *
+	 * @return Exchange 名称
+	 */
+	public String getExchange() {
+		return exchange;
+	}
+
+	/**
+	 * 设置 Exchange 名称
+	 *
+	 * @param exchange
+	 * 		Exchange 名称
+	 */
+	public void setExchange(String exchange) {
+		this.exchange = exchange;
+	}
+
+	/**
+	 * 返回 Routing key 名称
+	 *
+	 * @return Routing key 名称
+	 */
+	public String getRoutingKey() {
+		return routingKey;
+	}
+
+	/**
+	 * 设置 Routing key 名称
+	 *
+	 * @param routingKey
+	 * 		Routing key 名称
+	 */
+	public void setRoutingKey(String routingKey) {
+		this.routingKey = routingKey;
 	}
 
 	/**

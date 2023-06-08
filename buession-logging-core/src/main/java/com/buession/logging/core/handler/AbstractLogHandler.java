@@ -43,7 +43,7 @@ public abstract class AbstractLogHandler implements LogHandler {
 			return doHandle(logData);
 		}catch(Exception e){
 			if(logger.isErrorEnabled()){
-				logger.error("Save log data failure: {}", e.getMessage(), e);
+				logger.error("Save log data failure: " + e.getMessage(), e);
 			}
 			return Status.FAILURE;
 		}

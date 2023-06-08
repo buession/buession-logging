@@ -347,18 +347,24 @@ public class ConnectionFactory {
 		final com.rabbitmq.client.ConnectionFactory rabbitConnectionFactory = createRabbitConnectionFactory();
 		final CachingConnectionFactory connectionFactory = new CachingConnectionFactory(rabbitConnectionFactory);
 
-		propertyMapper.from(host).to(connectionFactory::setAddresses);
+		propertyMapper.from(host + ":" + this.determinePort()).to(connectionFactory::setAddresses);
 		propertyMapper.from(publisherReturns).to(connectionFactory::setPublisherReturns);
 		propertyMapper.from(publisherConfirmType).to(connectionFactory::setPublisherConfirmType);
 
-		Cache.Channel channel = cache.getChannel();
-		propertyMapper.from(channel::getSize).to(connectionFactory::setChannelCacheSize);
-		propertyMapper.from(channel::getCheckoutTimeout).as(Duration::toMillis)
-				.to(connectionFactory::setChannelCheckoutTimeout);
+		if(cache != null){
+			Cache.Channel channel = cache.getChannel();
+			if(channel != null){
+				propertyMapper.from(channel::getSize).to(connectionFactory::setChannelCacheSize);
+				propertyMapper.from(channel::getCheckoutTimeout).as(Duration::toMillis)
+						.to(connectionFactory::setChannelCheckoutTimeout);
+			}
 
-		Cache.Connection connection = cache.getConnection();
-		propertyMapper.from(connection::getMode).to(connectionFactory::setCacheMode);
-		propertyMapper.from(connection::getSize).to(connectionFactory::setConnectionCacheSize);
+			Cache.Connection connection = cache.getConnection();
+			if(connection != null){
+				propertyMapper.from(connection::getMode).to(connectionFactory::setCacheMode);
+				propertyMapper.from(connection::getSize).to(connectionFactory::setConnectionCacheSize);
+			}
+		}
 
 		return connectionFactory;
 	}

@@ -50,6 +50,7 @@ public class KafkaTemplateFactoryBean<K, V> extends KafkaTemplateFactory<K, V>
 		return kafkaTemplate;
 	}
 
+	@SuppressWarnings({"rawtypes"})
 	@Override
 	public Class<KafkaTemplate> getObjectType() {
 		return KafkaTemplate.class;

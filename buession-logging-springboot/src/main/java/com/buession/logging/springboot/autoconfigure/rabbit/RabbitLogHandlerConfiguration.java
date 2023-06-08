@@ -64,9 +64,9 @@ public class RabbitLogHandlerConfiguration extends AbstractLogHandlerConfigurati
 
 		propertyMapper.from(handlerProperties::getHost).to(connectionFactoryBean::setHost);
 		propertyMapper.from(handlerProperties::getPort).to(connectionFactoryBean::setPort);
+		propertyMapper.from(handlerProperties::getVirtualHost).to(connectionFactoryBean::setVirtualHost);
 		propertyMapper.from(handlerProperties::getUsername).to(connectionFactoryBean::setUsername);
 		propertyMapper.from(handlerProperties::getPassword).to(connectionFactoryBean::setPassword);
-		propertyMapper.from(handlerProperties::getVirtualHost).to(connectionFactoryBean::setVirtualHost);
 		propertyMapper.from(handlerProperties::getRequestedHeartbeat).to(connectionFactoryBean::setRequestedHeartbeat);
 		propertyMapper.from(handlerProperties::getRequestedChannelMax)
 				.to(connectionFactoryBean::setRequestedChannelMax);
@@ -97,6 +97,8 @@ public class RabbitLogHandlerConfiguration extends AbstractLogHandlerConfigurati
 		final RabbitLogHandlerFactoryBean logHandlerFactoryBean = new RabbitLogHandlerFactoryBean();
 
 		rabbitTemplate.ifUnique(logHandlerFactoryBean::setRabbitTemplate);
+		logHandlerFactoryBean.setExchange(handlerProperties.getExchange());
+		logHandlerFactoryBean.setRoutingKey(handlerProperties.getRoutingKey());
 
 		return logHandlerFactoryBean;
 	}

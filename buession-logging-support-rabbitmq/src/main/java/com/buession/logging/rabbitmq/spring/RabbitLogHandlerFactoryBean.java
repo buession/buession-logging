@@ -24,6 +24,7 @@
  */
 package com.buession.logging.rabbitmq.spring;
 
+import com.buession.core.converter.mapper.PropertyMapper;
 import com.buession.core.utils.Assert;
 import com.buession.logging.rabbitmq.core.Cache;
 import com.buession.logging.core.SslConfiguration;
@@ -46,6 +47,16 @@ public class RabbitLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<Rabbi
 
 	private RabbitTemplate rabbitTemplate;
 
+	/**
+	 * Exchange 名称
+	 */
+	private String exchange;
+
+	/**
+	 * Routing key 名称
+	 */
+	private String routingKey;
+
 	public RabbitTemplate getRabbitTemplate() {
 		return rabbitTemplate;
 	}
@@ -54,10 +65,55 @@ public class RabbitLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<Rabbi
 		this.rabbitTemplate = rabbitTemplate;
 	}
 
+	/**
+	 * 返回 Exchange 名称
+	 *
+	 * @return Exchange 名称
+	 */
+	public String getExchange() {
+		return exchange;
+	}
+
+	/**
+	 * 设置 Exchange 名称
+	 *
+	 * @param exchange
+	 * 		Exchange 名称
+	 */
+	public void setExchange(String exchange) {
+		this.exchange = exchange;
+	}
+
+	/**
+	 * 返回 Routing key 名称
+	 *
+	 * @return Routing key 名称
+	 */
+	public String getRoutingKey() {
+		return routingKey;
+	}
+
+	/**
+	 * 设置 Routing key 名称
+	 *
+	 * @param routingKey
+	 * 		Routing key 名称
+	 */
+	public void setRoutingKey(String routingKey) {
+		this.routingKey = routingKey;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.isNull(rabbitTemplate, "RabbitTemplate is null.");
+		Assert.isBlank(routingKey, "RoutingKey is blank, empty or null.");
+
 		logHandler = new RabbitLogHandler(rabbitTemplate, new Jackson2JsonMessageConverter());
+
+		final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenHasText();
+
+		propertyMapper.from(exchange).to(logHandler::setExchange);
+		propertyMapper.from(routingKey).to(logHandler::setRoutingKey);
 	}
 
 }

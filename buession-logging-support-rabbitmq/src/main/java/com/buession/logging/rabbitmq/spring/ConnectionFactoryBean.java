@@ -44,7 +44,7 @@ public class ConnectionFactoryBean extends ConnectionFactory
 	}
 
 	@Override
-	public Class<?> getObjectType() {
+	public Class<org.springframework.amqp.rabbit.connection.ConnectionFactory> getObjectType() {
 		return org.springframework.amqp.rabbit.connection.ConnectionFactory.class;
 	}
 

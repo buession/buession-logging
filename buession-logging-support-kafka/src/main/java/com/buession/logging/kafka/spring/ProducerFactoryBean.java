@@ -46,6 +46,7 @@ public class ProducerFactoryBean extends ProducerFactory
 		return producerFactory;
 	}
 
+	@SuppressWarnings({"rawtypes"})
 	@Override
 	public Class<? extends org.springframework.kafka.core.ProducerFactory> getObjectType() {
 		return producerFactory.getClass();
