@@ -28,9 +28,9 @@ import com.buession.core.utils.Assert;
 import com.buession.io.file.File;
 import com.buession.lang.Status;
 import com.buession.logging.core.LogData;
+import com.buession.logging.core.formatter.LogDataFormatter;
 import com.buession.logging.core.handler.AbstractLogHandler;
-import com.buession.logging.file.formatter.DefaultFormatter;
-import com.buession.logging.file.formatter.Formatter;
+import com.buession.logging.core.formatter.DefaultLogDataFormatter;
 
 import java.nio.file.Path;
 
@@ -50,7 +50,7 @@ public class FileLogHandler extends AbstractLogHandler {
 	/**
 	 * 日志格式化
 	 */
-	private Formatter formatter = new DefaultFormatter();
+	private LogDataFormatter<String> formatter = new DefaultLogDataFormatter();
 
 	/**
 	 * 构造函数
@@ -93,7 +93,7 @@ public class FileLogHandler extends AbstractLogHandler {
 	 * @param formatter
 	 * 		日志格式化
 	 */
-	public FileLogHandler(final java.io.File file, final Formatter formatter) {
+	public FileLogHandler(final java.io.File file, final LogDataFormatter<String> formatter) {
 		this(file);
 		Assert.isNull(formatter, "Formatter is null.");
 		this.formatter = formatter;
@@ -107,7 +107,7 @@ public class FileLogHandler extends AbstractLogHandler {
 	 * @param formatter
 	 * 		日志格式化
 	 */
-	public FileLogHandler(final Path path, final Formatter formatter) {
+	public FileLogHandler(final Path path, final LogDataFormatter<String> formatter) {
 		this(path);
 		Assert.isNull(formatter, "Formatter is null.");
 		this.formatter = formatter;
@@ -121,7 +121,7 @@ public class FileLogHandler extends AbstractLogHandler {
 	 * @param formatter
 	 * 		日志格式化
 	 */
-	public FileLogHandler(final String path, final Formatter formatter) {
+	public FileLogHandler(final String path, final LogDataFormatter<String> formatter) {
 		this(path);
 		Assert.isNull(formatter, "Formatter is null.");
 		this.formatter = formatter;

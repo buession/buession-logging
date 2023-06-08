@@ -25,8 +25,8 @@
 package com.buession.logging.file.spring;
 
 import com.buession.core.utils.Assert;
-import com.buession.logging.file.formatter.DefaultFormatter;
-import com.buession.logging.file.formatter.Formatter;
+import com.buession.logging.core.formatter.DefaultLogDataFormatter;
+import com.buession.logging.core.formatter.LogDataFormatter;
 import com.buession.logging.file.handler.FileLogHandler;
 import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
 
@@ -48,7 +48,7 @@ public class FileLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<FileLog
 	/**
 	 * 日志格式化
 	 */
-	private Formatter formatter = new DefaultFormatter();
+	private LogDataFormatter<String> formatter = new DefaultLogDataFormatter();
 
 	/**
 	 * 返回日志文件对象
@@ -74,7 +74,7 @@ public class FileLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<FileLog
 	 *
 	 * @return 日志格式化
 	 */
-	public Formatter getFormatter() {
+	public LogDataFormatter<String> getFormatter() {
 		return formatter;
 	}
 
@@ -84,7 +84,7 @@ public class FileLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<FileLog
 	 * @param formatter
 	 * 		日志格式化
 	 */
-	public void setFormatter(Formatter formatter) {
+	public void setFormatter(LogDataFormatter<String> formatter) {
 		this.formatter = formatter;
 	}
 

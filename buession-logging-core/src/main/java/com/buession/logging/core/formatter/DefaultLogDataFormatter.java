@@ -22,8 +22,21 @@
  * | Copyright @ 2013-2023 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
+package com.buession.logging.core.formatter;
+
+import com.buession.logging.core.LogData;
+
 /**
+ * 默认日志格式化
+ *
  * @author Yong.Teng
  * @since 0.0.1
  */
-package com.buession.logging.file.formatter;
+public class DefaultLogDataFormatter implements LogDataFormatter<String> {
+
+	@Override
+	public String format(final LogData logData) {
+		return logData == null ? null : logData.toString();
+	}
+
+}

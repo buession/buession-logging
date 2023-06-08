@@ -25,11 +25,6 @@
 package com.buession.logging.mongodb.spring;
 
 import com.buession.core.builder.ListBuilder;
-import com.buession.core.converter.mapper.PropertyMapper;
-import com.buession.logging.mongodb.core.converter.BusinessTypeConverter;
-import com.buession.logging.mongodb.core.converter.EventConverter;
-import org.springframework.beans.BeanUtils;
-import org.springframework.data.mapping.model.FieldNamingStrategy;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.convert.DbRefResolver;
@@ -76,8 +71,7 @@ public class MongoTemplateFactory {
 		final DbRefResolver dbRefResolver = new DefaultDbRefResolver(mongoDatabaseFactory);
 		final DefaultMongoTypeMapper typeMapper = new DefaultMongoTypeMapper(null, mongoMappingContext);
 		final MappingMongoConverter converter = new MappingMongoConverter(dbRefResolver, mongoMappingContext);
-		final MongoCustomConversions conversions = new MongoCustomConversions(
-				ListBuilder.create().add(new BusinessTypeConverter()).add(new EventConverter()).build());
+		final MongoCustomConversions conversions = new MongoCustomConversions(ListBuilder.empty());
 
 		converter.setCustomConversions(conversions);
 		converter.setCodecRegistryProvider(mongoDatabaseFactory);

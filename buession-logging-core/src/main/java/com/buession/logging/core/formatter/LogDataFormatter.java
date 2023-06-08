@@ -22,27 +22,19 @@
  * | Copyright @ 2013-2023 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.file.formatter;
+package com.buession.logging.core.formatter;
 
 import com.buession.logging.core.LogData;
 
 /**
- * 日志格式化
+ * 日志数据格式化
+ *
+ * @param <T>
+ * 		格式化目标类型
  *
  * @author Yong.Teng
  * @since 0.0.1
  */
-@FunctionalInterface
-public interface Formatter {
-
-	/**
-	 * 将日志数据格式化为字符串
-	 *
-	 * @param logData
-	 * 		日志数据
-	 *
-	 * @return 日志数据格式化后字符串
-	 */
-	String format(final LogData logData);
+public interface LogDataFormatter<T> extends Formatter<LogData, T> {
 
 }

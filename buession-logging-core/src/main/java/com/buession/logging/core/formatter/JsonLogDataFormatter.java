@@ -22,21 +22,28 @@
  * | Copyright @ 2013-2023 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.mongodb.core.converter;
+package com.buession.logging.core.formatter;
 
-import com.buession.lang.Constants;
-import com.buession.logging.core.Event;
-import org.springframework.core.convert.converter.Converter;
+import com.buession.logging.core.LogData;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
+ * 默认日志格式化
+ *
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class EventConverter implements Converter<Event, String> {
+public class JsonLogDataFormatter implements LogDataFormatter<String> {
 
 	@Override
-	public String convert(Event event) {
-		return event == null ? Constants.EMPTY_STRING : event.toString();
+	public String format(final LogData logData) {
+		ObjectMapper objectMapper = new ObjectMapper();
+		try{
+			return objectMapper.writeValueAsString(logData);
+		}catch(JsonProcessingException e){
+			return null;
+		}
 	}
 
 }

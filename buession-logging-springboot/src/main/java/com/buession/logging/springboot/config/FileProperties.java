@@ -24,7 +24,7 @@
  */
 package com.buession.logging.springboot.config;
 
-import com.buession.logging.file.formatter.Formatter;
+import com.buession.logging.core.formatter.LogDataFormatter;
 
 import java.io.Serializable;
 
@@ -46,7 +46,7 @@ public class FileProperties implements HandlerProperties, Serializable {
 	/**
 	 * 日志格式化
 	 */
-	private Class<? extends Formatter> formatter;
+	private Class<? extends LogDataFormatter<String>> formatter;
 
 	/**
 	 * 返回日志文件路径
@@ -72,7 +72,7 @@ public class FileProperties implements HandlerProperties, Serializable {
 	 *
 	 * @return 日志格式化
 	 */
-	public Class<? extends Formatter> getFormatter() {
+	public Class<? extends LogDataFormatter<String>> getFormatter() {
 		return formatter;
 	}
 
@@ -82,7 +82,7 @@ public class FileProperties implements HandlerProperties, Serializable {
 	 * @param formatter
 	 * 		日志格式化
 	 */
-	public void setFormatter(Class<? extends Formatter> formatter) {
+	public void setFormatter(Class<? extends LogDataFormatter<String>> formatter) {
 		this.formatter = formatter;
 	}
 
