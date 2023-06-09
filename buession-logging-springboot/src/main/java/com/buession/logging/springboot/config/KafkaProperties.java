@@ -26,8 +26,8 @@ package com.buession.logging.springboot.config;
 
 import com.buession.logging.kafka.config.SecurityConfiguration;
 import com.buession.logging.kafka.config.SslConfiguration;
-import com.buession.logging.kafka.spring.KafkaLogHandlerFactoryBean;
 import com.buession.logging.kafka.spring.ProducerFactory;
+import com.buession.logging.support.config.HandlerProperties;
 import org.springframework.util.unit.DataSize;
 
 import java.io.Serializable;

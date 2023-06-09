@@ -25,6 +25,7 @@
 package com.buession.logging.springboot.config;
 
 import com.buession.logging.core.formatter.LogDataFormatter;
+import com.buession.logging.support.config.HandlerProperties;
 
 import java.io.Serializable;
 

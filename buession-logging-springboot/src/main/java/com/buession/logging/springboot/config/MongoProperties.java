@@ -30,6 +30,7 @@ import com.buession.dao.mongodb.core.WriteConcern;
 import com.buession.logging.mongodb.core.PoolConfiguration;
 import com.buession.logging.mongodb.spring.MongoClientFactory;
 import com.buession.logging.mongodb.spring.MongoMappingContextFactory;
+import com.buession.logging.support.config.HandlerProperties;
 import org.bson.UuidRepresentation;
 import org.springframework.data.mapping.model.FieldNamingStrategy;
 

@@ -28,6 +28,7 @@ import com.buession.logging.core.SslConfiguration;
 import com.buession.logging.rabbitmq.core.Cache;
 import com.buession.logging.rabbitmq.core.Template;
 import com.buession.logging.rabbitmq.spring.ConnectionFactory;
+import com.buession.logging.support.config.HandlerProperties;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 
 import java.io.Serializable;

@@ -22,28 +22,8 @@
  * | Copyright @ 2013-2023 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.springboot.autoconfigure;
-
-import com.buession.core.converter.mapper.PropertyMapper;
-import com.buession.logging.support.config.HandlerProperties;
-
 /**
- * 日志处理器自动配置类抽象类
- *
- * @param <P>
- * 		Handler 配置
- *
  * @author Yong.Teng
  * @since 0.0.1
  */
-public abstract class AbstractLogHandlerConfiguration<P extends HandlerProperties> {
-
-	protected final P handlerProperties;
-
-	protected final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
-
-	public AbstractLogHandlerConfiguration(final P handlerProperties) {
-		this.handlerProperties = handlerProperties;
-	}
-
-}
+package com.buession.logging.support.config;

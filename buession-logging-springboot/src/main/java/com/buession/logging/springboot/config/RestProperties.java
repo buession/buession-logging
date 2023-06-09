@@ -27,6 +27,7 @@ package com.buession.logging.springboot.config;
 import com.buession.logging.rest.core.JsonRequestBodyBuilder;
 import com.buession.logging.rest.core.RequestBodyBuilder;
 import com.buession.logging.rest.core.RequestMethod;
+import com.buession.logging.support.config.HandlerProperties;
 
 import java.io.Serializable;
 
@@ -60,7 +61,7 @@ public class RestProperties implements HandlerProperties, Serializable {
 	 *
 	 * @return Rest Url
 	 */
-	public String getUrl(){
+	public String getUrl() {
 		return url;
 	}
 
@@ -70,7 +71,7 @@ public class RestProperties implements HandlerProperties, Serializable {
 	 * @param url
 	 * 		Rest Url
 	 */
-	public void setUrl(String url){
+	public void setUrl(String url) {
 		this.url = url;
 	}
 
@@ -79,7 +80,7 @@ public class RestProperties implements HandlerProperties, Serializable {
 	 *
 	 * @return 请求方式 {@link RequestMethod}
 	 */
-	public RequestMethod getRequestMethod(){
+	public RequestMethod getRequestMethod() {
 		return requestMethod;
 	}
 
@@ -89,7 +90,7 @@ public class RestProperties implements HandlerProperties, Serializable {
 	 * @param requestMethod
 	 * 		请求方式 {@link RequestMethod}
 	 */
-	public void setRequestMethod(RequestMethod requestMethod){
+	public void setRequestMethod(RequestMethod requestMethod) {
 		this.requestMethod = requestMethod;
 	}
 
@@ -98,7 +99,7 @@ public class RestProperties implements HandlerProperties, Serializable {
 	 *
 	 * @return 请求体构建器
 	 */
-	public Class<? extends RequestBodyBuilder> getRequestBodyBuilder(){
+	public Class<? extends RequestBodyBuilder> getRequestBodyBuilder() {
 		return requestBodyBuilder;
 	}
 
@@ -108,7 +109,7 @@ public class RestProperties implements HandlerProperties, Serializable {
 	 * @param requestBodyBuilder
 	 * 		请求体构建器
 	 */
-	public void setRequestBodyBuilder(Class<? extends RequestBodyBuilder> requestBodyBuilder){
+	public void setRequestBodyBuilder(Class<? extends RequestBodyBuilder> requestBodyBuilder) {
 		this.requestBodyBuilder = requestBodyBuilder;
 	}
 

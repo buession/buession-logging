@@ -25,6 +25,7 @@
 package com.buession.logging.springboot.config;
 
 import com.buession.logging.elasticsearch.spring.RestHighLevelClientFactory;
+import com.buession.logging.support.config.HandlerProperties;
 
 import java.io.Serializable;
 import java.time.Duration;

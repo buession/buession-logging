@@ -197,7 +197,7 @@ public class JdbcTemplateFactory {
 		return new JdbcTemplate(createDataSource());
 	}
 
-	@SuppressWarnings({"unchecked"})
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	protected DataSource createDataSource() {
 		if(this.dataSource != null){
 			return this.dataSource;

@@ -66,7 +66,7 @@ public class JdbcLogHandlerConfiguration extends AbstractLogHandlerConfiguration
 		propertyMapper.from(handlerProperties::getUrl).to(jdbcTemplateFactoryBean::setUrl);
 		propertyMapper.from(handlerProperties::getUsername).to(jdbcTemplateFactoryBean::setUsername);
 		propertyMapper.from(handlerProperties::getPassword).to(jdbcTemplateFactoryBean::setPassword);
-		propertyMapper.from(handlerProperties::getPoolConfiguration).to(jdbcTemplateFactoryBean::setPoolConfiguration);
+		propertyMapper.from(handlerProperties::getPool).to(jdbcTemplateFactoryBean::setPoolConfiguration);
 
 		return jdbcTemplateFactoryBean;
 	}

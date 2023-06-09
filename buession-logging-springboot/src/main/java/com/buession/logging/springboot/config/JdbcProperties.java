@@ -30,6 +30,7 @@ import com.buession.logging.jdbc.formatter.DefaultGeoFormatter;
 import com.buession.logging.core.formatter.GeoFormatter;
 import com.buession.logging.jdbc.formatter.JsonMapFormatter;
 import com.buession.logging.core.formatter.MapFormatter;
+import com.buession.logging.support.config.HandlerProperties;
 
 import java.io.Serializable;
 
@@ -66,7 +67,7 @@ public class JdbcProperties implements HandlerProperties, Serializable {
 	/**
 	 * 连接池配置
 	 */
-	private PoolConfiguration poolConfiguration;
+	private PoolConfiguration pool;
 
 	/**
 	 * SQL
@@ -179,18 +180,18 @@ public class JdbcProperties implements HandlerProperties, Serializable {
 	 *
 	 * @return 连接池配置
 	 */
-	public PoolConfiguration getPoolConfiguration() {
-		return poolConfiguration;
+	public PoolConfiguration getPool() {
+		return pool;
 	}
 
 	/**
 	 * 设置连接池配置
 	 *
-	 * @param poolConfiguration
+	 * @param pool
 	 * 		连接池配置
 	 */
-	public void setPoolConfiguration(PoolConfiguration poolConfiguration) {
-		this.poolConfiguration = poolConfiguration;
+	public void setPool(PoolConfiguration pool) {
+		this.pool = pool;
 	}
 
 	/**
