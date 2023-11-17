@@ -2,7 +2,7 @@
 ===========================
 
 
-## [0.0.2](https://github.com/buession/buession-logging/releases/tag/v0.0.2) (2023-xx-xx)
+## [0.0.2](https://github.com/buession/buession-logging/releases/tag/v0.0.2) (2023-11-17)
 
 ### 🔨依赖升级
 
@@ -16,7 +16,7 @@
 
 ### 🔨依赖升级
 
-- [依赖库版本升级和安全漏洞修复](https://github.com/buession/buession-parent/releases/tag/v0.0.1)
+- [依赖库版本升级和安全漏洞修复](https://github.com/buession/buession-parent/releases/tag/v2.3.0)
 
 
 ### ⭐ 新特性
@@ -28,5 +28,5 @@
 - **buession-logging-support-mongodb：** MongoDB 日志处理器
 - **buession-logging-support-rabbitmq：** RabbitMQ 日志处理器
 - **buession-logging-support-rest：** Rest 日志处理器
-- **bbuession-logging-annotations：** 注解
-- **bbuession-logging-aspectj：** aspectj
+- **buession-logging-annotations：** 注解
+- **buession-logging-aspectj：** aspectj
