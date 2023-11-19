@@ -2,7 +2,7 @@
 ===========================
 
 
-## [0.0.2](https://github.com/buession/buession-logging/releases/tag/v0.0.2) (2023-11-17)
+## [0.0.2](https://github.com/buession/buession-logging/releases/tag/v0.0.2) (2023-11-19)
 
 ### 🔨依赖升级
 
