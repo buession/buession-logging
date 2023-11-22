@@ -70,8 +70,8 @@
 	</modules>
 
 	<properties>
-		<buession.version>2.3.1</buession.version>
-		<buession.springboot.version>2.3.1</buession.springboot.version>
+		<buession.version>2.3.2</buession.version>
+		<buession.springboot.version>2.3.2</buession.springboot.version>
 	</properties>
 
 	<dependencyManagement>
