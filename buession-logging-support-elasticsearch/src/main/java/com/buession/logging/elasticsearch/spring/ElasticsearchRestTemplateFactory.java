@@ -24,6 +24,7 @@
  */
 package com.buession.logging.elasticsearch.spring;
 
+import com.buession.core.utils.Assert;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 
@@ -60,7 +61,8 @@ public class ElasticsearchRestTemplateFactory {
 	}
 
 	protected ElasticsearchRestTemplate createElasticsearchRestTemplate() {
-		return new ElasticsearchRestTemplate(client);
+		Assert.isNull(getClient(), "Property 'client' is required");
+		return new ElasticsearchRestTemplate(getClient());
 	}
 
 }

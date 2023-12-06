@@ -22,76 +22,88 @@
  * | Copyright @ 2013-2023 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.kafka.spring;
+package com.buession.logging.mongodb.spring;
 
 import com.buession.core.utils.Assert;
-import com.buession.logging.kafka.handler.KafkaLogHandler;
+import com.buession.logging.mongodb.handler.MongoLogHandler;
 import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
 /**
- * Kafka 日志处理器 {@link KafkaLogHandler} 工厂 Bean 基类
+ * MongoDB 日志处理器 {@link MongoLogHandler} 工厂 Bean 基类
  *
  * @author Yong.Teng
- * @since 0.0.1
+ * @since 0.0.3
  */
-public class KafkaLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<KafkaLogHandler> {
+public class MongoLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<MongoLogHandler> {
 
 	/**
-	 * {@link KafkaTemplate}
+	 * {@link MongoTemplate}
 	 */
-	private KafkaTemplate<String, Object> kafkaTemplate;
+	private MongoTemplate mongoTemplate;
 
 	/**
-	 * Topic 名称
+	 * Collection 名称
 	 */
-	private String topic;
+	private String collectionName;
+
+	private final static Logger logger = LoggerFactory.getLogger(MongoLogHandlerFactoryBean.class);
 
 	/**
-	 * 返回 {@link KafkaTemplate}
+	 * 返回 {@link MongoTemplate}
 	 *
-	 * @return {@link KafkaTemplate}
+	 * @return {@link MongoTemplate}
 	 */
-	public KafkaTemplate<String, Object> getKafkaTemplate() {
-		return kafkaTemplate;
+	public MongoTemplate getMongoTemplate() {
+		return mongoTemplate;
 	}
 
 	/**
-	 * 设置 {@link KafkaTemplate}
+	 * 设置 {@link MongoTemplate}
 	 *
-	 * @param kafkaTemplate
-	 *        {@link KafkaTemplate}
+	 * @param mongoTemplate
+	 *        {@link MongoTemplate}
 	 */
-	public void setKafkaTemplate(KafkaTemplate<String, Object> kafkaTemplate) {
-		this.kafkaTemplate = kafkaTemplate;
+	public void setMongoTemplate(MongoTemplate mongoTemplate) {
+		this.mongoTemplate = mongoTemplate;
 	}
 
 	/**
-	 * 返回 Topic 名称
+	 * 返回 Collection 名称
 	 *
-	 * @return Topic 名称
+	 * @return Collection 名称
 	 */
-	public String getTopic() {
-		return topic;
+	public String getCollectionName() {
+		return collectionName;
 	}
 
 	/**
-	 * 设置 Topic 名称
+	 * 设置 Collection 名称
 	 *
-	 * @param topic
-	 * 		Topic 名称
+	 * @param collectionName
+	 * 		Collection 名称
 	 */
-	public void setTopic(String topic) {
-		this.topic = topic;
+	public void setCollectionName(String collectionName) {
+		this.collectionName = collectionName;
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isNull(getKafkaTemplate(), "Property 'kafkaTemplate' is required");
-		Assert.isBlank(getTopic(), "Property 'topic' is required");
+		Assert.isNull(getMongoTemplate(), "Property 'mongoTemplate' is required");
 
 		if(logHandler == null){
-			logHandler = new KafkaLogHandler(getKafkaTemplate(), getTopic());
+			createCollection();
+
+			logHandler = new MongoLogHandler(getMongoTemplate(), getCollectionName());
+		}
+	}
+
+	private void createCollection() {
+		if(mongoTemplate.collectionExists(getCollectionName()) == false){
+			logger.trace("Creating database collection: [{}]", getCollectionName());
+			mongoTemplate.createCollection(getCollectionName());
 		}
 	}
 

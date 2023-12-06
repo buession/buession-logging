@@ -32,6 +32,7 @@ import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.mongodb.spring.MongoClientFactoryBean;
 import com.buession.logging.mongodb.spring.MongoDatabaseFactoryBean;
 import com.buession.logging.mongodb.spring.MongoHandlerFactoryBean;
+import com.buession.logging.mongodb.spring.MongoLogHandlerFactoryBean;
 import com.buession.logging.mongodb.spring.MongoMappingContextFactoryBean;
 import com.buession.logging.mongodb.spring.MongoTemplateFactoryBean;
 import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
@@ -205,7 +206,20 @@ public class MongoLogHandlerConfiguration extends AbstractLogHandlerConfiguratio
 	}
 
 	@Bean
-	public MongoHandlerFactoryBean logHandlerFactoryBean(
+	public MongoLogHandlerFactoryBean logHandlerFactoryBean(
+			@Qualifier("logMongoDbMongoTemplate") ObjectProvider<MongoTemplate> mongoTemplate) {
+		final MongoLogHandlerFactoryBean logHandlerFactoryBean = new MongoLogHandlerFactoryBean();
+
+		mongoTemplate.ifUnique(logHandlerFactoryBean::setMongoTemplate);
+
+		propertyMapper.from(handlerProperties::getCollectionName).to(logHandlerFactoryBean::setCollectionName);
+
+		return logHandlerFactoryBean;
+	}
+
+	@ConditionalOnMissingBean(MongoLogHandlerFactoryBean.class)
+	@Bean
+	public MongoHandlerFactoryBean dLogHandlerFactoryBean(
 			@Qualifier("logMongoDbMongoTemplate") ObjectProvider<MongoTemplate> mongoTemplate) {
 		final MongoHandlerFactoryBean logHandlerFactoryBean = new MongoHandlerFactoryBean();
 

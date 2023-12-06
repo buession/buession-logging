@@ -24,7 +24,6 @@
  */
 package com.buession.logging.rabbitmq.spring;
 
-import com.buession.core.utils.Assert;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -50,8 +49,9 @@ public class RabbitTemplateFactoryBean extends RabbitTemplateFactory implements 
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isNull(getConnectionFactory(), "ConnectionFactory is null.");
-		rabbitTemplate = createRabbitTemplate();
+		if(rabbitTemplate == null){
+			rabbitTemplate = createRabbitTemplate();
+		}
 	}
 
 }

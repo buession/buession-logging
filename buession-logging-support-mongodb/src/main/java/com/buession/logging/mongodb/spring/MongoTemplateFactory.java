@@ -25,6 +25,7 @@
 package com.buession.logging.mongodb.spring;
 
 import com.buession.core.builder.ListBuilder;
+import com.buession.core.utils.Assert;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.convert.DbRefResolver;
@@ -64,6 +65,7 @@ public class MongoTemplateFactory {
 	}
 
 	protected MongoTemplate createMongoTemplate() {
+		Assert.isNull(getMongoDatabaseFactory(), "Property 'mongoDatabaseFactory' is required");
 		return new MongoTemplate(mongoDatabaseFactory, createMongoConverter());
 	}
 

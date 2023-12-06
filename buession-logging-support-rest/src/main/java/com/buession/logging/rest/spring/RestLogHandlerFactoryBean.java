@@ -138,15 +138,17 @@ public class RestLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<RestLog
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isBlank(url, "Rest url cloud not be blank, empty or null.");
+		Assert.isBlank(getUrl(), "Property 'url' is required");
 
-		final Class<? extends HttpClient> httpClientType = findHttpClientType();
-		final HttpClient httpClient = BeanUtils.instantiateClass(httpClientType);
+		if(logHandler == null){
+			final Class<? extends HttpClient> httpClientType = findHttpClientType();
+			final HttpClient httpClient = BeanUtils.instantiateClass(httpClientType);
 
-		logHandler = new RestLogHandler(httpClient, url, requestMethod);
+			logHandler = new RestLogHandler(httpClient, getUrl(), getRequestMethod());
 
-		if(requestBodyBuilder != null){
-			logHandler.setRequestBodyBuilder(requestBodyBuilder);
+			if(getRequestBodyBuilder() != null){
+				logHandler.setRequestBodyBuilder(getRequestBodyBuilder());
+			}
 		}
 	}
 

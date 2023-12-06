@@ -24,7 +24,6 @@
  */
 package com.buession.logging.elasticsearch.spring;
 
-import com.buession.core.utils.Assert;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
@@ -52,8 +51,9 @@ public class ElasticsearchRestTemplateFactoryBean extends ElasticsearchRestTempl
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isNull(getClient(), "RestHighLevelClient is null.");
-		restTemplate = createElasticsearchRestTemplate();
+		if(restTemplate == null){
+			restTemplate = createElasticsearchRestTemplate();
+		}
 	}
 
 }

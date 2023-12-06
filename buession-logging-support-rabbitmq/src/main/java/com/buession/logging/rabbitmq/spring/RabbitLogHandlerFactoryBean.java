@@ -105,15 +105,17 @@ public class RabbitLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<Rabbi
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isNull(rabbitTemplate, "RabbitTemplate is null.");
-		Assert.isBlank(routingKey, "RoutingKey is blank, empty or null.");
+		Assert.isNull(getRabbitTemplate(), "Property 'rabbitTemplate' is required");
+		Assert.isBlank(getRoutingKey(), "Property 'topic' is required");
 
-		logHandler = new RabbitLogHandler(rabbitTemplate, new Jackson2JsonMessageConverter());
+		if(logHandler == null){
+			logHandler = new RabbitLogHandler(getRabbitTemplate(), new Jackson2JsonMessageConverter());
 
-		final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenHasText();
+			final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenHasText();
 
-		propertyMapper.from(exchange).to(logHandler::setExchange);
-		propertyMapper.from(routingKey).to(logHandler::setRoutingKey);
+			propertyMapper.from(getExchange()).to(logHandler::setExchange);
+			propertyMapper.from(getRoutingKey()).to(logHandler::setRoutingKey);
+		}
 	}
 
 }
