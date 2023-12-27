@@ -24,7 +24,6 @@
  */
 package com.buession.logging.kafka.spring;
 
-import com.buession.core.utils.Assert;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -58,8 +57,9 @@ public class KafkaTemplateFactoryBean<K, V> extends KafkaTemplateFactory<K, V>
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isNull(getProducerFactory(), "ProducerFactory is null.");
-		kafkaTemplate = createKafkaTemplate();
+		if(kafkaTemplate == null){
+			kafkaTemplate = createKafkaTemplate();
+		}
 	}
 
 }

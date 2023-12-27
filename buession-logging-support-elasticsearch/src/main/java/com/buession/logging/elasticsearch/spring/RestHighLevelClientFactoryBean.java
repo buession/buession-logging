@@ -24,8 +24,6 @@
  */
 package com.buession.logging.elasticsearch.spring;
 
-import com.buession.core.utils.Assert;
-import com.buession.core.validator.Validate;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -53,9 +51,9 @@ public class RestHighLevelClientFactoryBean extends RestHighLevelClientFactory
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isTrue(Validate.isBlank(getHost()) && Validate.isEmpty(getUrls()), "Elasticsearch host and urls is " +
-				"blank, empty or null.");
-		client = createRestHighLevelClient();
+		if(client == null){
+			client = createRestHighLevelClient();
+		}
 	}
 
 }

@@ -24,12 +24,7 @@
  */
 package com.buession.logging.mongodb.spring;
 
-import com.buession.core.utils.Assert;
 import com.buession.logging.mongodb.handler.MongoLogHandler;
-import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.mongodb.core.MongoTemplate;
 
 /**
  * MongoDB 日志处理器 {@link MongoLogHandler} 工厂 Bean 基类
@@ -37,72 +32,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class MongoHandlerFactoryBean extends BaseLogHandlerFactoryBean<MongoLogHandler> {
-
-	/**
-	 * {@link MongoTemplate}
-	 */
-	private MongoTemplate mongoTemplate;
-
-	/**
-	 * Collection 名称
-	 */
-	private String collectionName;
-
-	private final static Logger logger = LoggerFactory.getLogger(MongoHandlerFactoryBean.class);
-
-	/**
-	 * 返回 {@link MongoTemplate}
-	 *
-	 * @return {@link MongoTemplate}
-	 */
-	public MongoTemplate getMongoTemplate() {
-		return mongoTemplate;
-	}
-
-	/**
-	 * 设置 {@link MongoTemplate}
-	 *
-	 * @param mongoTemplate
-	 *        {@link MongoTemplate}
-	 */
-	public void setMongoTemplate(MongoTemplate mongoTemplate) {
-		this.mongoTemplate = mongoTemplate;
-	}
-
-	/**
-	 * 返回 Collection 名称
-	 *
-	 * @return Collection 名称
-	 */
-	public String getCollectionName() {
-		return collectionName;
-	}
-
-	/**
-	 * 设置 Collection 名称
-	 *
-	 * @param collectionName
-	 * 		Collection 名称
-	 */
-	public void setCollectionName(String collectionName) {
-		this.collectionName = collectionName;
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		Assert.isNull(mongoTemplate, "MongoTemplate is null.");
-
-		createCollection();
-
-		logHandler = new MongoLogHandler(mongoTemplate, collectionName);
-	}
-
-	private void createCollection() {
-		if(mongoTemplate.collectionExists(collectionName) == false){
-			logger.trace("Creating database collection: [{}]", collectionName);
-			mongoTemplate.createCollection(collectionName);
-		}
-	}
+@Deprecated
+public class MongoHandlerFactoryBean extends MongoLogHandlerFactoryBean {
 
 }

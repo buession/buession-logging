@@ -25,6 +25,7 @@
 package com.buession.logging.rabbitmq.spring;
 
 import com.buession.core.converter.mapper.PropertyMapper;
+import com.buession.core.utils.Assert;
 import com.buession.core.utils.StringUtils;
 import com.buession.logging.core.SslConfiguration;
 import com.buession.logging.rabbitmq.core.Cache;
@@ -343,6 +344,8 @@ public class ConnectionFactory {
 	}
 
 	public org.springframework.amqp.rabbit.connection.ConnectionFactory createConnectionFactory() throws Exception {
+		Assert.isBlank(getHost(), "Property 'host' is required");
+
 		final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 		final com.rabbitmq.client.ConnectionFactory rabbitConnectionFactory = createRabbitConnectionFactory();
 		final CachingConnectionFactory connectionFactory = new CachingConnectionFactory(rabbitConnectionFactory);

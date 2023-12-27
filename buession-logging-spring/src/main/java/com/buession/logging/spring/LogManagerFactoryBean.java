@@ -54,9 +54,11 @@ public class LogManagerFactoryBean extends LogManagerFactory implements FactoryB
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isNull(getRequestContext(), "RequestContext is null.");
+		Assert.isNull(getRequestContext(), "Property 'requestContext' is required");
 
-		logManager = createLogManager();
+		if(logManager == null){
+			logManager = createLogManager();
+		}
 	}
 
 }

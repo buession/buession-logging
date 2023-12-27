@@ -24,6 +24,7 @@
  */
 package com.buession.logging.mongodb.spring;
 
+import com.buession.core.utils.Assert;
 import com.mongodb.client.MongoClient;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
@@ -56,6 +57,8 @@ public class MongoDatabaseFactory {
 	}
 
 	protected org.springframework.data.mongodb.MongoDatabaseFactory createMongoDatabaseFactory() {
+		Assert.isNull(getMongoClient(), "Property 'mongoClient' is required");
+		Assert.isNull(getDatabaseName(), "Property 'databaseName' is required");
 		return new SimpleMongoClientDatabaseFactory(mongoClient, databaseName);
 	}
 

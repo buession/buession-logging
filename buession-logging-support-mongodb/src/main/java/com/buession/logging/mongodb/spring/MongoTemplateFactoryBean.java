@@ -24,7 +24,6 @@
  */
 package com.buession.logging.mongodb.spring;
 
-import com.buession.core.utils.Assert;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -52,8 +51,9 @@ public class MongoTemplateFactoryBean extends MongoTemplateFactory implements Fa
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isNull(getMongoDatabaseFactory(), "MongoDatabaseFactory is null.");
-		mongoTemplate = createMongoTemplate();
+		if(mongoTemplate == null){
+			mongoTemplate = createMongoTemplate();
+		}
 	}
 
 }

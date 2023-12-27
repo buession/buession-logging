@@ -25,6 +25,7 @@
 package com.buession.logging.jdbc.spring;
 
 import com.buession.core.converter.mapper.PropertyMapper;
+import com.buession.core.utils.Assert;
 import com.buession.jdbc.datasource.config.Dbcp2PoolConfiguration;
 import com.buession.jdbc.datasource.config.DruidPoolConfiguration;
 import com.buession.jdbc.datasource.config.HikariPoolConfiguration;
@@ -194,6 +195,9 @@ public class JdbcTemplateFactory {
 	}
 
 	protected JdbcTemplate createJdbcTemplate() {
+		Assert.isBlank(getDriverClassName(), "Property 'driverClassName' is required");
+		Assert.isBlank(getUrl(), "Property 'url' is required");
+
 		return new JdbcTemplate(createDataSource());
 	}
 

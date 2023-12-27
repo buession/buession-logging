@@ -24,6 +24,7 @@
  */
 package com.buession.logging.kafka.spring;
 
+import com.buession.core.utils.Assert;
 import com.buession.logging.kafka.core.Constants;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
@@ -54,6 +55,8 @@ public class KafkaTemplateFactory<K, V> {
 	}
 
 	protected KafkaTemplate<K, V> createKafkaTemplate() {
+		Assert.isNull(getProducerFactory(), "Property 'producerFactory' is required");
+		
 		final KafkaTemplate<K, V> kafkaTemplate = new KafkaTemplate<>(getProducerFactory());
 
 		kafkaTemplate.setDefaultTopic(Constants.DEFAULT_TOPIC);

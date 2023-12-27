@@ -26,6 +26,7 @@ package com.buession.logging.jdbc.spring;
 
 import com.buession.core.converter.mapper.PropertyMapper;
 import com.buession.core.id.IdGenerator;
+import com.buession.core.utils.Assert;
 import com.buession.logging.core.formatter.DateTimeFormatter;
 import com.buession.logging.jdbc.formatter.DefaultGeoFormatter;
 import com.buession.logging.core.formatter.GeoFormatter;
@@ -165,7 +166,7 @@ public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLog
 	 *
 	 * @return 请求参数格式化为字符串
 	 */
-	public MapFormatter<?> getRequestParametersFormatter() {
+	public MapFormatter<Object> getRequestParametersFormatter() {
 		return requestParametersFormatter;
 	}
 
@@ -203,7 +204,7 @@ public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLog
 	 *
 	 * @return 附加参数格式化为字符串
 	 */
-	public MapFormatter<?> getExtraFormatter() {
+	public MapFormatter<Object> getExtraFormatter() {
 		return extraFormatter;
 	}
 
@@ -219,16 +220,21 @@ public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLog
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
+		Assert.isNull(getJdbcTemplate(), "Property 'jdbcTemplate' is required");
+		Assert.isBlank(getSql(), "Property 'sql' is required");
 
-		logHandler = new JdbcLogHandler(jdbcTemplate, sql);
+		if(logHandler == null){
+			final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 
-		propertyMapper.from(idGenerator).to(logHandler::setIdGenerator);
-		propertyMapper.from(dateTimeFormat).whenHasText().as(DateTimeFormatter::new)
-				.to(logHandler::setDateTimeFormatter);
-		propertyMapper.from(requestParametersFormatter).to(logHandler::setRequestParametersFormatter);
-		propertyMapper.from(geoFormatter).to(logHandler::setGeoFormatter);
-		propertyMapper.from(extraFormatter).to(logHandler::setExtraFormatter);
+			logHandler = new JdbcLogHandler(getJdbcTemplate(), getSql());
+
+			propertyMapper.from(getIdGenerator()).to(logHandler::setIdGenerator);
+			propertyMapper.from(getDateTimeFormat()).whenHasText().as(DateTimeFormatter::new)
+					.to(logHandler::setDateTimeFormatter);
+			propertyMapper.from(getRequestParametersFormatter()).to(logHandler::setRequestParametersFormatter);
+			propertyMapper.from(getGeoFormatter()).to(logHandler::setGeoFormatter);
+			propertyMapper.from(getExtraFormatter()).to(logHandler::setExtraFormatter);
+		}
 	}
 
 }

@@ -24,7 +24,6 @@
  */
 package com.buession.logging.mongodb.spring;
 
-import com.buession.core.utils.Assert;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -53,9 +52,9 @@ public class MongoDatabaseFactoryBean extends MongoDatabaseFactory
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isNull(getMongoClient(), "MongoClient is null.");
-		Assert.isNull(getDatabaseName(), "Database is blank, empty or null.");
-		mongoDatabaseFactory = createMongoDatabaseFactory();
+		if(mongoDatabaseFactory == null){
+			mongoDatabaseFactory = createMongoDatabaseFactory();
+		}
 	}
 
 	@Override
