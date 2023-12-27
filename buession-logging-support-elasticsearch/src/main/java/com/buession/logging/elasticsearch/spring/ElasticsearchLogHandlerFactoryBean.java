@@ -24,6 +24,7 @@
  */
 package com.buession.logging.elasticsearch.spring;
 
+import com.buession.core.utils.Assert;
 import com.buession.logging.elasticsearch.handler.ElasticsearchLogHandler;
 import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
@@ -72,7 +73,12 @@ public class ElasticsearchLogHandlerFactoryBean extends BaseLogHandlerFactoryBea
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		logHandler = new ElasticsearchLogHandler(restTemplate, indexName);
+		Assert.isNull(getRestTemplate(), "Property 'restTemplate' is required");
+		Assert.isBlank(getIndexName(), "Property 'indexName' is required");
+
+		if(logHandler == null){
+			logHandler = new ElasticsearchLogHandler(getRestTemplate(), getIndexName());
+		}
 	}
 
 }

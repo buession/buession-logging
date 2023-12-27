@@ -90,8 +90,12 @@ public class FileLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<FileLog
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isTrue(file.isDirectory(), file + " is a directory.");
-		logHandler = new FileLogHandler(file, formatter);
+		Assert.isNull(getFile(), "Property 'file' is required");
+		Assert.isTrue(getFile().isDirectory(), getFile() + " is a directory.");
+
+		if(logHandler == null){
+			logHandler = new FileLogHandler(getFile(), getFormatter());
+		}
 	}
 
 }

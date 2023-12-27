@@ -24,7 +24,6 @@
  */
 package com.buession.logging.kafka.spring;
 
-import com.buession.core.utils.Assert;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -54,8 +53,9 @@ public class ProducerFactoryBean extends ProducerFactory
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isNull(getBootstrapServers(), "BootstrapServers is empty or null.");
-		producerFactory = createProducerFactory();
+		if(producerFactory == null){
+			producerFactory = createProducerFactory();
+		}
 	}
 
 	@Override

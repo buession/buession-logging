@@ -51,7 +51,9 @@ public class MongoMappingContextFactoryBean extends MongoMappingContextFactory
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		this.mappingContext = createMongoMappingContext();
+		if(mappingContext == null){
+			mappingContext = createMongoMappingContext();
+		}
 	}
 
 }

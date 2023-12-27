@@ -50,7 +50,9 @@ public class ConnectionFactoryBean extends ConnectionFactory
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		connectionFactory = createConnectionFactory();
+		if(connectionFactory == null){
+			connectionFactory = createConnectionFactory();
+		}
 	}
 
 	@Override

@@ -26,6 +26,7 @@ package com.buession.logging.elasticsearch.spring;
 
 import com.buession.core.builder.ListBuilder;
 import com.buession.core.converter.mapper.PropertyMapper;
+import com.buession.core.utils.Assert;
 import com.buession.core.validator.Validate;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -225,6 +226,9 @@ public class RestHighLevelClientFactory {
 	}
 
 	protected RestHighLevelClient createRestHighLevelClient() {
+		Assert.isTrue(Validate.isBlank(getHost()) && Validate.isEmpty(getUrls()),
+				"Property 'host' or 'urls' is required");
+
 		final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 		final RestClientBuilder builder = RestClient.builder(createHttpHost());
 

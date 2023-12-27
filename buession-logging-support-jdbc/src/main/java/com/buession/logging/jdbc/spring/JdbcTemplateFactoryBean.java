@@ -24,7 +24,6 @@
  */
 package com.buession.logging.jdbc.spring;
 
-import com.buession.core.utils.Assert;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -52,10 +51,9 @@ public class JdbcTemplateFactoryBean extends JdbcTemplateFactory implements Fact
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isBlank(getDriverClassName(), "DriverClassName is blank, empty or null.");
-		Assert.isBlank(getUrl(), "JDBC url is blank, empty or null.");
-
-		jdbcTemplate = createJdbcTemplate();
+		if(jdbcTemplate == null){
+			jdbcTemplate = createJdbcTemplate();
+		}
 	}
 
 }

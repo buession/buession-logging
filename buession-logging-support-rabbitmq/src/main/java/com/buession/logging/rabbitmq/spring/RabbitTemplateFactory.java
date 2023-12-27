@@ -25,6 +25,7 @@
 package com.buession.logging.rabbitmq.spring;
 
 import com.buession.core.converter.mapper.PropertyMapper;
+import com.buession.core.utils.Assert;
 import com.buession.logging.rabbitmq.core.Retry;
 import com.buession.logging.rabbitmq.core.Template;
 import com.buession.logging.rabbitmq.support.RabbitRetryTemplateCustomizer;
@@ -80,6 +81,8 @@ public class RabbitTemplateFactory {
 	}
 
 	protected RabbitTemplate createRabbitTemplate() {
+		Assert.isNull(getConnectionFactory(), "Property 'connectionFactory' is required");
+
 		final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 		final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
 

@@ -26,6 +26,7 @@ package com.buession.logging.kafka.spring;
 
 import com.buession.core.builder.ListBuilder;
 import com.buession.core.converter.mapper.PropertyMapper;
+import com.buession.core.utils.Assert;
 import com.buession.core.utils.StringUtils;
 import com.buession.core.validator.Validate;
 import com.buession.logging.core.LogData;
@@ -338,6 +339,8 @@ public class ProducerFactory {
 	}
 
 	protected org.springframework.kafka.core.ProducerFactory<String, Object> createProducerFactory() {
+		Assert.isNull(getBootstrapServers(), "Property 'bootstrapServers' is required");
+		
 		final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 		final Properties properties = new Properties();
 
