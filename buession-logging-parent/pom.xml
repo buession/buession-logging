@@ -7,13 +7,13 @@
 		<groupId>com.buession</groupId>
 		<artifactId>parent</artifactId>
 		<relativePath/>
-		<version>2.3.2</version>
+		<version>2.3.3</version>
 	</parent>
 	<groupId>com.buession.logging</groupId>
 	<artifactId>buession-logging-parent</artifactId>
 	<url>https://logging.buession.com/</url>
 	<description>Buession Logging Framework Parent</description>
-	<version>0.0.3</version>
+	<version>0.0.4</version>
 	<packaging>pom</packaging>
 
 	<organization>
