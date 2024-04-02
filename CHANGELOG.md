@@ -8,6 +8,11 @@
 
 - [依赖库版本升级和安全漏洞修复](https://github.com/buession/buession-parent/releases/tag/v2.3.3)
 
+
+### ⭐ 新特性
+
+- **buession-logging-support-console：** 控制台日志处理器
+
 ---
 
 

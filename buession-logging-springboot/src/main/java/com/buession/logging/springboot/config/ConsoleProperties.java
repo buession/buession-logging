@@ -19,11 +19,72 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2024 Buession.com Inc.														       |
+ * | Copyright @ 2013-2023 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
+package com.buession.logging.springboot.config;
+
+import com.buession.logging.core.formatter.LogDataFormatter;
+import com.buession.logging.support.config.HandlerProperties;
+
+import java.io.Serializable;
+
 /**
+ * 文件日志配置
+ *
  * @author Yong.Teng
  * @since 0.0.1
  */
-package com.buession.logging.jdbc;
+public class FileProperties implements HandlerProperties, Serializable {
+
+	private final static long serialVersionUID = -8119695487949928232L;
+
+	/**
+	 * 日志文件路径
+	 */
+	private String path;
+
+	/**
+	 * 日志格式化
+	 */
+	private Class<? extends LogDataFormatter<String>> formatter;
+
+	/**
+	 * 返回日志文件路径
+	 *
+	 * @return 日志文件路径
+	 */
+	public String getPath() {
+		return path;
+	}
+
+	/**
+	 * 设置日志文件路径
+	 *
+	 * @param path
+	 * 		日志文件路径
+	 */
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	/**
+	 * 返回日志格式化
+	 *
+	 * @return 日志格式化
+	 */
+	public Class<? extends LogDataFormatter<String>> getFormatter() {
+		return formatter;
+	}
+
+	/**
+	 * 设置日志格式化
+	 *
+	 * @param formatter
+	 * 		日志格式化
+	 */
+	public void setFormatter(Class<? extends LogDataFormatter<String>> formatter) {
+		this.formatter = formatter;
+	}
+
+}

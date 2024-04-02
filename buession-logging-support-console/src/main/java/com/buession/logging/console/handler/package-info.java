@@ -19,35 +19,11 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.jdbc.support;
-
-import com.buession.core.utils.Assert;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
-
-import java.util.Map;
-
 /**
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class LoggingJdbcDaoSupport extends NamedParameterJdbcDaoSupport {
-
-	private final String sql;
-
-	public LoggingJdbcDaoSupport(final JdbcTemplate jdbcTemplate, final String sql) {
-		Assert.isNull(jdbcTemplate, "JdbcTemplate cloud not be null.");
-		Assert.isBlank(sql, "Log sql cloud not be null or empty.");
-
-		this.sql = sql;
-		setJdbcTemplate(jdbcTemplate);
-	}
-
-	public void execute(final Map<String, ?> data) {
-		getNamedParameterJdbcTemplate().update(sql, data);
-	}
-
-}
+package com.buession.logging.console.handler;

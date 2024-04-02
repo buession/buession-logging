@@ -60,6 +60,7 @@
 		<module>../buession-logging-spring</module>
 		<module>../buession-logging-springboot</module>
 		<module>../buession-logging-support-core</module>
+		<module>../buession-logging-support-console</module>
 		<module>../buession-logging-support-elasticsearch</module>
 		<module>../buession-logging-support-file</module>
 		<module>../buession-logging-support-jdbc</module>
