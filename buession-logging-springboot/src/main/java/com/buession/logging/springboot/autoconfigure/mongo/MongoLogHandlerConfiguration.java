@@ -19,7 +19,7 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.springboot.autoconfigure.mongo;
@@ -169,7 +169,7 @@ public class MongoLogHandlerConfiguration extends AbstractLogHandlerConfiguratio
 			@Qualifier("logMongoDbMongoClient") ObjectProvider<MongoClient> mongoClient) {
 		final MongoDatabaseFactoryBean mongoDatabaseFactoryBean = new MongoDatabaseFactoryBean();
 
-		mongoClient.ifUnique(mongoDatabaseFactoryBean::setMongoClient);
+		mongoClient.ifAvailable(mongoDatabaseFactoryBean::setMongoClient);
 
 		if(Validate.hasText(handlerProperties.getDatabaseName())){
 			mongoDatabaseFactoryBean.setDatabaseName(handlerProperties.getDatabaseName());
@@ -199,8 +199,8 @@ public class MongoLogHandlerConfiguration extends AbstractLogHandlerConfiguratio
 			@Qualifier("logMongoDbMongoMappingContext") ObjectProvider<MongoMappingContext> mongoMappingContext) {
 		final MongoTemplateFactoryBean mongoTemplateFactoryBean = new MongoTemplateFactoryBean();
 
-		mongoDatabaseFactory.ifUnique(mongoTemplateFactoryBean::setMongoDatabaseFactory);
-		mongoMappingContext.ifUnique(mongoTemplateFactoryBean::setMongoMappingContext);
+		mongoDatabaseFactory.ifAvailable(mongoTemplateFactoryBean::setMongoDatabaseFactory);
+		mongoMappingContext.ifAvailable(mongoTemplateFactoryBean::setMongoMappingContext);
 
 		return mongoTemplateFactoryBean;
 	}
@@ -210,7 +210,7 @@ public class MongoLogHandlerConfiguration extends AbstractLogHandlerConfiguratio
 			@Qualifier("logMongoDbMongoTemplate") ObjectProvider<MongoTemplate> mongoTemplate) {
 		final MongoLogHandlerFactoryBean logHandlerFactoryBean = new MongoLogHandlerFactoryBean();
 
-		mongoTemplate.ifUnique(logHandlerFactoryBean::setMongoTemplate);
+		mongoTemplate.ifAvailable(logHandlerFactoryBean::setMongoTemplate);
 
 		propertyMapper.from(handlerProperties::getCollectionName).to(logHandlerFactoryBean::setCollectionName);
 
@@ -223,7 +223,7 @@ public class MongoLogHandlerConfiguration extends AbstractLogHandlerConfiguratio
 			@Qualifier("logMongoDbMongoTemplate") ObjectProvider<MongoTemplate> mongoTemplate) {
 		final MongoHandlerFactoryBean logHandlerFactoryBean = new MongoHandlerFactoryBean();
 
-		mongoTemplate.ifUnique(logHandlerFactoryBean::setMongoTemplate);
+		mongoTemplate.ifAvailable(logHandlerFactoryBean::setMongoTemplate);
 
 		propertyMapper.from(handlerProperties::getCollectionName).to(logHandlerFactoryBean::setCollectionName);
 

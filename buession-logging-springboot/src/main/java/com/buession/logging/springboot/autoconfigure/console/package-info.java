@@ -24,6 +24,6 @@
  */
 /**
  * @author Yong.Teng
- * @since 0.0.1
+ * @since 0.0.4
  */
-package com.buession.logging.springboot.autoconfigure;
+package com.buession.logging.springboot.autoconfigure.console;

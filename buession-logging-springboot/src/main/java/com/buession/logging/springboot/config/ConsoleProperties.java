@@ -24,48 +24,48 @@
  */
 package com.buession.logging.springboot.config;
 
-import com.buession.logging.core.formatter.LogDataFormatter;
+import com.buession.logging.console.formatter.ConsoleLogDataFormatter;
 import com.buession.logging.support.config.HandlerProperties;
 
 import java.io.Serializable;
 
 /**
- * 文件日志配置
+ * 控制台日志配置
  *
  * @author Yong.Teng
- * @since 0.0.1
+ * @since 0.0.4
  */
-public class FileProperties implements HandlerProperties, Serializable {
+public class ConsoleProperties implements HandlerProperties, Serializable {
 
 	private final static long serialVersionUID = -8119695487949928232L;
 
 	/**
-	 * 日志文件路径
+	 * 日志模板
 	 */
-	private String path;
+	private String template;
 
 	/**
 	 * 日志格式化
 	 */
-	private Class<? extends LogDataFormatter<String>> formatter;
+	private Class<? extends ConsoleLogDataFormatter<String>> formatter;
 
 	/**
-	 * 返回日志文件路径
+	 * 返回日志模板
 	 *
-	 * @return 日志文件路径
+	 * @return 日志模板
 	 */
-	public String getPath() {
-		return path;
+	public String getTemplate() {
+		return template;
 	}
 
 	/**
-	 * 设置日志文件路径
+	 * 设置日志模板
 	 *
-	 * @param path
-	 * 		日志文件路径
+	 * @param template
+	 * 		日志模板
 	 */
-	public void setPath(String path) {
-		this.path = path;
+	public void setTemplate(String template) {
+		this.template = template;
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class FileProperties implements HandlerProperties, Serializable {
 	 *
 	 * @return 日志格式化
 	 */
-	public Class<? extends LogDataFormatter<String>> getFormatter() {
+	public Class<? extends ConsoleLogDataFormatter<String>> getFormatter() {
 		return formatter;
 	}
 
@@ -83,7 +83,7 @@ public class FileProperties implements HandlerProperties, Serializable {
 	 * @param formatter
 	 * 		日志格式化
 	 */
-	public void setFormatter(Class<? extends LogDataFormatter<String>> formatter) {
+	public void setFormatter(Class<? extends ConsoleLogDataFormatter<String>> formatter) {
 		this.formatter = formatter;
 	}
 
