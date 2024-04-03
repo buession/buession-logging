@@ -25,7 +25,12 @@
 package com.buession.logging.console.formatter;
 
 import com.buession.core.utils.StringUtils;
+import com.buession.core.validator.Validate;
+import com.buession.lang.Constants;
+import com.buession.lang.Geo;
 import com.buession.logging.core.LogData;
+
+import java.util.Map;
 
 /**
  * 默认控制台日志格式化
@@ -48,17 +53,91 @@ public class DefaultConsoleLogDataFormatter implements ConsoleLogDataFormatter<S
 
 		String message = template;
 
-		message = StringUtils.replace(message, "${principal}", logData.getPrincipal().toString());
-		message = StringUtils.replace(message, "${time}", logData.getDateTime().toString());
-		message = StringUtils.replace(message, "${clientIp}", logData.getClientIp());
-		message = StringUtils.replace(message, "${User-Agent}", logData.getUserAgent());
-		message = StringUtils.replace(message, "${os_name}", logData.getOperatingSystem().getName());
-		message = StringUtils.replace(message, "${os_version}", logData.getOperatingSystem().getVersion());
-		message = StringUtils.replace(message, "${device_type}", logData.getDeviceType().getName());
-		message = StringUtils.replace(message, "${browser_name}", logData.getBrowser().getName());
-		message = StringUtils.replace(message, "${browser_version}", logData.getBrowser().getVersion());
+		message = replace(message, "principal", logData.getPrincipal().toString());
+		message = replace(message, "uid", logData.getPrincipal().getId());
+		message = replace(message, "username", logData.getPrincipal().getUserName());
+
+		String loginDateTime = logData.getDateTime().toString();
+		message = replace(message, "date_time", loginDateTime);
+		message = replace(message, "datetime", loginDateTime);
+
+		message = replace(message, "businessType", logData.getBusinessType());
+		message = replace(message, "event", logData.getEvent());
+		message = replace(message, "description", logData.getDescription());
+		message = replace(message, "trace_id", logData.getTraceId());
+		message = replace(message, "traceId", logData.getTraceId());
+		message = replace(message, "url", logData.getUrl());
+		message = replace(message, "requestMethod", logData.getRequestMethod().name());
+		message = replace(message, "request_method", logData.getRequestMethod().name());
+		message = replace(message, "method", logData.getRequestMethod().name());
+		message = replace(message, "request_parameters", buildMap(logData.getRequestParameters()));
+		message = replace(message, "request_body", logData.getRequestBody());
+		message = replace(message, "client_ip", logData.getClientIp());
+		message = replace(message, "remoteAddr", logData.getRemoteAddr());
+		message = replace(message, "remote_addr", logData.getRemoteAddr());
+		message = replace(message, "userAgent", logData.getUserAgent());
+		message = replace(message, "user-agent", logData.getUserAgent());
+		message = replace(message, "user_agent", logData.getUserAgent());
+
+		String operatingSystem = logData.getOperatingSystem().toString();
+		message = replace(message, "operating_system", operatingSystem);
+		message = replace(message, "os", operatingSystem);
+		message = replace(message, "operating_system_name", logData.getOperatingSystem().getName());
+		message = replace(message, "os_name", logData.getOperatingSystem().getName());
+		message = replace(message, "operating_system_version", logData.getOperatingSystem().getVersion());
+		message = replace(message, "os_version", logData.getOperatingSystem().getVersion());
+
+		message = replace(message, "device_type", logData.getDeviceType().getName());
+
+		message = replace(message, "browser", logData.getBrowser().toString());
+		message = replace(message, "browser_name", logData.getBrowser().getName());
+		message = replace(message, "browser_version", logData.getBrowser().getVersion());
+		message = replace(message, "browser_type", logData.getBrowser().getType().name());
+
+		message = replace(message, "location", logData.getLocation().toString());
+		message = replace(message, "geo", buildGeo(logData.getLocation().getGeo()));
+		message = replace(message, "country", logData.getLocation().getCountry().toString());
+		message = replace(message, "country_code", logData.getLocation().getCountry().getCode());
+		message = replace(message, "country_name", logData.getLocation().getCountry().getName());
+		message = replace(message, "country_full_name", logData.getLocation().getCountry().getFullName());
+		message = replace(message, "district", logData.getLocation().getDistrict().toString());
+		message = replace(message, "district_name", logData.getLocation().getDistrict().getName());
+		message = replace(message, "district_full_name", logData.getLocation().getDistrict().getFullName());
+
+		message = replace(message, "status", logData.getStatus() == null ? Constants.EMPTY_STRING :
+				logData.getStatus().name());
+
+		message = replace(message, "extra", buildMap(logData.getExtra()));
 
 		return message;
+	}
+
+	protected static String replace(final String message, final String varName, final String value) {
+		return Validate.hasText(varName) ? StringUtils.replace(message, "${" + varName + '}', value)
+				: message;
+	}
+
+	protected static String buildMap(final Map<String, Object> parameters) {
+		if(parameters == null){
+			return Constants.EMPTY_STRING;
+		}else{
+			final StringBuilder sb = new StringBuilder();
+			int i = 0;
+
+			for(Map.Entry<String, Object> parameter : parameters.entrySet()){
+				if(i++ > 0){
+					sb.append('&');
+				}
+
+				sb.append(parameter.getKey()).append('=').append(parameter.getValue());
+			}
+
+			return sb.toString();
+		}
+	}
+
+	protected static String buildGeo(final Geo geo) {
+		return geo == null ? Constants.EMPTY_STRING : geo.toString();
 	}
 
 }
