@@ -19,14 +19,13 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.springboot.autoconfigure;
 
 import com.buession.core.validator.Validate;
 import com.buession.geoip.Resolver;
-import com.buession.logging.core.handler.DefaultLogHandler;
 import com.buession.logging.core.handler.DefaultPrincipalHandler;
 import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.core.handler.PrincipalHandler;
@@ -35,6 +34,7 @@ import com.buession.logging.core.request.RequestContext;
 import com.buession.logging.core.request.ServletRequestContext;
 import com.buession.logging.spring.LogManagerFactoryBean;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -55,29 +55,28 @@ public class LogConfiguration {
 	}
 
 	@Bean
+	@ConditionalOnMissingBean({RequestContext.class})
+	public RequestContext requestContext() {
+		return new ServletRequestContext();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean({PrincipalHandler.class})
+	public PrincipalHandler<?> principalHandler() {
+		return new DefaultPrincipalHandler();
+	}
+
+	@Bean
 	public LogManagerFactoryBean logManagerFactoryBean(ObjectProvider<RequestContext> requestContext,
 													   ObjectProvider<PrincipalHandler<?>> principalHandler,
 													   ObjectProvider<LogHandler> logHandler,
 													   ObjectProvider<Resolver> geoResolver) {
 		final LogManagerFactoryBean logManagerFactoryBean = new LogManagerFactoryBean();
-
-		requestContext.ifUnique(logManagerFactoryBean::setRequestContext);
-		geoResolver.ifUnique(logManagerFactoryBean::setGeoResolver);
-		principalHandler.ifUnique(logManagerFactoryBean::setPrincipalHandler);
-
-		PrincipalHandler<?> principalHandlerInstance = principalHandler.getIfAvailable();
-		if(principalHandlerInstance == null){
-			logManagerFactoryBean.setPrincipalHandler(new DefaultPrincipalHandler());
-		}else{
-			logManagerFactoryBean.setPrincipalHandler(principalHandlerInstance);
-		}
-
-		LogHandler logHandlerInstance = logHandler.getIfAvailable();
-		if(logHandlerInstance == null){
-			logManagerFactoryBean.setLogHandler(new DefaultLogHandler());
-		}else{
-			logManagerFactoryBean.setLogHandler(logHandlerInstance);
-		}
+		
+		requestContext.ifAvailable(logManagerFactoryBean::setRequestContext);
+		geoResolver.ifAvailable(logManagerFactoryBean::setGeoResolver);
+		principalHandler.ifAvailable(logManagerFactoryBean::setPrincipalHandler);
+		logHandler.ifAvailable(logManagerFactoryBean::setLogHandler);
 
 		if(Validate.isNotBlank(logProperties.getClientIpHeaderName())){
 			logManagerFactoryBean.setClientIpHeaderName(logProperties.getClientIpHeaderName());

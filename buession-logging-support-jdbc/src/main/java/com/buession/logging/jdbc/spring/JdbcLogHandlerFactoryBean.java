@@ -19,7 +19,7 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.jdbc.spring;
@@ -28,6 +28,8 @@ import com.buession.core.converter.mapper.PropertyMapper;
 import com.buession.core.id.IdGenerator;
 import com.buession.core.utils.Assert;
 import com.buession.logging.core.formatter.DateTimeFormatter;
+import com.buession.logging.jdbc.converter.DefaultLogDataConverter;
+import com.buession.logging.jdbc.converter.LogDataConverter;
 import com.buession.logging.jdbc.formatter.DefaultGeoFormatter;
 import com.buession.logging.core.formatter.GeoFormatter;
 import com.buession.logging.jdbc.formatter.JsonMapFormatter;
@@ -44,11 +46,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
  */
 public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLogHandler> {
 
-	public final static MapFormatter DEFAULT_REQUEST_PARAMETERS_FORMATTER = new JsonMapFormatter();
+	public final static MapFormatter<Object> DEFAULT_REQUEST_PARAMETERS_FORMATTER = new JsonMapFormatter();
 
 	public final static GeoFormatter DEFAULT_GEO_FORMATTER = new DefaultGeoFormatter();
 
-	public final static MapFormatter DEFAULT_EXTRA_FORMATTER = new JsonMapFormatter();
+	public final static MapFormatter<Object> DEFAULT_EXTRA_FORMATTER = new JsonMapFormatter();
 
 	/**
 	 * {@link JdbcTemplate}
@@ -84,6 +86,13 @@ public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLog
 	 * 附加参数格式化为字符串
 	 */
 	private MapFormatter<Object> extraFormatter = DEFAULT_EXTRA_FORMATTER;
+
+	/**
+	 * 日志数据转换
+	 *
+	 * @since 2.3.3
+	 */
+	private LogDataConverter logDataConverter = new DefaultLogDataConverter();
 
 	/**
 	 * 返回 {@link JdbcTemplate}
@@ -218,15 +227,38 @@ public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLog
 		this.extraFormatter = extraFormatter;
 	}
 
+	/**
+	 * 返回日志数据转换
+	 *
+	 * @return 日志数据转换
+	 *
+	 * @since 2.3.3
+	 */
+	public LogDataConverter getLogDataConverter() {
+		return logDataConverter;
+	}
+
+	/**
+	 * 设置日志数据转换
+	 *
+	 * @param logDataConverter
+	 * 		日志数据转换
+	 *
+	 * @since 2.3.3
+	 */
+	public void setLogDataConverter(LogDataConverter logDataConverter) {
+		this.logDataConverter = logDataConverter;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.isNull(getJdbcTemplate(), "Property 'jdbcTemplate' is required");
 		Assert.isBlank(getSql(), "Property 'sql' is required");
 
 		if(logHandler == null){
-			final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
-
 			logHandler = new JdbcLogHandler(getJdbcTemplate(), getSql());
+
+			final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 
 			propertyMapper.from(getIdGenerator()).to(logHandler::setIdGenerator);
 			propertyMapper.from(getDateTimeFormat()).whenHasText().as(DateTimeFormatter::new)
@@ -234,6 +266,7 @@ public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLog
 			propertyMapper.from(getRequestParametersFormatter()).to(logHandler::setRequestParametersFormatter);
 			propertyMapper.from(getGeoFormatter()).to(logHandler::setGeoFormatter);
 			propertyMapper.from(getExtraFormatter()).to(logHandler::setExtraFormatter);
+			propertyMapper.from(getLogDataConverter()).to(logHandler::setLogDataConverter);
 		}
 	}
 

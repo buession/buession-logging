@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<name>Buession Logging Annotations</name>
+	<groupId>com.buession.logging</groupId>
+	<name>Buession Logging Support Console</name>
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.buession.logging</groupId>
@@ -9,9 +10,9 @@
 		<relativePath>../buession-logging-parent</relativePath>
 		<version>0.0.4</version>
 	</parent>
-	<artifactId>buession-logging-annotations</artifactId>
+	<artifactId>buession-logging-support-console</artifactId>
 	<url>https://security.buession.com/</url>
-	<description>Buession Logging Framework Annotations</description>
+	<description>Buession Logging Framework For Support Console</description>
 	<packaging>jar</packaging>
 
 	<organization>
@@ -53,13 +54,14 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
+			<groupId>com.buession.logging</groupId>
+			<artifactId>buession-logging-support-core</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
 		</dependency>
 
 		<dependency>
@@ -69,7 +71,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>buession-logging-annotations</finalName>
+		<finalName>buession-logging-support-console</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

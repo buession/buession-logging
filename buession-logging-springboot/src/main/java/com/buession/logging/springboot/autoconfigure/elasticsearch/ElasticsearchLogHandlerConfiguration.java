@@ -19,7 +19,7 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.springboot.autoconfigure.elasticsearch;
@@ -81,7 +81,7 @@ public class ElasticsearchLogHandlerConfiguration extends AbstractLogHandlerConf
 		final ElasticsearchRestTemplateFactoryBean elasticsearchRestTemplateFactoryBean =
 				new ElasticsearchRestTemplateFactoryBean();
 
-		restHighLevelClient.ifUnique(elasticsearchRestTemplateFactoryBean::setClient);
+		restHighLevelClient.ifAvailable(elasticsearchRestTemplateFactoryBean::setClient);
 
 		return elasticsearchRestTemplateFactoryBean;
 	}
@@ -91,7 +91,7 @@ public class ElasticsearchLogHandlerConfiguration extends AbstractLogHandlerConf
 			@Qualifier("loggingElasticsearchElasticsearchRestTemplate") ObjectProvider<ElasticsearchRestTemplate> restTemplateFactory) {
 		final ElasticsearchLogHandlerFactoryBean logHandlerFactoryBean = new ElasticsearchLogHandlerFactoryBean();
 
-		restTemplateFactory.ifUnique(logHandlerFactoryBean::setRestTemplate);
+		restTemplateFactory.ifAvailable(logHandlerFactoryBean::setRestTemplate);
 		propertyMapper.from(handlerProperties::getIndexName).to(logHandlerFactoryBean::setIndexName);
 
 		return logHandlerFactoryBean;

@@ -19,11 +19,72 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2024 Buession.com Inc.														       |
+ * | Copyright @ 2013-2023 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
+package com.buession.logging.springboot.config;
+
+import com.buession.logging.console.formatter.ConsoleLogDataFormatter;
+import com.buession.logging.support.config.HandlerProperties;
+
+import java.io.Serializable;
+
 /**
+ * 控制台日志配置
+ *
  * @author Yong.Teng
- * @since 0.0.1
+ * @since 0.0.4
  */
-package com.buession.logging.springboot.autoconfigure;
+public class ConsoleProperties implements HandlerProperties, Serializable {
+
+	private final static long serialVersionUID = -8119695487949928232L;
+
+	/**
+	 * 日志模板
+	 */
+	private String template;
+
+	/**
+	 * 日志格式化
+	 */
+	private Class<? extends ConsoleLogDataFormatter<String>> formatter;
+
+	/**
+	 * 返回日志模板
+	 *
+	 * @return 日志模板
+	 */
+	public String getTemplate() {
+		return template;
+	}
+
+	/**
+	 * 设置日志模板
+	 *
+	 * @param template
+	 * 		日志模板
+	 */
+	public void setTemplate(String template) {
+		this.template = template;
+	}
+
+	/**
+	 * 返回日志格式化
+	 *
+	 * @return 日志格式化
+	 */
+	public Class<? extends ConsoleLogDataFormatter<String>> getFormatter() {
+		return formatter;
+	}
+
+	/**
+	 * 设置日志格式化
+	 *
+	 * @param formatter
+	 * 		日志格式化
+	 */
+	public void setFormatter(Class<? extends ConsoleLogDataFormatter<String>> formatter) {
+		this.formatter = formatter;
+	}
+
+}
