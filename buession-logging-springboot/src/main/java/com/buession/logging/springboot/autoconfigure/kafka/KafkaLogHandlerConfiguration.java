@@ -19,7 +19,7 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.springboot.autoconfigure.kafka;
@@ -85,7 +85,7 @@ public class KafkaLogHandlerConfiguration extends AbstractLogHandlerConfiguratio
 																					 ObjectProvider<org.springframework.kafka.core.ProducerFactory<String, Object>> producerFactory) {
 		final KafkaTemplateFactoryBean<String, Object> kafkaTemplateFactoryBean = new KafkaTemplateFactoryBean<>();
 
-		producerFactory.ifUnique(kafkaTemplateFactoryBean::setProducerFactory);
+		producerFactory.ifAvailable(kafkaTemplateFactoryBean::setProducerFactory);
 
 		return kafkaTemplateFactoryBean;
 	}
@@ -95,7 +95,7 @@ public class KafkaLogHandlerConfiguration extends AbstractLogHandlerConfiguratio
 			@Qualifier("loggingKafkaKafkaTemplate") ObjectProvider<KafkaTemplate<String, Object>> kafkaTemplate) {
 		final KafkaLogHandlerFactoryBean logHandlerFactoryBean = new KafkaLogHandlerFactoryBean();
 
-		kafkaTemplate.ifUnique(logHandlerFactoryBean::setKafkaTemplate);
+		kafkaTemplate.ifAvailable(logHandlerFactoryBean::setKafkaTemplate);
 
 		propertyMapper.from(handlerProperties::getTopic).to(logHandlerFactoryBean::setTopic);
 

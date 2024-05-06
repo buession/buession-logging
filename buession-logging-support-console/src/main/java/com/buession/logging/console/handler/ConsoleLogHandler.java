@@ -22,8 +22,62 @@
  * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
+package com.buession.logging.console.handler;
+
+import com.buession.core.utils.Assert;
+import com.buession.lang.Status;
+import com.buession.logging.console.formatter.ConsoleLogDataFormatter;
+import com.buession.logging.console.formatter.DefaultConsoleLogDataFormatter;
+import com.buession.logging.core.LogData;
+import com.buession.logging.core.handler.AbstractLogHandler;
+
 /**
+ * 控制台日志处理器
+ *
  * @author Yong.Teng
- * @since 0.0.1
+ * @since 0.0.4
  */
-package com.buession.logging.springboot.autoconfigure;
+public class ConsoleLogHandler extends AbstractLogHandler {
+
+	/**
+	 * 日志模板
+	 */
+	private final String template;
+
+	/**
+	 * 日志格式化
+	 */
+	private ConsoleLogDataFormatter<String> formatter = new DefaultConsoleLogDataFormatter();
+
+	/**
+	 * 构造函数
+	 *
+	 * @param template
+	 * 		日志模板
+	 */
+	public ConsoleLogHandler(final String template) {
+		Assert.isBlank(template, "Log message template cloud not be null.");
+		this.template = template;
+	}
+
+	/**
+	 * 构造函数
+	 *
+	 * @param template
+	 * 		日志模板
+	 * @param formatter
+	 * 		日志格式化
+	 */
+	public ConsoleLogHandler(final String template, final ConsoleLogDataFormatter<String> formatter) {
+		this(template);
+		Assert.isNull(formatter, "Formatter is null.");
+		this.formatter = formatter;
+	}
+
+	@Override
+	protected Status doHandle(final LogData logData) throws Exception {
+		System.out.println(formatter.format(template, logData));
+		return Status.SUCCESS;
+	}
+
+}

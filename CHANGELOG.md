@@ -2,6 +2,31 @@
 ===========================
 
 
+## [0.0.4](https://github.com/buession/buession-logging/releases/tag/v0.0.4) (2024-05-06)
+
+### 🔨依赖升级
+
+- [依赖库版本升级和安全漏洞修复](https://github.com/buession/buession-parent/releases/tag/v2.3.3)
+
+
+### ⭐ 新特性
+
+- **buession-logging-support-console：** 新增控制台日志处理
+
+
+### 🔔 变化
+
+- **buession-logging-support-jdbc：** 新增 LogDataConverter 实现数据和字段映射
+
+
+### 🐞 Bug 修复
+
+- **ALL：** 修复 ObjectProvider.ifUnique 的使用，应使用 ObjectProvider.ifAvailable
+
+
+---
+
+
 ## [0.0.3](https://github.com/buession/buession-logging/releases/tag/v0.0.3) (2023-12-27)
 
 ### 🔨依赖升级

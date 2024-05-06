@@ -7,7 +7,7 @@
 		<groupId>com.buession.logging</groupId>
 		<artifactId>buession-logging-parent</artifactId>
 		<relativePath>../buession-logging-parent</relativePath>
-		<version>0.0.3</version>
+		<version>0.0.4</version>
 	</parent>
 	<artifactId>buession-logging-springboot</artifactId>
 	<url>https://security.buession.com/</url>
@@ -56,6 +56,12 @@
 			<groupId>com.buession.logging</groupId>
 			<artifactId>buession-logging-spring</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.buession.logging</groupId>
+			<artifactId>buession-logging-support-console</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.buession.logging</groupId>

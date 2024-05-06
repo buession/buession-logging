@@ -19,7 +19,7 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.springboot.autoconfigure.rabbit;
@@ -84,7 +84,7 @@ public class RabbitLogHandlerConfiguration extends AbstractLogHandlerConfigurati
 			@Qualifier("logRabbitConnectionFactory") ObjectProvider<org.springframework.amqp.rabbit.connection.ConnectionFactory> connectionFactory) {
 		final RabbitTemplateFactoryBean rabbitTemplateFactoryBean = new RabbitTemplateFactoryBean();
 
-		connectionFactory.ifUnique(rabbitTemplateFactoryBean::setConnectionFactory);
+		connectionFactory.ifAvailable(rabbitTemplateFactoryBean::setConnectionFactory);
 		propertyMapper.from(handlerProperties::getTemplate).to(rabbitTemplateFactoryBean::setTemplate);
 		propertyMapper.from(handlerProperties::isPublisherReturns).to(rabbitTemplateFactoryBean::setPublisherReturns);
 
@@ -96,7 +96,7 @@ public class RabbitLogHandlerConfiguration extends AbstractLogHandlerConfigurati
 																	 ObjectProvider<RabbitTemplate> rabbitTemplate) {
 		final RabbitLogHandlerFactoryBean logHandlerFactoryBean = new RabbitLogHandlerFactoryBean();
 
-		rabbitTemplate.ifUnique(logHandlerFactoryBean::setRabbitTemplate);
+		rabbitTemplate.ifAvailable(logHandlerFactoryBean::setRabbitTemplate);
 		logHandlerFactoryBean.setExchange(handlerProperties.getExchange());
 		logHandlerFactoryBean.setRoutingKey(handlerProperties.getRoutingKey());
 

@@ -19,11 +19,12 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.springboot.autoconfigure;
 
+import com.buession.logging.springboot.config.ConsoleProperties;
 import com.buession.logging.springboot.config.ElasticsearchProperties;
 import com.buession.logging.springboot.config.FileProperties;
 import com.buession.logging.springboot.config.JdbcProperties;
@@ -46,6 +47,13 @@ public class LogProperties {
 	 * 客户端 IP 请求头名称
 	 */
 	private String clientIpHeaderName;
+
+	/**
+	 * 控制台日志配置
+	 *
+	 * @since 0.0.4
+	 */
+	private ConsoleProperties console;
 
 	/**
 	 * Elasticsearch 日志配置
@@ -99,6 +107,25 @@ public class LogProperties {
 	 */
 	public void setClientIpHeaderName(String clientIpHeaderName) {
 		this.clientIpHeaderName = clientIpHeaderName;
+	}
+
+	/**
+	 * 返回控制台日志配置
+	 *
+	 * @return 控制台日志配置
+	 */
+	public ConsoleProperties getConsole() {
+		return console;
+	}
+
+	/**
+	 * 设置控制台日志配置
+	 *
+	 * @param console
+	 * 		控制台日志配置
+	 */
+	public void setConsole(ConsoleProperties console) {
+		this.console = console;
 	}
 
 	/**

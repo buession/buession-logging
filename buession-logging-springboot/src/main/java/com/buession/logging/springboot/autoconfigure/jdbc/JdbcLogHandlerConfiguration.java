@@ -19,12 +19,14 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.springboot.autoconfigure.jdbc;
 
 import com.buession.logging.core.handler.LogHandler;
+import com.buession.logging.jdbc.converter.DefaultLogDataConverter;
+import com.buession.logging.jdbc.converter.LogDataConverter;
 import com.buession.logging.jdbc.spring.JdbcLogHandlerFactoryBean;
 import com.buession.logging.jdbc.spring.JdbcTemplateFactoryBean;
 import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
@@ -69,6 +71,11 @@ public class JdbcLogHandlerConfiguration extends AbstractLogHandlerConfiguration
 		propertyMapper.from(handlerProperties::getPool).to(jdbcTemplateFactoryBean::setPoolConfiguration);
 
 		return jdbcTemplateFactoryBean;
+	}
+
+	@Bean(name = "loggingJdbcDataConverter")
+	public LogDataConverter logDataConverter() {
+		return new DefaultLogDataConverter();
 	}
 
 	@Bean

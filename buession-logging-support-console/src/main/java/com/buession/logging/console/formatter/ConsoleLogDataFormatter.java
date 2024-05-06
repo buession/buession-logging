@@ -22,8 +22,32 @@
  * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
+package com.buession.logging.console.formatter;
+
+import com.buession.logging.core.LogData;
+import com.buession.logging.core.formatter.LogDataFormatter;
+
 /**
+ * 控制台日志数据格式化
+ *
+ * @param <T>
+ * 		格式化目标类型
+ *
  * @author Yong.Teng
- * @since 0.0.1
+ * @since 0.0.4
  */
-package com.buession.logging.springboot.autoconfigure;
+public interface ConsoleLogDataFormatter<T> extends LogDataFormatter<T> {
+
+	/**
+	 * 日志参数数据格式化为 T 类型对象数据
+	 *
+	 * @param template
+	 * 		日志模板
+	 * @param logData
+	 * 		待格式化数据
+	 *
+	 * @return 日志参数数据格式化结果
+	 */
+	T format(final String template, final LogData logData);
+
+}

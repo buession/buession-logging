@@ -7,13 +7,13 @@
 		<groupId>com.buession</groupId>
 		<artifactId>parent</artifactId>
 		<relativePath/>
-		<version>2.3.2</version>
+		<version>2.3.3</version>
 	</parent>
 	<groupId>com.buession.logging</groupId>
 	<artifactId>buession-logging-parent</artifactId>
 	<url>https://logging.buession.com/</url>
 	<description>Buession Logging Framework Parent</description>
-	<version>0.0.3</version>
+	<version>0.0.4</version>
 	<packaging>pom</packaging>
 
 	<organization>
@@ -60,6 +60,7 @@
 		<module>../buession-logging-spring</module>
 		<module>../buession-logging-springboot</module>
 		<module>../buession-logging-support-core</module>
+		<module>../buession-logging-support-console</module>
 		<module>../buession-logging-support-elasticsearch</module>
 		<module>../buession-logging-support-file</module>
 		<module>../buession-logging-support-jdbc</module>
@@ -70,8 +71,8 @@
 	</modules>
 
 	<properties>
-		<buession.version>2.3.2</buession.version>
-		<buession.springboot.version>2.3.2</buession.springboot.version>
+		<buession.version>2.3.3</buession.version>
+		<buession.springboot.version>2.3.3</buession.springboot.version>
 	</properties>
 
 	<dependencyManagement>

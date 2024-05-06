@@ -1,4 +1,5 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.buession.logging.springboot.autoconfigure.console.ConsoleLogHandlerConfiguration, \
   com.buession.logging.springboot.autoconfigure.elasticsearch.ElasticsearchLogHandlerConfiguration, \
   com.buession.logging.springboot.autoconfigure.file.FileLogHandlerConfiguration, \
   com.buession.logging.springboot.autoconfigure.jdbc.JdbcLogHandlerConfiguration, \
