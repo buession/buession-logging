@@ -72,13 +72,13 @@ public class LogConfiguration {
 													   ObjectProvider<LogHandler> logHandler,
 													   ObjectProvider<Resolver> geoResolver) {
 		final LogManagerFactoryBean logManagerFactoryBean = new LogManagerFactoryBean();
-		
+
 		requestContext.ifAvailable(logManagerFactoryBean::setRequestContext);
 		geoResolver.ifAvailable(logManagerFactoryBean::setGeoResolver);
 		principalHandler.ifAvailable(logManagerFactoryBean::setPrincipalHandler);
 		logHandler.ifAvailable(logManagerFactoryBean::setLogHandler);
 
-		if(Validate.isNotBlank(logProperties.getClientIpHeaderName())){
+		if(Validate.hasText(logProperties.getClientIpHeaderName())){
 			logManagerFactoryBean.setClientIpHeaderName(logProperties.getClientIpHeaderName());
 		}
 
