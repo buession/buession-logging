@@ -8,7 +8,7 @@
 		<groupId>com.buession.logging</groupId>
 		<artifactId>buession-logging-parent</artifactId>
 		<relativePath>../buession-logging-parent</relativePath>
-		<version>0.0.4</version>
+		<version>1.0.0</version>
 	</parent>
 	<artifactId>buession-logging-support-mongodb</artifactId>
 	<url>https://security.buession.com/</url>
