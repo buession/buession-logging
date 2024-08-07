@@ -9,21 +9,6 @@
 - [依赖库版本升级和安全漏洞修复](https://github.com/buession/buession-parent/releases/tag/v3.0.0)
 
 
-### ⭐ 新特性
-
-- **buession-logging-support-console：** 新增控制台日志处理
-
-
-### 🔔 变化
-
-- **buession-logging-support-jdbc：** 新增 LogDataConverter 实现数据和字段映射
-
-
-### 🐞 Bug 修复
-
-- **ALL：** 修复 ObjectProvider.ifUnique 的使用，应使用 ObjectProvider.ifAvailable
-
-
 ---
 
 
