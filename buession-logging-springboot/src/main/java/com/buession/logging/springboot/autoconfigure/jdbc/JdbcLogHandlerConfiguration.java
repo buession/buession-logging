@@ -24,6 +24,11 @@
  */
 package com.buession.logging.springboot.autoconfigure.jdbc;
 
+import com.buession.jdbc.datasource.Dbcp2DataSource;
+import com.buession.jdbc.datasource.DruidDataSource;
+import com.buession.jdbc.datasource.HikariDataSource;
+import com.buession.jdbc.datasource.OracleDataSource;
+import com.buession.jdbc.datasource.TomcatDataSource;
 import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.jdbc.converter.DefaultLogDataConverter;
 import com.buession.logging.jdbc.converter.LogDataConverter;
@@ -68,7 +73,22 @@ public class JdbcLogHandlerConfiguration extends AbstractLogHandlerConfiguration
 		propertyMapper.from(handlerProperties::getUrl).to(jdbcTemplateFactoryBean::setUrl);
 		propertyMapper.from(handlerProperties::getUsername).to(jdbcTemplateFactoryBean::setUsername);
 		propertyMapper.from(handlerProperties::getPassword).to(jdbcTemplateFactoryBean::setPassword);
-		propertyMapper.from(handlerProperties::getPool).to(jdbcTemplateFactoryBean::setPoolConfiguration);
+		propertyMapper.from(handlerProperties::getLoginTimeout).to(jdbcTemplateFactoryBean::setLoginTimeout);
+		propertyMapper.from(handlerProperties::getConnectionProperties)
+				.to(jdbcTemplateFactoryBean::setConnectionProperties);
+
+		if(jdbcTemplateFactoryBean.getDataSourceType().isAssignableFrom(Dbcp2DataSource.class)){
+			propertyMapper.from(handlerProperties::getDbcp2).to(jdbcTemplateFactoryBean::setDataSourceConfiguration);
+		}else if(jdbcTemplateFactoryBean.getDataSourceType().isAssignableFrom(DruidDataSource.class)){
+			propertyMapper.from(handlerProperties::getDruid).to(jdbcTemplateFactoryBean::setDataSourceConfiguration);
+		}else if(jdbcTemplateFactoryBean.getDataSourceType().isAssignableFrom(HikariDataSource.class)){
+			propertyMapper.from(handlerProperties::getHikari).to(jdbcTemplateFactoryBean::setDataSourceConfiguration);
+		}else if(jdbcTemplateFactoryBean.getDataSourceType().isAssignableFrom(OracleDataSource.class)){
+			propertyMapper.from(handlerProperties::getOracle).to(jdbcTemplateFactoryBean::setDataSourceConfiguration);
+		}else if(jdbcTemplateFactoryBean.getDataSourceType().isAssignableFrom(TomcatDataSource.class)){
+			propertyMapper.from(handlerProperties::getTomcat).to(jdbcTemplateFactoryBean::setDataSourceConfiguration);
+		}
+
 
 		return jdbcTemplateFactoryBean;
 	}

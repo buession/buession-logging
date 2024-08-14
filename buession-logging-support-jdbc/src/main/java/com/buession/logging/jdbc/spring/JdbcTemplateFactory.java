@@ -19,25 +19,26 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.jdbc.spring;
 
-import com.buession.core.converter.mapper.PropertyMapper;
 import com.buession.core.utils.Assert;
-import com.buession.jdbc.datasource.config.Dbcp2PoolConfiguration;
-import com.buession.jdbc.datasource.config.DruidPoolConfiguration;
-import com.buession.jdbc.datasource.config.HikariPoolConfiguration;
-import com.buession.jdbc.datasource.config.PoolConfiguration;
-import com.buession.jdbc.datasource.config.TomcatPoolConfiguration;
+import com.buession.jdbc.config.*;
+import com.buession.jdbc.datasource.*;
+import com.buession.jdbc.datasource.pool.*;
+import org.springframework.beans.BeanInstantiationException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.ClassUtils;
 
 import javax.sql.DataSource;
+import java.lang.reflect.Constructor;
+import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * {@link JdbcTemplate} 工厂
@@ -47,7 +48,8 @@ import java.util.Map;
  */
 public class JdbcTemplateFactory {
 
-	private final static Map<String, Setting> DATA_SOURCE_MAP = new LinkedHashMap<>(4);
+	private final static Map<String, Class<? extends com.buession.jdbc.datasource.DataSource<?, ?>>> DATA_SOURCE_MAP =
+			new LinkedHashMap<>(5);
 
 	/**
 	 * 数据库驱动类名
@@ -70,25 +72,48 @@ public class JdbcTemplateFactory {
 	private String password;
 
 	/**
-	 * 连接池配置
+	 * 登录超时
+	 *
+	 * @since 1.0.0
 	 */
-	private PoolConfiguration poolConfiguration;
+	private Duration loginTimeout;
+
+	/**
+	 * 设置一个SQL语句，在将每个新连接创建后，将其添加到池中之前执行该语句
+	 *
+	 * @since 1.0.0
+	 */
+	private String initSQL;
+
+	/**
+	 * 连接属性
+	 *
+	 * @since 1.0.0
+	 */
+	private Properties connectionProperties;
+
+	/**
+	 * 数据源配置
+	 *
+	 * @since 1.0.0
+	 */
+	private Config dataSourceConfiguration;
 
 	private ClassLoader classLoader;
 
-	private Setting dataSourceSetting;
+	private Class<? extends com.buession.jdbc.datasource.DataSource<?, ?>> dataSourceType;
 
 	private DataSource dataSource;
 
 	static {
-		DATA_SOURCE_MAP.put("com.zaxxer.hikari.HikariDataSource",
-				new Setting(com.buession.jdbc.datasource.HikariDataSource.class, HikariPoolConfiguration.class));
 		DATA_SOURCE_MAP.put("org.apache.commons.dbcp2.BasicDataSource",
-				new Setting(com.buession.jdbc.datasource.Dbcp2DataSource.class, Dbcp2PoolConfiguration.class));
+				com.buession.jdbc.datasource.Dbcp2DataSource.class);
 		DATA_SOURCE_MAP.put("com.alibaba.druid.pool.DruidDataSource",
-				new Setting(com.buession.jdbc.datasource.DruidDataSource.class, DruidPoolConfiguration.class));
+				com.buession.jdbc.datasource.DruidDataSource.class);
+		DATA_SOURCE_MAP.put("com.zaxxer.hikari.HikariDataSource", com.buession.jdbc.datasource.HikariDataSource.class);
+		DATA_SOURCE_MAP.put("oracle.ucp.jdbc.PoolDataSource", com.buession.jdbc.datasource.OracleDataSource.class);
 		DATA_SOURCE_MAP.put("org.apache.tomcat.jdbc.pool.DataSource",
-				new Setting(com.buession.jdbc.datasource.TomcatDataSource.class, TomcatPoolConfiguration.class));
+				com.buession.jdbc.datasource.TomcatDataSource.class);
 	}
 
 	/**
@@ -168,22 +193,91 @@ public class JdbcTemplateFactory {
 	}
 
 	/**
-	 * 返回连接池配置
+	 * 返回登录超时
 	 *
-	 * @return 连接池配置
+	 * @return 登录超时
+	 *
+	 * @since 1.0.0
 	 */
-	public PoolConfiguration getPoolConfiguration() {
-		return poolConfiguration;
+	public Duration getLoginTimeout() {
+		return loginTimeout;
 	}
 
 	/**
-	 * 设置连接池配置
+	 * 设置登录超时
 	 *
-	 * @param poolConfiguration
-	 * 		连接池配置
+	 * @param loginTimeout
+	 * 		登录超时
+	 *
+	 * @since 1.0.0
 	 */
-	public void setPoolConfiguration(PoolConfiguration poolConfiguration) {
-		this.poolConfiguration = poolConfiguration;
+	public void setLoginTimeout(Duration loginTimeout) {
+		this.loginTimeout = loginTimeout;
+	}
+
+	/**
+	 * 返回在将每个新连接创建后，将其添加到池中之前执行的SQL语句
+	 *
+	 * @return 每个新连接创建后，将其添加到池中之前执行的SQL语句
+	 *
+	 * @since 1.0.0
+	 */
+	public String getInitSQL() {
+		return initSQL;
+	}
+
+	/**
+	 * 设置每个新连接创建后，将其添加到池中之前执行的SQL语句
+	 *
+	 * @param initSQL
+	 * 		每个新连接创建后，将其添加到池中之前执行的SQL语句
+	 *
+	 * @since 1.0.0
+	 */
+	public void setInitSQL(String initSQL) {
+		this.initSQL = initSQL;
+	}
+
+	/**
+	 * 返回连接属性
+	 *
+	 * @return 连接属性
+	 *
+	 * @since 1.0.0
+	 */
+	public Properties getConnectionProperties() {
+		return connectionProperties;
+	}
+
+	/**
+	 * 设置连接属性
+	 *
+	 * @param connectionProperties
+	 * 		连接属性
+	 *
+	 * @since 1.0.0
+	 */
+	public void setConnectionProperties(Properties connectionProperties) {
+		this.connectionProperties = connectionProperties;
+	}
+
+	/**
+	 * 返回数据源配置
+	 *
+	 * @return 数据源配置
+	 */
+	public Config getDataSourceConfiguration() {
+		return dataSourceConfiguration;
+	}
+
+	/**
+	 * 设置数据源配置
+	 *
+	 * @param dataSourceConfiguration
+	 * 		数据源配置
+	 */
+	public void setDataSourceConfiguration(Config dataSourceConfiguration) {
+		this.dataSourceConfiguration = dataSourceConfiguration;
 	}
 
 	public ClassLoader getClassLoader() {
@@ -201,73 +295,352 @@ public class JdbcTemplateFactory {
 		return new JdbcTemplate(createDataSource());
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({"rawtypes"})
 	protected DataSource createDataSource() {
 		if(this.dataSource != null){
 			return this.dataSource;
 		}
 
-		final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
-		final Setting dataSourceSetting = getDataSourceSetting();
-		final com.buession.jdbc.datasource.DataSource dataSource = BeanUtils.instantiateClass(
-				dataSourceSetting.getDataSourceType());
+		final Class<? extends com.buession.jdbc.datasource.DataSource<?, ?>> dataSourceClazz = getDataSourceType();
+		try{
+			final Constructor<? extends com.buession.jdbc.datasource.DataSource<?, ?>> constructor =
+					dataSourceClazz.getConstructor(String.class, String.class, String.class, String.class);
 
-		propertyMapper.from(driverClassName).to(dataSource::setDriverClassName);
-		propertyMapper.from(url).to(dataSource::setUrl);
-		propertyMapper.from(username).to(dataSource::setUsername);
-		propertyMapper.from(password).to(dataSource::setPassword);
-		propertyMapper.from(poolConfiguration).to(dataSource::setPoolConfiguration);
+			final com.buession.jdbc.datasource.DataSource dataSource = BeanUtils.instantiateClass(constructor,
+					driverClassName, url, username, password);
 
-		this.dataSource = dataSource.createDataSource();
-		return this.dataSource;
+			dataSource.setLoginTimeout(getLoginTimeout());
+
+			dataSource.setInitSQL(getInitSQL());
+
+			dataSource.setConnectionProperties(getConnectionProperties());
+
+			if(getDataSourceConfiguration() != null){
+				dataSource.setQueryTimeout(getDataSourceConfiguration().getQueryTimeout());
+				dataSource.setDefaultTransactionIsolation(
+						getDataSourceConfiguration().getDefaultTransactionIsolation());
+				dataSource.setDefaultAutoCommit(getDataSourceConfiguration().getDefaultAutoCommit());
+				dataSource.setAccessToUnderlyingConnectionAllowed(
+						getDataSourceConfiguration().getAccessToUnderlyingConnectionAllowed());
+
+				if(dataSourceClazz.isAssignableFrom(Dbcp2DataSource.class)){
+					Dbcp2DataSource dbcp2DataSource = (Dbcp2DataSource) dataSource;
+					Dbcp2Config dbcp2Config = (Dbcp2Config) getDataSourceConfiguration();
+					Dbcp2PoolConfiguration poolConfiguration = new Dbcp2PoolConfiguration();
+
+					dbcp2DataSourceConfig(dbcp2DataSource, dbcp2Config, poolConfiguration);
+				}else if(dataSourceClazz.isAssignableFrom(DruidDataSource.class)){
+					DruidDataSource druidDataSource = (DruidDataSource) dataSource;
+					DruidConfig druidConfig = (DruidConfig) getDataSourceConfiguration();
+					DruidPoolConfiguration poolConfiguration = new DruidPoolConfiguration();
+
+					druidDataSourceConfig(druidDataSource, druidConfig, poolConfiguration);
+				}else if(dataSourceClazz.isAssignableFrom(HikariDataSource.class)){
+					HikariDataSource hikariDataSource = (HikariDataSource) dataSource;
+					HikariConfig hikariConfig = (HikariConfig) getDataSourceConfiguration();
+					HikariPoolConfiguration poolConfiguration = new HikariPoolConfiguration();
+
+					hikariDataSourceConfig(hikariDataSource, hikariConfig, poolConfiguration);
+				}else if(dataSourceClazz.isAssignableFrom(OracleDataSource.class)){
+					OracleDataSource oracleDataSource = (OracleDataSource) dataSource;
+					OracleConfig oracleConfig = (OracleConfig) getDataSourceConfiguration();
+					OraclePoolConfiguration poolConfiguration = new OraclePoolConfiguration();
+
+					oracleDataSourceConfig(oracleDataSource, oracleConfig, poolConfiguration);
+				}else if(dataSourceClazz.isAssignableFrom(TomcatDataSource.class)){
+					TomcatDataSource tomcatDataSource = (TomcatDataSource) dataSource;
+					TomcatConfig tomcatConfig = (TomcatConfig) getDataSourceConfiguration();
+					TomcatPoolConfiguration poolConfiguration = new TomcatPoolConfiguration();
+
+					tomcatDataSourceConfig(tomcatDataSource, tomcatConfig, poolConfiguration);
+				}
+			}
+
+			this.dataSource = dataSource.createDataSource();
+			return this.dataSource;
+		}catch(NoSuchMethodException e){
+			throw new BeanInstantiationException(dataSourceClazz,
+					"Can't specify more arguments than constructor parameters");
+		}
 	}
 
-	protected Setting getDataSourceSetting() {
-		if(dataSourceSetting != null){
-			return dataSourceSetting;
+	public Class<? extends com.buession.jdbc.datasource.DataSource<?, ?>> getDataSourceType() {
+		if(this.dataSourceType != null){
+			return this.dataSourceType;
 		}
 
-		dataSourceSetting = getDataSourceSetting(classLoader);
-		if(dataSourceSetting != null){
-			return dataSourceSetting;
-		}
-
-		throw new IllegalStateException("No supported javax.sql.DataSource type found");
-	}
-
-	protected static Setting getDataSourceSetting(final ClassLoader classLoader) {
-		for(Map.Entry<String, Setting> e : DATA_SOURCE_MAP.entrySet()){
+		for(Map.Entry<String, Class<? extends com.buession.jdbc.datasource.DataSource<?, ?>>> e : DATA_SOURCE_MAP.entrySet()){
 			try{
 				ClassUtils.forName(e.getKey(), classLoader);
-				return e.getValue();
+				this.dataSourceType = e.getValue();
+				return this.dataSourceType;
 			}catch(Exception ex){
 				// Swallow and continue
 			}
 		}
 
-		return null;
+		throw new IllegalStateException("No supported javax.sql.DataSource type found");
 	}
 
-	protected final static class Setting {
+	protected void dbcp2DataSourceConfig(final Dbcp2DataSource dataSource, final Dbcp2Config dataSourceConfig,
+										 final Dbcp2PoolConfiguration poolConfiguration) {
+		dataSource.setConnectionFactoryClassName(dataSourceConfig.getConnectionFactoryClassName());
 
-		private final Class<? extends com.buession.jdbc.datasource.DataSource> dataSourceType;
+		dataSource.setFastFailValidation(dataSourceConfig.getFastFailValidation());
+		dataSource.setLogExpiredConnections(dataSourceConfig.getLogExpiredConnections());
 
-		private final Class<? extends PoolConfiguration> poolConfiguration;
+		dataSource.setAutoCommitOnReturn(dataSourceConfig.getAutoCommitOnReturn());
+		dataSource.setRollbackOnReturn(dataSourceConfig.getRollbackOnReturn());
 
-		public Setting(final Class<? extends com.buession.jdbc.datasource.DataSource> dataSourceType,
-					   final Class<? extends PoolConfiguration> poolConfiguration) {
-			this.dataSourceType = dataSourceType;
-			this.poolConfiguration = poolConfiguration;
-		}
+		dataSource.setCacheState(dataSourceConfig.getCacheState());
+		dataSource.setDefaultAutoCommit(dataSourceConfig.getDefaultAutoCommit());
 
-		public Class<? extends com.buession.jdbc.datasource.DataSource> getDataSourceType() {
-			return dataSourceType;
-		}
+		poolConfiguration(poolConfiguration, dataSourceConfiguration);
 
-		public Class<? extends PoolConfiguration> getPoolConfiguration() {
-			return poolConfiguration;
-		}
+		poolConfiguration.setMaxConnLifetime(dataSourceConfig.getMaxConnLifetime());
 
+		poolConfiguration.setPoolPreparedStatements(dataSourceConfig.getPoolPreparedStatements());
+		poolConfiguration.setMaxOpenPreparedStatements(dataSourceConfig.getMaxOpenPreparedStatements());
+		poolConfiguration.setMaxOpenPreparedStatements(dataSourceConfig.getMaxOpenPreparedStatements());
+		poolConfiguration.setClearStatementPoolOnReturn(dataSourceConfig.getClearStatementPoolOnReturn());
+
+		poolConfiguration.setRemoveAbandonedOnBorrow(dataSourceConfig.getRemoveAbandonedOnBorrow());
+		poolConfiguration.setRemoveAbandonedOnMaintenance(dataSourceConfig.getRemoveAbandonedOnMaintenance());
+		poolConfiguration.setAbandonedUsageTracking(dataSourceConfig.getAbandonedUsageTracking());
+
+		poolConfiguration.setSoftMinEvictableIdle(dataSourceConfig.getSoftMinEvictableIdle());
+
+		poolConfiguration.setEvictionPolicyClassName(dataSourceConfig.getEvictionPolicyClassName());
+
+		poolConfiguration.setLifo(dataSourceConfig.getLifo());
+	}
+
+	protected void druidDataSourceConfig(final DruidDataSource dataSource, final DruidConfig dataSourceConfig,
+										 final DruidPoolConfiguration poolConfiguration) {
+		dataSource.setUserCallbackClassName(dataSourceConfig.getUserCallbackClassName());
+		dataSource.setPasswordCallbackClassName(dataSourceConfig.getPasswordCallbackClassName());
+
+		dataSource.setConnectTimeout(dataSourceConfig.getConnectTimeout());
+		dataSource.setSocketTimeout(dataSourceConfig.getSocketTimeout());
+
+		dataSource.setTimeBetweenConnectError(dataSourceConfig.getTimeBetweenConnectError());
+		dataSource.setKillWhenSocketReadTimeout(dataSourceConfig.getKillWhenSocketReadTimeout());
+
+		dataSource.setPhyTimeout(dataSourceConfig.getPhyTimeout());
+		dataSource.setPhyMaxUseCount(dataSourceConfig.getPhyMaxUseCount());
+
+		dataSource.setAsyncInit(dataSourceConfig.getAsyncInit());
+
+		dataSource.setInitVariants(dataSourceConfig.getInitVariants());
+		dataSource.setInitGlobalVariants(dataSourceConfig.getInitGlobalVariants());
+
+		dataSource.setValidConnectionCheckerClassName(dataSourceConfig.getValidConnectionCheckerClassName());
+		dataSource.setConnectionErrorRetryAttempts(dataSourceConfig.getConnectionErrorRetryAttempts());
+
+		dataSource.setInitExceptionThrow(dataSourceConfig.getInitExceptionThrow());
+		dataSource.setExceptionSorterClassName(dataSourceConfig.getExceptionSorterClassName());
+
+		dataSource.setUseOracleImplicitCache(dataSourceConfig.getUseOracleImplicitCache());
+		dataSource.setAsyncCloseConnectionEnable(dataSourceConfig.getAsyncCloseConnectionEnable());
+
+		dataSource.setTransactionQueryTimeout(dataSourceConfig.getTransactionQueryTimeout());
+		dataSource.setTransactionThreshold(dataSourceConfig.getTransactionThreshold());
+
+		dataSource.setFairLock(dataSourceConfig.getFairLock());
+
+		dataSource.setFailFast(dataSourceConfig.getFailFast());
+
+		dataSource.setCheckExecuteTime(dataSourceConfig.getCheckExecuteTime());
+
+		dataSource.setUseGlobalDataSourceStat(dataSourceConfig.getUseGlobalDataSourceStat());
+		dataSource.setStatLoggerClassName(dataSourceConfig.getStatLoggerClassName());
+
+		dataSource.setMaxSqlSize(dataSourceConfig.getMaxSqlSize());
+		dataSource.setResetStatEnable(dataSourceConfig.getResetStatEnable());
+
+		dataSource.setFilters(dataSourceConfig.getFilters());
+		dataSource.setLoadSpifilterSkip(dataSourceConfig.getLoadSpifilterSkip());
+		dataSource.setClearFiltersEnable(dataSourceConfig.getClearFiltersEnable());
+
+		dataSource.setEnable(dataSourceConfig.getEnable());
+
+		poolConfiguration(poolConfiguration, dataSourceConfiguration);
+		poolConfiguration.setMaxActive(dataSourceConfig.getMaxActive());
+
+		poolConfiguration.setKeepAlive(dataSourceConfig.getKeepAlive());
+		poolConfiguration.setKeepAliveBetweenTime(dataSourceConfig.getKeepAliveBetweenTime());
+
+		poolConfiguration.setUsePingMethod(dataSourceConfig.getUsePingMethod());
+		poolConfiguration.setKeepConnectionUnderlyingTransactionIsolation(
+				dataSourceConfig.getKeepConnectionUnderlyingTransactionIsolation());
+
+		poolConfiguration.setMaxCreateTaskCount(dataSourceConfig.getMaxCreateTaskCount());
+		poolConfiguration.setMaxWaitThreadCount(dataSourceConfig.getMaxWaitThreadCount());
+
+		poolConfiguration.setOnFatalErrorMaxActive(dataSourceConfig.getOnFatalErrorMaxActive());
+		poolConfiguration.setBreakAfterAcquireFailure(dataSourceConfig.getBreakAfterAcquireFailure());
+
+		poolConfiguration.setNotFullTimeoutRetryCount(dataSourceConfig.getNotFullTimeoutRetryCount());
+
+		poolConfiguration.setUseLocalSessionState(dataSourceConfig.getUseLocalSessionState());
+		poolConfiguration.setPoolPreparedStatements(dataSourceConfig.getPoolPreparedStatements());
+		poolConfiguration.setSharePreparedStatements(dataSourceConfig.getSharePreparedStatements());
+		poolConfiguration.setMaxPoolPreparedStatementPerConnectionSize(
+				dataSourceConfig.getMaxPoolPreparedStatementPerConnectionSize());
+		poolConfiguration.setMaxOpenPreparedStatements(dataSourceConfig.getMaxOpenPreparedStatements());
+
+		poolConfiguration.setRemoveAbandoned(dataSourceConfig.getRemoveAbandoned());
+
+		poolConfiguration.setTimeBetweenLogStats(dataSourceConfig.getTimeBetweenLogStats());
+
+		poolConfiguration.setDupCloseLogEnable(dataSourceConfig.getDupCloseLogEnable());
+		poolConfiguration.setLogDifferentThread(dataSourceConfig.getLogDifferentThread());
+	}
+
+	protected void hikariDataSourceConfig(final HikariDataSource dataSource, final HikariConfig dataSourceConfig,
+										  final HikariPoolConfiguration poolConfiguration) {
+		dataSource.setJndiName(dataSourceConfig.getJndiName());
+
+		dataSource.setConnectionTimeout(dataSourceConfig.getConnectionTimeout());
+
+		dataSource.setIsolateInternalQueries(dataSourceConfig.getIsolateInternalQueries());
+
+		poolConfiguration(poolConfiguration, dataSourceConfiguration);
+		poolConfiguration.setInitializationFailTimeout(dataSourceConfig.getInitializationFailTimeout());
+
+		poolConfiguration.setMaxPoolSize(dataSourceConfig.getMaxPoolSize());
+
+		poolConfiguration.setConnectionTestQuery(dataSourceConfig.getConnectionTestQuery());
+		poolConfiguration.setValidationTimeout(dataSourceConfig.getValidationTimeout());
+
+		poolConfiguration.setIdleTimeout(dataSourceConfig.getIdleTimeout());
+		poolConfiguration.setMaxLifetime(dataSourceConfig.getMaxLifetime());
+		poolConfiguration.setKeepaliveTime(dataSourceConfig.getKeepaliveTime());
+
+		poolConfiguration.setLeakDetectionThreshold(dataSourceConfig.getLeakDetectionThreshold());
+		poolConfiguration.setAllowPoolSuspension(dataSourceConfig.getAllowPoolSuspension());
+
+		poolConfiguration.setMetricsTrackerFactoryClassName(dataSourceConfig.getMetricsTrackerFactoryClassName());
+		poolConfiguration.setMetricRegistryClassName(dataSourceConfig.getMetricRegistryClassName());
+
+		poolConfiguration.setHealthCheckRegistryClassName(dataSourceConfig.getHealthCheckRegistryClassName());
+		poolConfiguration.setHealthCheckProperties(dataSourceConfig.getHealthCheckProperties());
+	}
+
+	protected void oracleDataSourceConfig(final OracleDataSource dataSource, final OracleConfig dataSourceConfig,
+										  final OraclePoolConfiguration poolConfiguration) {
+		dataSource.setNetworkProtocol(dataSourceConfig.getNetworkProtocol());
+		dataSource.setServerName(dataSourceConfig.getServerName());
+		dataSource.setPortNumber(dataSourceConfig.getPortNumber());
+		dataSource.setServiceName(dataSourceConfig.getServiceName());
+		dataSource.setDataSourceName(dataSourceConfig.getDataSourceName());
+		dataSource.setDataSourceDescription(dataSourceConfig.getDataSourceDescription());
+		dataSource.setDatabaseName(dataSourceConfig.getDatabaseName());
+
+		dataSource.setRoleName(dataSourceConfig.getRoleName());
+		dataSource.setPdbRoles(dataSourceConfig.getPdbRoles());
+
+		dataSource.setConnectionFactoryClassName(dataSourceConfig.getConnectionFactoryClassName());
+		dataSource.setFastConnectionFailoverEnabled(dataSourceConfig.getFastConnectionFailoverEnabled());
+
+		dataSource.setOnsConfiguration(dataSourceConfig.getOnsConfiguration());
+
+		dataSource.setShardingMode(dataSourceConfig.getShardingMode());
+		dataSource.setMaxConnectionsPerShard(dataSourceConfig.getMaxConnectionsPerShard());
+
+		dataSource.setMaxConnectionsPerService(dataSourceConfig.getMaxConnectionsPerService());
+
+		poolConfiguration(poolConfiguration, dataSourceConfiguration);
+		poolConfiguration.setMinPoolSize(dataSourceConfig.getMinPoolSize());
+		poolConfiguration.setMaxPoolSize(dataSourceConfig.getMaxPoolSize());
+
+		poolConfiguration.setMaxIdleTime(dataSourceConfig.getMaxIdleTime());
+		poolConfiguration.setTimeToLiveConnectionTimeout(dataSourceConfig.getTimeToLiveConnectionTimeout());
+
+		poolConfiguration.setTrustIdleConnection(dataSourceConfig.getTrustIdleConnection());
+		poolConfiguration.setMaxConnectionReuseTime(dataSourceConfig.getMaxConnectionReuseTime());
+		poolConfiguration.setMaxConnectionReuseCount(dataSourceConfig.getMaxConnectionReuseCount());
+
+		poolConfiguration.setConnectionLabelingHighCost(dataSourceConfig.getConnectionLabelingHighCost());
+		poolConfiguration.setHighCostConnectionReuseThreshold(
+				dataSourceConfig.getHighCostConnectionReuseThreshold());
+		poolConfiguration.setConnectionRepurposeThreshold(dataSourceConfig.getConnectionRepurposeThreshold());
+
+		poolConfiguration.setTimeoutCheckInterval(dataSourceConfig.getTimeoutCheckInterval());
+
+		poolConfiguration.setMaxStatements(dataSourceConfig.getMaxStatements());
+
+		poolConfiguration.setConnectionHarvestTriggerCount(dataSourceConfig.getConnectionHarvestTriggerCount());
+		poolConfiguration.setConnectionHarvestMaxCount(dataSourceConfig.getConnectionHarvestMaxCount());
+
+		poolConfiguration.setReadOnlyInstanceAllowed(dataSourceConfig.getReadOnlyInstanceAllowed());
+		poolConfiguration.setCreateConnectionInBorrowThread(dataSourceConfig.getCreateConnectionInBorrowThread());
+	}
+
+	protected void tomcatDataSourceConfig(final TomcatDataSource dataSource, final TomcatConfig dataSourceConfig,
+										  final TomcatPoolConfiguration poolConfiguration) {
+		dataSource.setJndiName(dataSourceConfig.getJndiName());
+
+		dataSource.setAlternateUsernameAllowed(dataSourceConfig.getAlternateUsernameAllowed());
+
+		dataSource.setCommitOnReturn(dataSourceConfig.getCommitOnReturn());
+		dataSource.setRollbackOnReturn(dataSourceConfig.getRollbackOnReturn());
+
+		dataSource.setValidatorClassName(dataSourceConfig.getValidatorClassName());
+		dataSource.setValidationInterval(dataSourceConfig.getValidationInterval());
+
+		dataSource.setJdbcInterceptors(dataSourceConfig.getJdbcInterceptors());
+
+		poolConfiguration(poolConfiguration, dataSourceConfiguration);
+		poolConfiguration.setMaxActive(dataSourceConfig.getMaxActive());
+		poolConfiguration.setMaxAge(dataSourceConfig.getMaxAge());
+
+		poolConfiguration.setTestOnConnect(dataSourceConfig.getTestOnConnect());
+
+		poolConfiguration.setUseDisposableConnectionFacade(dataSourceConfig.getUseDisposableConnectionFacade());
+		poolConfiguration.setIgnoreExceptionOnPreLoad(dataSourceConfig.getIgnoreExceptionOnPreLoad());
+
+		poolConfiguration.setFairQueue(dataSourceConfig.getFairQueue());
+		poolConfiguration.setUseStatementFacade(dataSourceConfig.getUseStatementFacade());
+
+		poolConfiguration.setRemoveAbandoned(dataSourceConfig.getRemoveAbandoned());
+		poolConfiguration.setSuspectTimeout(dataSourceConfig.getSuspectTimeout());
+		poolConfiguration.setAbandonWhenPercentageFull(dataSourceConfig.getAbandonWhenPercentageFull());
+
+		poolConfiguration.setPropagateInterruptState(dataSourceConfig.getPropagateInterruptState());
+		poolConfiguration.setLogValidationErrors(dataSourceConfig.getLogValidationErrors());
+
+		poolConfiguration.setUseLock(dataSourceConfig.getUseLock());
+		poolConfiguration.setUseEquals(dataSourceConfig.getUseEquals());
+	}
+
+	protected void poolConfiguration(final PoolConfiguration poolConfiguration, final Config dataSourceConfig) {
+		poolConfiguration.setPoolName(dataSourceConfig.getPoolName());
+
+		poolConfiguration.setInitialSize(dataSourceConfig.getInitialSize());
+		poolConfiguration.setMinIdle(dataSourceConfig.getMinIdle());
+		poolConfiguration.setMaxIdle(dataSourceConfig.getMaxIdle());
+		poolConfiguration.setMaxTotal(dataSourceConfig.getMaxTotal());
+		poolConfiguration.setMaxWait(dataSourceConfig.getMaxWait());
+
+		poolConfiguration.setTestOnCreate(dataSourceConfig.getTestOnCreate());
+		poolConfiguration.setTestOnBorrow(dataSourceConfig.getTestOnBorrow());
+		poolConfiguration.setTestOnReturn(dataSourceConfig.getTestOnReturn());
+		poolConfiguration.setTestWhileIdle(dataSourceConfig.getTestWhileIdle());
+
+		poolConfiguration.setValidationQuery(dataSourceConfig.getValidationQuery());
+		poolConfiguration.setValidationQueryTimeout(dataSourceConfig.getValidationQueryTimeout());
+
+		poolConfiguration.setMinEvictableIdle(dataSourceConfig.getMinEvictableIdle());
+		poolConfiguration.setMaxEvictableIdle(dataSourceConfig.getMaxEvictableIdle());
+
+		poolConfiguration.setNumTestsPerEvictionRun(dataSourceConfig.getNumTestsPerEvictionRun());
+		poolConfiguration.setTimeBetweenEvictionRuns(dataSourceConfig.getTimeBetweenEvictionRuns());
+
+		poolConfiguration.setRemoveAbandonedTimeout(dataSourceConfig.getRemoveAbandonedTimeout());
+		poolConfiguration.setLogAbandoned(dataSourceConfig.getLogAbandoned());
+
+		poolConfiguration.setJmx(dataSourceConfig.getJmx());
 	}
 
 }
