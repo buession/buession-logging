@@ -24,14 +24,11 @@
  */
 package com.buession.logging.springboot.autoconfigure.jdbc;
 
-import com.buession.jdbc.datasource.Dbcp2DataSource;
-import com.buession.jdbc.datasource.DruidDataSource;
-import com.buession.jdbc.datasource.HikariDataSource;
-import com.buession.jdbc.datasource.OracleDataSource;
-import com.buession.jdbc.datasource.TomcatDataSource;
+import com.buession.jdbc.datasource.*;
 import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.jdbc.converter.DefaultLogDataConverter;
 import com.buession.logging.jdbc.converter.LogDataConverter;
+import com.buession.logging.jdbc.spring.DataSourceFactoryBean;
 import com.buession.logging.jdbc.spring.JdbcLogHandlerFactoryBean;
 import com.buession.logging.jdbc.spring.JdbcTemplateFactoryBean;
 import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
@@ -65,30 +62,44 @@ public class JdbcLogHandlerConfiguration extends AbstractLogHandlerConfiguration
 		super(logProperties.getJdbc());
 	}
 
-	@Bean(name = "loggingJdbcJdbcTemplate")
-	public JdbcTemplateFactoryBean jdbcTemplateFactoryBean() {
-		final JdbcTemplateFactoryBean jdbcTemplateFactoryBean = new JdbcTemplateFactoryBean();
+	@Bean(name = "loggingDataSource")
+	public DataSourceFactoryBean dataSourceFactoryBean() {
+		final DataSourceFactoryBean dataSourceFactoryBean = new DataSourceFactoryBean();
 
-		propertyMapper.from(handlerProperties::getDriverClassName).to(jdbcTemplateFactoryBean::setDriverClassName);
-		propertyMapper.from(handlerProperties::getUrl).to(jdbcTemplateFactoryBean::setUrl);
-		propertyMapper.from(handlerProperties::getUsername).to(jdbcTemplateFactoryBean::setUsername);
-		propertyMapper.from(handlerProperties::getPassword).to(jdbcTemplateFactoryBean::setPassword);
-		propertyMapper.from(handlerProperties::getLoginTimeout).to(jdbcTemplateFactoryBean::setLoginTimeout);
+		propertyMapper.from(handlerProperties::getDriverClassName).to(dataSourceFactoryBean::setDriverClassName);
+		propertyMapper.from(handlerProperties::getUrl).to(dataSourceFactoryBean::setUrl);
+		propertyMapper.from(handlerProperties::getUsername).to(dataSourceFactoryBean::setUsername);
+		propertyMapper.from(handlerProperties::getPassword).to(dataSourceFactoryBean::setPassword);
+		propertyMapper.from(handlerProperties::getLoginTimeout).to(dataSourceFactoryBean::setLoginTimeout);
 		propertyMapper.from(handlerProperties::getConnectionProperties)
-				.to(jdbcTemplateFactoryBean::setConnectionProperties);
+				.to(dataSourceFactoryBean::setConnectionProperties);
 
-		if(jdbcTemplateFactoryBean.getDataSourceType().isAssignableFrom(Dbcp2DataSource.class)){
-			propertyMapper.from(handlerProperties::getDbcp2).to(jdbcTemplateFactoryBean::setDataSourceConfiguration);
-		}else if(jdbcTemplateFactoryBean.getDataSourceType().isAssignableFrom(DruidDataSource.class)){
-			propertyMapper.from(handlerProperties::getDruid).to(jdbcTemplateFactoryBean::setDataSourceConfiguration);
-		}else if(jdbcTemplateFactoryBean.getDataSourceType().isAssignableFrom(HikariDataSource.class)){
-			propertyMapper.from(handlerProperties::getHikari).to(jdbcTemplateFactoryBean::setDataSourceConfiguration);
-		}else if(jdbcTemplateFactoryBean.getDataSourceType().isAssignableFrom(OracleDataSource.class)){
-			propertyMapper.from(handlerProperties::getOracle).to(jdbcTemplateFactoryBean::setDataSourceConfiguration);
-		}else if(jdbcTemplateFactoryBean.getDataSourceType().isAssignableFrom(TomcatDataSource.class)){
-			propertyMapper.from(handlerProperties::getTomcat).to(jdbcTemplateFactoryBean::setDataSourceConfiguration);
+		if(dataSourceFactoryBean.getDataSourceType().isAssignableFrom(Dbcp2DataSource.class)){
+			propertyMapper.from(handlerProperties::getDbcp2).to(dataSourceFactoryBean::setDataSourceConfiguration);
+		}else if(dataSourceFactoryBean.getDataSourceType().isAssignableFrom(DruidDataSource.class)){
+			propertyMapper.from(handlerProperties::getDruid).to(dataSourceFactoryBean::setDataSourceConfiguration);
+		}else if(dataSourceFactoryBean.getDataSourceType().isAssignableFrom(HikariDataSource.class)){
+			propertyMapper.from(handlerProperties::getHikari).to(dataSourceFactoryBean::setDataSourceConfiguration);
+		}else if(dataSourceFactoryBean.getDataSourceType().isAssignableFrom(OracleDataSource.class)){
+			propertyMapper.from(handlerProperties::getOracle).to(dataSourceFactoryBean::setDataSourceConfiguration);
+		}else if(dataSourceFactoryBean.getDataSourceType().isAssignableFrom(TomcatDataSource.class)){
+			propertyMapper.from(handlerProperties::getTomcat).to(dataSourceFactoryBean::setDataSourceConfiguration);
 		}
 
+		return dataSourceFactoryBean;
+	}
+
+	@Bean(name = "loggingJdbcJdbcTemplate")
+	public JdbcTemplateFactoryBean jdbcTemplateFactoryBean(ObjectProvider<DataSourceFactoryBean> dataSourceFactory) {
+		final JdbcTemplateFactoryBean jdbcTemplateFactoryBean = new JdbcTemplateFactoryBean();
+
+		dataSourceFactory.ifAvailable((obj)->{
+			try{
+				jdbcTemplateFactoryBean.setDataSource(obj.getObject());
+			}catch(Exception e){
+				throw new RuntimeException(e);
+			}
+		});
 
 		return jdbcTemplateFactoryBean;
 	}

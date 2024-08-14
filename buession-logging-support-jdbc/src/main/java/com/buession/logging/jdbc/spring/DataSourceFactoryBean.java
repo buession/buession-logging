@@ -25,28 +25,35 @@
 package com.buession.logging.jdbc.spring;
 
 import com.buession.jdbc.datasource.DataSource;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.InitializingBean;
 
 /**
- * {@link JdbcTemplate} 工厂
+ * 数据源 {@link  com.buession.jdbc.datasource.DataSource} 工厂 Bean
  *
  * @author Yong.Teng
- * @since 0.0.1
+ * @since 3.0.0
  */
-public class JdbcTemplateFactory {
+public class DataSourceFactoryBean extends DataSourceFactory implements FactoryBean<DataSource<?, ?>>,
+		InitializingBean {
 
-	private DataSource<?, ?> dataSource;
+	protected DataSource<?, ?> dataSource;
 
-	public DataSource<?, ?> getDataSource() {
+	@Override
+	public DataSource<?, ?> getObject() throws Exception {
 		return dataSource;
 	}
 
-	public void setDataSource(DataSource<?, ?> dataSource) {
-		this.dataSource = dataSource;
+	@Override
+	public Class<? extends DataSource<?, ?>> getObjectType() {
+		return getDataSourceType();
 	}
 
-	protected JdbcTemplate createJdbcTemplate() {
-		return new JdbcTemplate(getDataSource().createDataSource());
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		if(dataSource == null){
+			dataSource = createDataSource();
+		}
 	}
 
 }
