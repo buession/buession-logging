@@ -19,40 +19,40 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.elasticsearch.spring;
 
-import org.elasticsearch.client.RestHighLevelClient;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
 /**
- * {@link RestHighLevelClient} 工厂 Bean
+ * {@link ElasticsearchClient} 工厂 Bean
  *
  * @author Yong.Teng
- * @since 0.0.1
+ * @since 1.0.0
  */
-public class RestHighLevelClientFactoryBean extends RestHighLevelClientFactory
-		implements FactoryBean<RestHighLevelClient>, InitializingBean {
+public class ElasticsearchClientFactoryBean extends ElasticsearchClientFactory implements
+		FactoryBean<ElasticsearchClient>, InitializingBean {
 
-	private RestHighLevelClient client;
+	private ElasticsearchClient client;
 
 	@Override
-	public RestHighLevelClient getObject() throws Exception {
+	public ElasticsearchClient getObject() throws Exception {
 		return client;
 	}
 
 	@Override
-	public Class<RestHighLevelClient> getObjectType() {
-		return RestHighLevelClient.class;
+	public Class<? extends ElasticsearchClient> getObjectType() {
+		return client.getClass();
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		if(client == null){
-			client = createRestHighLevelClient();
+			client = createElasticsearchClient();
 		}
 	}
 

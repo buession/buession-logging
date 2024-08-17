@@ -24,14 +24,17 @@
  */
 package com.buession.logging.springboot.autoconfigure.elasticsearch;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import com.buession.core.validator.Validate;
 import com.buession.logging.core.handler.LogHandler;
+import com.buession.logging.elasticsearch.spring.ElasticsearchClientFactoryBean;
 import com.buession.logging.elasticsearch.spring.ElasticsearchLogHandlerFactoryBean;
-import com.buession.logging.elasticsearch.spring.ElasticsearchRestTemplateFactoryBean;
-import com.buession.logging.elasticsearch.spring.RestHighLevelClientFactoryBean;
+import com.buession.logging.elasticsearch.spring.ElasticsearchTemplateFactoryBean;
 import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.ElasticsearchProperties;
-import org.elasticsearch.client.RestHighLevelClient;
+import org.apache.http.client.config.RequestConfig;
+import org.elasticsearch.client.RequestOptions;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -40,7 +43,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 
 /**
  * Elasticsearch 日志处理器自动配置类
@@ -59,39 +62,52 @@ public class ElasticsearchLogHandlerConfiguration extends AbstractLogHandlerConf
 		super(logProperties.getElasticsearch());
 	}
 
-	@Bean(name = "loggingElasticsearchRestHighLevelClient")
-	public RestHighLevelClientFactoryBean restHighLevelClientFactoryBean() {
-		final RestHighLevelClientFactoryBean restHighLevelClientFactoryBean = new RestHighLevelClientFactoryBean();
+	@Bean(name = "loggingElasticsearchClient")
+	public ElasticsearchClientFactoryBean elasticsearchClientFactoryBean() {
+		final ElasticsearchClientFactoryBean elasticsearchClientFactoryBean = new ElasticsearchClientFactoryBean();
 
-		propertyMapper.from(handlerProperties::getUrls).to(restHighLevelClientFactoryBean::setUrls);
-		propertyMapper.from(handlerProperties::getHost).to(restHighLevelClientFactoryBean::setHost);
-		propertyMapper.from(handlerProperties::getPort).to(restHighLevelClientFactoryBean::setPort);
-		propertyMapper.from(handlerProperties::getUsername).to(restHighLevelClientFactoryBean::setUsername);
-		propertyMapper.from(handlerProperties::getPassword).to(restHighLevelClientFactoryBean::setPassword);
-		propertyMapper.from(handlerProperties::getConnectionTimeout)
-				.to(restHighLevelClientFactoryBean::setConnectionTimeout);
-		propertyMapper.from(handlerProperties::getReadTimeout).to(restHighLevelClientFactoryBean::setReadTimeout);
+		propertyMapper.from(handlerProperties::getUrls).to(elasticsearchClientFactoryBean::setUrls);
+		propertyMapper.from(handlerProperties::getUsername).to(elasticsearchClientFactoryBean::setUsername);
+		propertyMapper.from(handlerProperties::getPassword).to(elasticsearchClientFactoryBean::setPassword);
 
-		return restHighLevelClientFactoryBean;
+		RequestOptions.Builder requestOptionsBuilder = RequestOptions.DEFAULT.toBuilder();
+		RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
+
+		requestConfigBuilder.setConnectTimeout((int) handlerProperties.getConnectionTimeout().toMillis());
+		requestConfigBuilder.setSocketTimeout((int) handlerProperties.getReadTimeout().toMillis());
+
+		if(Validate.isNotEmpty(handlerProperties.getHeaders())){
+			handlerProperties.getHeaders().forEach(requestOptionsBuilder::addHeader);
+		}
+
+		if(Validate.isNotEmpty(handlerProperties.getParameters())){
+			handlerProperties.getParameters().forEach(requestOptionsBuilder::addParameter);
+		}
+
+		requestOptionsBuilder.setRequestConfig(requestConfigBuilder.build());
+
+		elasticsearchClientFactoryBean.setRequestOptions(requestOptionsBuilder.build());
+
+		return elasticsearchClientFactoryBean;
 	}
 
-	@Bean(name = "loggingElasticsearchElasticsearchRestTemplate")
-	public ElasticsearchRestTemplateFactoryBean elasticsearchRestTemplateFactoryBean(
-			@Qualifier("loggingElasticsearchRestHighLevelClient") ObjectProvider<RestHighLevelClient> restHighLevelClient) {
-		final ElasticsearchRestTemplateFactoryBean elasticsearchRestTemplateFactoryBean =
-				new ElasticsearchRestTemplateFactoryBean();
+	@Bean(name = "loggingElasticsearchTemplate")
+	public ElasticsearchTemplateFactoryBean elasticsearchTemplateFactoryBean(
+			@Qualifier("loggingElasticsearchClient") ObjectProvider<ElasticsearchClient> elasticsearchClient) {
+		final ElasticsearchTemplateFactoryBean elasticsearchTemplateFactoryBean =
+				new ElasticsearchTemplateFactoryBean();
 
-		restHighLevelClient.ifAvailable(elasticsearchRestTemplateFactoryBean::setClient);
+		elasticsearchClient.ifAvailable(elasticsearchTemplateFactoryBean::setClient);
 
-		return elasticsearchRestTemplateFactoryBean;
+		return elasticsearchTemplateFactoryBean;
 	}
 
 	@Bean
 	public ElasticsearchLogHandlerFactoryBean logHandlerFactoryBean(
-			@Qualifier("loggingElasticsearchElasticsearchRestTemplate") ObjectProvider<ElasticsearchRestTemplate> restTemplateFactory) {
+			@Qualifier("loggingElasticsearchTemplate") ObjectProvider<ElasticsearchTemplate> elasticsearchTemplate) {
 		final ElasticsearchLogHandlerFactoryBean logHandlerFactoryBean = new ElasticsearchLogHandlerFactoryBean();
 
-		restTemplateFactory.ifAvailable(logHandlerFactoryBean::setRestTemplate);
+		elasticsearchTemplate.ifAvailable(logHandlerFactoryBean::setElasticsearchTemplate);
 		propertyMapper.from(handlerProperties::getIndexName).to(logHandlerFactoryBean::setIndexName);
 
 		return logHandlerFactoryBean;

@@ -19,18 +19,17 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.elasticsearch.handler;
 
-import com.buession.core.id.IdGenerator;
-import com.buession.core.id.SnowflakeIdGenerator;
+;
 import com.buession.core.utils.Assert;
 import com.buession.lang.Status;
 import com.buession.logging.core.LogData;
 import com.buession.logging.core.handler.AbstractLogHandler;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.IndexOperations;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 
@@ -43,52 +42,36 @@ import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 public class ElasticsearchLogHandler extends AbstractLogHandler {
 
 	/**
-	 * {@link ElasticsearchRestTemplate}
+	 * {@link ElasticsearchOperations}
 	 */
-	private final ElasticsearchRestTemplate restTemplate;
+	private final ElasticsearchOperations elasticsearchOperations;
 
 	private final IndexOperations indexOperations;
 
 	private final IndexCoordinates indexCoordinates;
 
 	/**
-	 * ID 生成器
-	 */
-	private IdGenerator<?> idGenerator = new SnowflakeIdGenerator();
-
-	/**
 	 * 构造函数
 	 *
-	 * @param restTemplate
-	 *        {@link ElasticsearchRestTemplate}
+	 * @param elasticsearchOperations
+	 *        {@link ElasticsearchOperations}
 	 * @param indexName
 	 * 		索引名称
 	 */
-	public ElasticsearchLogHandler(final ElasticsearchRestTemplate restTemplate, final String indexName) {
-		Assert.isNull(restTemplate, "ElasticsearchRestTemplate cloud not be null.");
+	public ElasticsearchLogHandler(final ElasticsearchOperations elasticsearchOperations, final String indexName) {
+		Assert.isNull(elasticsearchOperations, "ElasticsearchOperations cloud not be null.");
 		Assert.isNull(indexName, "Index name cloud not be blank, empty or null.");
 
-		this.restTemplate = restTemplate;
+		this.elasticsearchOperations = elasticsearchOperations;
 		this.indexCoordinates = IndexCoordinates.of(indexName);
-		this.indexOperations = restTemplate.indexOps(this.indexCoordinates);
+		this.indexOperations = elasticsearchOperations.indexOps(this.indexCoordinates);
 
 		createIndex();
 	}
 
-	/**
-	 * 设置 ID 生成器
-	 *
-	 * @param idGenerator
-	 * 		ID 生成器
-	 */
-	public void setIdGenerator(IdGenerator<?> idGenerator) {
-		Assert.isNull(idGenerator, "IdGenerator cloud not be null.");
-		this.idGenerator = idGenerator;
-	}
-
 	@Override
 	protected Status doHandle(final LogData logData) throws Exception {
-		restTemplate.save(logData, indexCoordinates);
+		elasticsearchOperations.save(logData, indexCoordinates);
 		return Status.SUCCESS;
 	}
 

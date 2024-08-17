@@ -19,17 +19,19 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.springboot.config;
 
-import com.buession.logging.elasticsearch.spring.RestHighLevelClientFactory;
+import com.buession.core.builder.ListBuilder;
 import com.buession.logging.support.config.HandlerProperties;
 
 import java.io.Serializable;
 import java.time.Duration;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Elasticsearch 日志配置
@@ -44,17 +46,7 @@ public class ElasticsearchProperties implements HandlerProperties, Serializable 
 	/**
 	 * Elasticsearch URL 地址
 	 */
-	private List<String> urls = RestHighLevelClientFactory.DEFAULT_URLS;
-
-	/**
-	 * Elasticsearch 地址
-	 */
-	private String host;
-
-	/**
-	 * Elasticsearch 端口
-	 */
-	private int port = RestHighLevelClientFactory.DEFAULT_PORT;
+	private List<String> urls = ListBuilder.of("http://localhost:9200");
 
 	/**
 	 * 用户名
@@ -69,12 +61,26 @@ public class ElasticsearchProperties implements HandlerProperties, Serializable 
 	/**
 	 * 连接超时
 	 */
-	private Duration connectionTimeout = RestHighLevelClientFactory.DEFAULT_CONNECTION_TIMEOUT;
+	private Duration connectionTimeout = Duration.ofSeconds(3);
 
 	/**
 	 * 读取超时
 	 */
-	private Duration readTimeout = RestHighLevelClientFactory.DEFAULT_READ_TIMEOUT;
+	private Duration readTimeout = Duration.ofSeconds(10);
+
+	/**
+	 * 请求头
+	 *
+	 * @since 1.0.0
+	 */
+	private Map<String, String> headers = new LinkedHashMap<>();
+
+	/**
+	 * 请求头
+	 *
+	 * @since 1.0.0
+	 */
+	private Map<String, String> parameters = new LinkedHashMap<>();
 
 	/**
 	 * 索引名称
@@ -98,44 +104,6 @@ public class ElasticsearchProperties implements HandlerProperties, Serializable 
 	 */
 	public void setUrls(List<String> urls) {
 		this.urls = urls;
-	}
-
-	/**
-	 * 返回 Elasticsearch 地址
-	 *
-	 * @return Elasticsearch 地址
-	 */
-	public String getHost() {
-		return host;
-	}
-
-	/**
-	 * 设置 Elasticsearch 地址
-	 *
-	 * @param host
-	 * 		Elasticsearch 地址
-	 */
-	public void setHost(String host) {
-		this.host = host;
-	}
-
-	/**
-	 * 返回 Elasticsearch 端口
-	 *
-	 * @return Elasticsearch 端口
-	 */
-	public int getPort() {
-		return port;
-	}
-
-	/**
-	 * 设置 Elasticsearch 端口
-	 *
-	 * @param port
-	 * 		Elasticsearch 端口
-	 */
-	public void setPort(int port) {
-		this.port = port;
 	}
 
 	/**
@@ -212,6 +180,50 @@ public class ElasticsearchProperties implements HandlerProperties, Serializable 
 	 */
 	public void setReadTimeout(Duration readTimeout) {
 		this.readTimeout = readTimeout;
+	}
+
+	/**
+	 * 返回请求头
+	 *
+	 * @return 请求头
+	 */
+	public Map<String, String> getHeaders() {
+		return headers;
+	}
+
+	/**
+	 * 设置请求头
+	 *
+	 * @param headers
+	 * 		请求头
+	 *
+	 * @since 1.0.0
+	 */
+	public void setHeaders(Map<String, String> headers) {
+		this.headers = headers;
+	}
+
+	/**
+	 * 返回请求参数
+	 *
+	 * @return 请求参数
+	 *
+	 * @since 1.0.0
+	 */
+	public Map<String, String> getParameters() {
+		return parameters;
+	}
+
+	/**
+	 * 设置请求参数
+	 *
+	 * @param parameters
+	 * 		请求参数
+	 *
+	 * @since 1.0.0
+	 */
+	public void setParameters(Map<String, String> parameters) {
+		this.parameters = parameters;
 	}
 
 	/**

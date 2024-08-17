@@ -19,50 +19,42 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.elasticsearch.spring;
 
-import com.buession.core.utils.Assert;
-import org.elasticsearch.client.RestHighLevelClient;
+import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 
 /**
- * {@link ElasticsearchRestTemplate} 工厂
+ * {@link ElasticsearchTemplate} 工厂 Bean
  *
  * @author Yong.Teng
- * @since 0.0.1
+ * @since 1.0.0
  */
-public class ElasticsearchRestTemplateFactory {
+public class ElasticsearchTemplateFactoryBean extends ElasticsearchTemplateFactory implements
+		FactoryBean<ElasticsearchTemplate>, InitializingBean {
 
-	/**
-	 * {@link RestHighLevelClient}
-	 */
-	private RestHighLevelClient client;
+	private ElasticsearchTemplate elasticsearchTemplate;
 
-	/**
-	 * 返回 {@link RestHighLevelClient}
-	 *
-	 * @return {@link RestHighLevelClient}
-	 */
-	public RestHighLevelClient getClient() {
-		return client;
+	@Override
+	public ElasticsearchTemplate getObject() throws Exception {
+		return elasticsearchTemplate;
 	}
 
-	/**
-	 * 设置 {@link RestHighLevelClient}
-	 *
-	 * @param client
-	 *        {@link RestHighLevelClient}
-	 */
-	public void setClient(RestHighLevelClient client) {
-		this.client = client;
+	@Override
+	public Class<ElasticsearchRestTemplate> getObjectType() {
+		return ElasticsearchRestTemplate.class;
 	}
 
-	protected ElasticsearchRestTemplate createElasticsearchRestTemplate() {
-		Assert.isNull(getClient(), "Property 'client' is required");
-		return new ElasticsearchRestTemplate(getClient());
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		if(elasticsearchTemplate == null){
+			elasticsearchTemplate = createElasticsearchTemplate();
+		}
 	}
 
 }

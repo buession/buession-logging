@@ -19,7 +19,7 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.elasticsearch.spring;
@@ -27,7 +27,7 @@ package com.buession.logging.elasticsearch.spring;
 import com.buession.core.utils.Assert;
 import com.buession.logging.elasticsearch.handler.ElasticsearchLogHandler;
 import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 
 /**
  * Elasticsearch 日志处理器 {@link ElasticsearchLogHandler} 工厂 Bean 基类
@@ -37,19 +37,33 @@ import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
  */
 public class ElasticsearchLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<ElasticsearchLogHandler> {
 
-	private ElasticsearchRestTemplate restTemplate;
+	/**
+	 * {@link ElasticsearchTemplate}
+	 */
+	private ElasticsearchTemplate elasticsearchTemplate;
 
 	/**
 	 * 索引名称
 	 */
 	private String indexName;
 
-	public ElasticsearchRestTemplate getRestTemplate() {
-		return restTemplate;
+	/**
+	 * 返回 {@link ElasticsearchTemplate}
+	 *
+	 * @return {@link ElasticsearchTemplate}
+	 */
+	public ElasticsearchTemplate getElasticsearchTemplate() {
+		return elasticsearchTemplate;
 	}
 
-	public void setRestTemplate(ElasticsearchRestTemplate restTemplate) {
-		this.restTemplate = restTemplate;
+	/**
+	 * 设置 {@link ElasticsearchTemplate}
+	 *
+	 * @param elasticsearchTemplate
+	 *        {@link ElasticsearchTemplate}
+	 */
+	public void setElasticsearchTemplate(ElasticsearchTemplate elasticsearchTemplate) {
+		this.elasticsearchTemplate = elasticsearchTemplate;
 	}
 
 	/**
@@ -73,11 +87,11 @@ public class ElasticsearchLogHandlerFactoryBean extends BaseLogHandlerFactoryBea
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isNull(getRestTemplate(), "Property 'restTemplate' is required");
+		Assert.isNull(getElasticsearchTemplate(), "Property 'elasticsearchTemplate' is required");
 		Assert.isBlank(getIndexName(), "Property 'indexName' is required");
 
 		if(logHandler == null){
-			logHandler = new ElasticsearchLogHandler(getRestTemplate(), getIndexName());
+			logHandler = new ElasticsearchLogHandler(getElasticsearchTemplate(), getIndexName());
 		}
 	}
 

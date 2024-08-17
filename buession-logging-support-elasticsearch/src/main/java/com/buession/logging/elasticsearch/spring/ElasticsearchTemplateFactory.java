@@ -19,41 +19,75 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.elasticsearch.spring;
 
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import com.buession.core.utils.Assert;
+import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.convert.ElasticsearchConverter;
 
 /**
- * {@link ElasticsearchRestTemplate} 工厂 Bean
+ * {@link ElasticsearchTemplate} 工厂
  *
  * @author Yong.Teng
- * @since 0.0.1
+ * @since 1.0.0
  */
-public class ElasticsearchRestTemplateFactoryBean extends ElasticsearchRestTemplateFactory implements
-		FactoryBean<ElasticsearchRestTemplate>, InitializingBean {
+public class ElasticsearchTemplateFactory {
 
-	private ElasticsearchRestTemplate restTemplate;
+	/**
+	 * {@link ElasticsearchClient}
+	 */
+	private ElasticsearchClient client;
 
-	@Override
-	public ElasticsearchRestTemplate getObject() throws Exception {
-		return restTemplate;
+	/**
+	 * {@link ElasticsearchConverter}
+	 */
+	private ElasticsearchConverter converter;
+
+	/**
+	 * 返回 {@link ElasticsearchClient}
+	 *
+	 * @return {@link ElasticsearchClient}
+	 */
+	public ElasticsearchClient getClient() {
+		return client;
 	}
 
-	@Override
-	public Class<ElasticsearchRestTemplate> getObjectType() {
-		return ElasticsearchRestTemplate.class;
+	/**
+	 * 设置 {@link ElasticsearchClient}
+	 *
+	 * @param client
+	 *        {@link ElasticsearchClient}
+	 */
+	public void setClient(ElasticsearchClient client) {
+		this.client = client;
 	}
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		if(restTemplate == null){
-			restTemplate = createElasticsearchRestTemplate();
-		}
+	/**
+	 * 返回 {@link ElasticsearchConverter}
+	 *
+	 * @return {@link ElasticsearchConverter}
+	 */
+	public ElasticsearchConverter getConverter() {
+		return converter;
+	}
+
+	/**
+	 * 设置 {@link ElasticsearchConverter}
+	 *
+	 * @param converter
+	 *        {@link ElasticsearchConverter}
+	 */
+	public void setConverter(ElasticsearchConverter converter) {
+		this.converter = converter;
+	}
+
+	protected ElasticsearchTemplate createElasticsearchTemplate() {
+		Assert.isNull(getClient(), "Property 'client' is required");
+		return new ElasticsearchTemplate(getClient(), null);
 	}
 
 }
