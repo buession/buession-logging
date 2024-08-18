@@ -62,19 +62,18 @@ public class RabbitLogHandlerConfiguration extends AbstractLogHandlerConfigurati
 	public ConnectionFactoryBean connectionFactoryBean() {
 		final ConnectionFactoryBean connectionFactoryBean = new ConnectionFactoryBean();
 
-		propertyMapper.from(handlerProperties::getHost).to(connectionFactoryBean::setHost);
-		propertyMapper.from(handlerProperties::getPort).to(connectionFactoryBean::setPort);
-		propertyMapper.from(handlerProperties::getVirtualHost).to(connectionFactoryBean::setVirtualHost);
-		propertyMapper.from(handlerProperties::getUsername).to(connectionFactoryBean::setUsername);
-		propertyMapper.from(handlerProperties::getPassword).to(connectionFactoryBean::setPassword);
-		propertyMapper.from(handlerProperties::getRequestedHeartbeat).to(connectionFactoryBean::setRequestedHeartbeat);
-		propertyMapper.from(handlerProperties::getRequestedChannelMax)
-				.to(connectionFactoryBean::setRequestedChannelMax);
-		propertyMapper.from(handlerProperties::getPublisherConfirmType)
-				.to(connectionFactoryBean::setPublisherConfirmType);
-		propertyMapper.from(handlerProperties::getConnectionTimeout).to(connectionFactoryBean::setConnectionTimeout);
-		propertyMapper.from(handlerProperties::getSslConfiguration).to(connectionFactoryBean::setSslConfiguration);
-		propertyMapper.from(handlerProperties::getCache).to(connectionFactoryBean::setCache);
+		connectionFactoryBean.setHost(properties.getHost());
+		
+		propertyMapper.from(properties::getPort).to(connectionFactoryBean::setPort);
+		propertyMapper.from(properties::getVirtualHost).to(connectionFactoryBean::setVirtualHost);
+		propertyMapper.from(properties::getUsername).to(connectionFactoryBean::setUsername);
+		propertyMapper.from(properties::getPassword).to(connectionFactoryBean::setPassword);
+		propertyMapper.from(properties::getRequestedHeartbeat).to(connectionFactoryBean::setRequestedHeartbeat);
+		propertyMapper.from(properties::getRequestedChannelMax).to(connectionFactoryBean::setRequestedChannelMax);
+		propertyMapper.from(properties::getPublisherConfirmType).to(connectionFactoryBean::setPublisherConfirmType);
+		propertyMapper.from(properties::getConnectionTimeout).to(connectionFactoryBean::setConnectionTimeout);
+		propertyMapper.from(properties::getSslConfiguration).to(connectionFactoryBean::setSslConfiguration);
+		propertyMapper.from(properties::getCache).to(connectionFactoryBean::setCache);
 
 		return connectionFactoryBean;
 	}
@@ -85,20 +84,20 @@ public class RabbitLogHandlerConfiguration extends AbstractLogHandlerConfigurati
 		final RabbitTemplateFactoryBean rabbitTemplateFactoryBean = new RabbitTemplateFactoryBean();
 
 		connectionFactory.ifAvailable(rabbitTemplateFactoryBean::setConnectionFactory);
-		propertyMapper.from(handlerProperties::getTemplate).to(rabbitTemplateFactoryBean::setTemplate);
-		propertyMapper.from(handlerProperties::isPublisherReturns).to(rabbitTemplateFactoryBean::setPublisherReturns);
+		propertyMapper.from(properties::getTemplate).to(rabbitTemplateFactoryBean::setTemplate);
+		propertyMapper.from(properties::isPublisherReturns).to(rabbitTemplateFactoryBean::setPublisherReturns);
 
 		return rabbitTemplateFactoryBean;
 	}
 
 	@Bean
 	public RabbitLogHandlerFactoryBean logHandlerFactoryBean(@Qualifier("logRabbitRabbitTemplate")
-																	 ObjectProvider<RabbitTemplate> rabbitTemplate) {
+															 ObjectProvider<RabbitTemplate> rabbitTemplate) {
 		final RabbitLogHandlerFactoryBean logHandlerFactoryBean = new RabbitLogHandlerFactoryBean();
 
 		rabbitTemplate.ifAvailable(logHandlerFactoryBean::setRabbitTemplate);
-		logHandlerFactoryBean.setExchange(handlerProperties.getExchange());
-		logHandlerFactoryBean.setRoutingKey(handlerProperties.getRoutingKey());
+		logHandlerFactoryBean.setExchange(properties.getExchange());
+		logHandlerFactoryBean.setRoutingKey(properties.getRoutingKey());
 
 		return logHandlerFactoryBean;
 	}

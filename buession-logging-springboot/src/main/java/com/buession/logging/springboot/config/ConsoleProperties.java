@@ -19,13 +19,13 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.springboot.config;
 
 import com.buession.logging.console.formatter.ConsoleLogDataFormatter;
-import com.buession.logging.support.config.HandlerProperties;
+import com.buession.logging.support.config.AdapterProperties;
 
 import java.io.Serializable;
 
@@ -35,7 +35,7 @@ import java.io.Serializable;
  * @author Yong.Teng
  * @since 0.0.4
  */
-public class ConsoleProperties implements HandlerProperties, Serializable {
+public class ConsoleProperties implements AdapterProperties, Serializable {
 
 	private final static long serialVersionUID = -8119695487949928232L;
 

@@ -31,7 +31,6 @@ import com.buession.dao.mongodb.core.WriteConcern;
 import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.mongodb.spring.MongoClientFactoryBean;
 import com.buession.logging.mongodb.spring.MongoDatabaseFactoryBean;
-import com.buession.logging.mongodb.spring.MongoHandlerFactoryBean;
 import com.buession.logging.mongodb.spring.MongoLogHandlerFactoryBean;
 import com.buession.logging.mongodb.spring.MongoMappingContextFactoryBean;
 import com.buession.logging.mongodb.spring.MongoTemplateFactoryBean;
@@ -68,7 +67,7 @@ import java.util.concurrent.TimeUnit;
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(LogProperties.class)
 @ConditionalOnMissingBean(LogHandler.class)
-@ConditionalOnClass({MongoHandlerFactoryBean.class})
+@ConditionalOnClass({MongoLogHandlerFactoryBean.class})
 @ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "mongo.enabled", havingValue = "true")
 public class MongoLogHandlerConfiguration extends AbstractLogHandlerConfiguration<MongoProperties> {
 
@@ -80,81 +79,78 @@ public class MongoLogHandlerConfiguration extends AbstractLogHandlerConfiguratio
 	public MongoClientFactoryBean mongoClientFactoryBean() {
 		final MongoClientFactoryBean mongoClientFactoryBean = new MongoClientFactoryBean();
 
-		if(Validate.hasText(handlerProperties.getUrl())){
-			propertyMapper.from(handlerProperties::getUrl).as(ConnectionString::new)
+		if(Validate.hasText(properties.getUrl())){
+			propertyMapper.from(properties::getUrl).as(ConnectionString::new)
 					.to(mongoClientFactoryBean::setConnectionString);
 		}else{
-			propertyMapper.from(handlerProperties::getHost).to(mongoClientFactoryBean::setHost);
-			propertyMapper.from(handlerProperties::getPort).to(mongoClientFactoryBean::setPort);
+			mongoClientFactoryBean.setHost(properties.getHost());
+			propertyMapper.from(properties::getPort).to(mongoClientFactoryBean::setPort);
 		}
-		propertyMapper.from(handlerProperties::getReplicaSetName).to(mongoClientFactoryBean::setReplicaSet);
+		propertyMapper.from(properties::getReplicaSetName).to(mongoClientFactoryBean::setReplicaSet);
 
-		if(handlerProperties.getUsername() != null && handlerProperties.getPassword() != null){
+		if(properties.getUsername() != null && properties.getPassword() != null){
 			final String database =
-					handlerProperties.getAuthenticationDatabase() ==
-							null ? handlerProperties.getDatabaseName() : handlerProperties.getAuthenticationDatabase();
-			final MongoCredential credential = MongoCredential.createCredential(handlerProperties.getUsername(),
-					database, handlerProperties.getPassword().toCharArray());
+					properties.getAuthenticationDatabase() ==
+							null ? properties.getDatabaseName() : properties.getAuthenticationDatabase();
+			final MongoCredential credential = MongoCredential.createCredential(properties.getUsername(),
+					database, properties.getPassword().toCharArray());
 
 			mongoClientFactoryBean.setCredential(new MongoCredential[]{credential});
 		}
 
 		final MongoClientSettings.Builder mongoClientSettingsBuilder = MongoClientSettings.builder();
 
-		propertyMapper.from(handlerProperties::getReadPreference).as(ReadPreference::getValue)
+		propertyMapper.from(properties::getReadPreference).as(ReadPreference::getValue)
 				.to(mongoClientSettingsBuilder::readPreference);
-		propertyMapper.from(handlerProperties::getReadConcern).as(
+		propertyMapper.from(properties::getReadConcern).as(
 				ReadConcern::getValue).to(mongoClientSettingsBuilder::readConcern);
-		propertyMapper.from(handlerProperties::getWriteConcern).as(
+		propertyMapper.from(properties::getWriteConcern).as(
 				WriteConcern::getValue).to(mongoClientSettingsBuilder::writeConcern);
-		propertyMapper.from(handlerProperties::getUuidRepresentation)
+		propertyMapper.from(properties::getUuidRepresentation)
 				.to(mongoClientSettingsBuilder::uuidRepresentation);
 
 		mongoClientSettingsBuilder.applyToSocketSettings(($builder)->{
 			final SocketSettings.Builder socketBuilder = SocketSettings.builder();
 
-			if(handlerProperties.getConnectionTimeout() != null){
-				socketBuilder.connectTimeout((int) handlerProperties.getConnectionTimeout().toMillis(),
+			if(properties.getConnectionTimeout() != null){
+				socketBuilder.connectTimeout((int) properties.getConnectionTimeout().toMillis(),
 						TimeUnit.MILLISECONDS);
 			}
-			if(handlerProperties.getReadTimeout() != null){
-				socketBuilder.readTimeout((int) handlerProperties.getReadTimeout().toMillis(), TimeUnit.MILLISECONDS);
+			if(properties.getReadTimeout() != null){
+				socketBuilder.readTimeout((int) properties.getReadTimeout().toMillis(), TimeUnit.MILLISECONDS);
 			}
 
 			$builder.applySettings(socketBuilder.build());
 		}).applyToConnectionPoolSettings(($builder)->{
-			if(handlerProperties.getPool() != null){
+			if(properties.getPool() != null){
 				final ConnectionPoolSettings.Builder poolBuilder = ConnectionPoolSettings.builder();
 
-				if(handlerProperties.getPool().getMinSize() > 0){
-					poolBuilder.minSize(handlerProperties.getPool().getMinSize());
-				}
-				if(handlerProperties.getPool().getMaxSize() > 0){
-					poolBuilder.minSize(handlerProperties.getPool().getMaxSize());
-				}
-				if(handlerProperties.getPool().getMaxWaitTime() != null){
-					poolBuilder.maxWaitTime(handlerProperties.getPool().getMaxWaitTime().toMillis(),
+				propertyMapper.from(properties.getPool()::getMinSize).to(poolBuilder::minSize);
+				propertyMapper.from(properties.getPool()::getMaxSize).to(poolBuilder::maxSize);
+
+				if(properties.getPool().getMaxWaitTime() != null){
+					poolBuilder.maxWaitTime(properties.getPool().getMaxWaitTime().toMillis(),
 							TimeUnit.MILLISECONDS);
 				}
-				if(handlerProperties.getPool().getMaxConnectionLifeTime() != null){
-					poolBuilder.maxConnectionLifeTime(handlerProperties.getPool().getMaxConnectionLifeTime().toMillis(),
+				if(properties.getPool().getMaxConnectionLifeTime() != null){
+					poolBuilder.maxConnectionLifeTime(properties.getPool().getMaxConnectionLifeTime().toMillis(),
 							TimeUnit.MILLISECONDS);
 				}
-				if(handlerProperties.getPool().getMaxConnectionIdleTime() != null){
-					poolBuilder.maxConnectionIdleTime(handlerProperties.getPool().getMaxConnectionIdleTime().toMillis(),
+				if(properties.getPool().getMaxConnectionIdleTime() != null){
+					poolBuilder.maxConnectionIdleTime(properties.getPool().getMaxConnectionIdleTime().toMillis(),
 							TimeUnit.MILLISECONDS);
 				}
-				if(handlerProperties.getPool().getMaintenanceInitialDelay() != null){
+				if(properties.getPool().getMaintenanceInitialDelay() != null){
 					poolBuilder.maintenanceInitialDelay(
-							handlerProperties.getPool().getMaintenanceInitialDelay().toMillis(),
+							properties.getPool().getMaintenanceInitialDelay().toMillis(),
 							TimeUnit.MILLISECONDS);
 				}
-				if(handlerProperties.getPool().getMaintenanceFrequency() != null){
-					poolBuilder.maintenanceFrequency(handlerProperties.getPool().getMaintenanceFrequency().toMillis(),
+				if(properties.getPool().getMaintenanceFrequency() != null){
+					poolBuilder.maintenanceFrequency(properties.getPool().getMaintenanceFrequency().toMillis(),
 							TimeUnit.MILLISECONDS);
 				}
-				if(handlerProperties.getPool().getMaxConnecting() > 0){
-					poolBuilder.maxConnecting(handlerProperties.getPool().getMaxConnecting());
+				if(properties.getPool().getMaxConnecting() > 0){
+					poolBuilder.maxConnecting(properties.getPool().getMaxConnecting());
 				}
 
 				$builder.applySettings(poolBuilder.build());
@@ -171,10 +167,10 @@ public class MongoLogHandlerConfiguration extends AbstractLogHandlerConfiguratio
 
 		mongoClient.ifAvailable(mongoDatabaseFactoryBean::setMongoClient);
 
-		if(Validate.hasText(handlerProperties.getDatabaseName())){
-			mongoDatabaseFactoryBean.setDatabaseName(handlerProperties.getDatabaseName());
+		if(Validate.hasText(properties.getDatabaseName())){
+			mongoDatabaseFactoryBean.setDatabaseName(properties.getDatabaseName());
 		}else{
-			String database = new ConnectionString(handlerProperties.getUrl()).getDatabase();
+			String database = new ConnectionString(properties.getUrl()).getDatabase();
 			mongoDatabaseFactoryBean.setDatabaseName(database);
 		}
 
@@ -185,9 +181,9 @@ public class MongoLogHandlerConfiguration extends AbstractLogHandlerConfiguratio
 	public MongoMappingContextFactoryBean mongoMappingContextFactoryBean() {
 		final MongoMappingContextFactoryBean mongoMappingContextFactoryBean = new MongoMappingContextFactoryBean();
 
-		propertyMapper.from(handlerProperties::getAutoIndexCreation)
+		propertyMapper.from(properties::getAutoIndexCreation)
 				.to(mongoMappingContextFactoryBean::setAutoIndexCreation);
-		propertyMapper.from(handlerProperties::getFieldNamingStrategy).as(BeanUtils::instantiateClass)
+		propertyMapper.from(properties::getFieldNamingStrategy).as(BeanUtils::instantiateClass)
 				.to(mongoMappingContextFactoryBean::setFieldNamingStrategy);
 
 		return mongoMappingContextFactoryBean;
@@ -212,20 +208,7 @@ public class MongoLogHandlerConfiguration extends AbstractLogHandlerConfiguratio
 
 		mongoTemplate.ifAvailable(logHandlerFactoryBean::setMongoTemplate);
 
-		propertyMapper.from(handlerProperties::getCollectionName).to(logHandlerFactoryBean::setCollectionName);
-
-		return logHandlerFactoryBean;
-	}
-
-	@ConditionalOnMissingBean(MongoLogHandlerFactoryBean.class)
-	@Bean
-	public MongoHandlerFactoryBean dLogHandlerFactoryBean(
-			@Qualifier("logMongoDbMongoTemplate") ObjectProvider<MongoTemplate> mongoTemplate) {
-		final MongoHandlerFactoryBean logHandlerFactoryBean = new MongoHandlerFactoryBean();
-
-		mongoTemplate.ifAvailable(logHandlerFactoryBean::setMongoTemplate);
-
-		propertyMapper.from(handlerProperties::getCollectionName).to(logHandlerFactoryBean::setCollectionName);
+		logHandlerFactoryBean.setCollectionName(properties.getCollectionName());
 
 		return logHandlerFactoryBean;
 	}

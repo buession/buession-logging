@@ -19,7 +19,7 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.springboot.config;
@@ -30,7 +30,7 @@ import com.buession.dao.mongodb.core.WriteConcern;
 import com.buession.logging.mongodb.core.PoolConfiguration;
 import com.buession.logging.mongodb.spring.MongoClientFactory;
 import com.buession.logging.mongodb.spring.MongoMappingContextFactory;
-import com.buession.logging.support.config.HandlerProperties;
+import com.buession.logging.support.config.AdapterProperties;
 import org.bson.UuidRepresentation;
 import org.springframework.data.mapping.model.FieldNamingStrategy;
 
@@ -43,7 +43,7 @@ import java.time.Duration;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class MongoProperties implements HandlerProperties, Serializable {
+public class MongoProperties implements AdapterProperties, Serializable {
 
 	private final static long serialVersionUID = -8119695487949928232L;
 

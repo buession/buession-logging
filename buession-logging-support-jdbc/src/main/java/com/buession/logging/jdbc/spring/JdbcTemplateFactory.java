@@ -24,8 +24,9 @@
  */
 package com.buession.logging.jdbc.spring;
 
-import com.buession.jdbc.datasource.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
+
+import javax.sql.DataSource;
 
 /**
  * {@link JdbcTemplate} 工厂
@@ -35,18 +36,18 @@ import org.springframework.jdbc.core.JdbcTemplate;
  */
 public class JdbcTemplateFactory {
 
-	private DataSource<?, ?> dataSource;
+	private DataSource dataSource;
 
-	public DataSource<?, ?> getDataSource() {
+	public DataSource getDataSource() {
 		return dataSource;
 	}
 
-	public void setDataSource(DataSource<?, ?> dataSource) {
+	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
 
 	protected JdbcTemplate createJdbcTemplate() {
-		return new JdbcTemplate(getDataSource().createDataSource());
+		return new JdbcTemplate(getDataSource());
 	}
 
 }

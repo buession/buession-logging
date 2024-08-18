@@ -31,11 +31,13 @@ import com.buession.jdbc.config.GenericConfig;
 import com.buession.jdbc.config.HikariConfig;
 import com.buession.jdbc.config.OracleConfig;
 import com.buession.jdbc.config.TomcatConfig;
+import com.buession.logging.jdbc.converter.DefaultLogDataConverter;
+import com.buession.logging.jdbc.converter.LogDataConverter;
 import com.buession.logging.jdbc.formatter.DefaultGeoFormatter;
 import com.buession.logging.core.formatter.GeoFormatter;
 import com.buession.logging.jdbc.formatter.JsonMapFormatter;
 import com.buession.logging.core.formatter.MapFormatter;
-import com.buession.logging.support.config.HandlerProperties;
+import com.buession.logging.support.config.AdapterProperties;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -47,7 +49,7 @@ import java.util.Properties;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class JdbcProperties implements HandlerProperties, Serializable {
+public class JdbcProperties implements AdapterProperties, Serializable {
 
 	private final static long serialVersionUID = -8823778313817319882L;
 
@@ -60,6 +62,7 @@ public class JdbcProperties implements HandlerProperties, Serializable {
 	 * JDBC URL
 	 */
 	private String url;
+
 	/**
 	 * 数据库账号
 	 */
@@ -162,6 +165,13 @@ public class JdbcProperties implements HandlerProperties, Serializable {
 	 * 附加参数格式化为字符串
 	 */
 	private Class<? extends MapFormatter<Object>> extraFormatter = JsonMapFormatter.class;
+
+	/**
+	 * 数据转换器
+	 *
+	 * @since 1.0.0
+	 */
+	private Class<? extends LogDataConverter> dataConverter = DefaultLogDataConverter.class;
 
 	/**
 	 * 返回数据库驱动类名
@@ -558,6 +568,29 @@ public class JdbcProperties implements HandlerProperties, Serializable {
 	 */
 	public void setExtraFormatter(Class<? extends MapFormatter<Object>> extraFormatter) {
 		this.extraFormatter = extraFormatter;
+	}
+
+	/**
+	 * 返回数据转换器
+	 *
+	 * @return 数据转换器
+	 *
+	 * @since 1.0.0
+	 */
+	public Class<? extends LogDataConverter> getDataConverter() {
+		return dataConverter;
+	}
+
+	/**
+	 * 设置数据转换器
+	 *
+	 * @param dataConverter
+	 * 		数据转换器
+	 *
+	 * @since 1.0.0
+	 */
+	public void setDataConverter(Class<? extends LogDataConverter> dataConverter) {
+		this.dataConverter = dataConverter;
 	}
 
 }

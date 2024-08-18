@@ -60,8 +60,9 @@ public class FileLogHandlerConfiguration extends AbstractLogHandlerConfiguration
 	public FileLogHandlerFactoryBean logHandlerFactoryBean() {
 		final FileLogHandlerFactoryBean logHandlerFactoryBean = new FileLogHandlerFactoryBean();
 
-		propertyMapper.from(handlerProperties::getPath).as(File::new).to(logHandlerFactoryBean::setFile);
-		propertyMapper.from(handlerProperties::getFormatter).as(BeanUtils::instantiateClass)
+		logHandlerFactoryBean.setFile(new File(properties.getPath()));
+
+		propertyMapper.from(properties::getFormatter).as(BeanUtils::instantiateClass)
 				.to(logHandlerFactoryBean::setFormatter);
 
 		return logHandlerFactoryBean;

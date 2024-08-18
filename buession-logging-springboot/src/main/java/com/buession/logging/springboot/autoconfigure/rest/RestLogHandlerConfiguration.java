@@ -58,9 +58,9 @@ public class RestLogHandlerConfiguration extends AbstractLogHandlerConfiguration
 	public RestLogHandlerFactoryBean logHandlerFactoryBean() {
 		final RestLogHandlerFactoryBean logHandlerFactoryBean = new RestLogHandlerFactoryBean();
 
-		propertyMapper.from(handlerProperties::getUrl).to(logHandlerFactoryBean::setUrl);
-		propertyMapper.from(handlerProperties::getRequestMethod).to(logHandlerFactoryBean::setRequestMethod);
-		propertyMapper.from(handlerProperties::getRequestBodyBuilder).as(BeanUtils::instantiateClass)
+		logHandlerFactoryBean.setUrl(properties.getUrl());
+		propertyMapper.from(properties::getRequestMethod).to(logHandlerFactoryBean::setRequestMethod);
+		propertyMapper.from(properties::getRequestBodyBuilder).as(BeanUtils::instantiateClass)
 				.to(logHandlerFactoryBean::setRequestBodyBuilder);
 
 		return logHandlerFactoryBean;

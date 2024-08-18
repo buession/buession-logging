@@ -66,22 +66,24 @@ public class ElasticsearchLogHandlerConfiguration extends AbstractLogHandlerConf
 	public ElasticsearchClientFactoryBean elasticsearchClientFactoryBean() {
 		final ElasticsearchClientFactoryBean elasticsearchClientFactoryBean = new ElasticsearchClientFactoryBean();
 
-		propertyMapper.from(handlerProperties::getUrls).to(elasticsearchClientFactoryBean::setUrls);
-		propertyMapper.from(handlerProperties::getUsername).to(elasticsearchClientFactoryBean::setUsername);
-		propertyMapper.from(handlerProperties::getPassword).to(elasticsearchClientFactoryBean::setPassword);
+		elasticsearchClientFactoryBean.setUrls(properties.getUrls());
+		propertyMapper.from(properties::getUsername).to(elasticsearchClientFactoryBean::setUsername);
+		propertyMapper.from(properties::getPassword).to(elasticsearchClientFactoryBean::setPassword);
 
 		RequestOptions.Builder requestOptionsBuilder = RequestOptions.DEFAULT.toBuilder();
 		RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
 
-		requestConfigBuilder.setConnectTimeout((int) handlerProperties.getConnectionTimeout().toMillis());
-		requestConfigBuilder.setSocketTimeout((int) handlerProperties.getReadTimeout().toMillis());
+		propertyMapper.from(properties::getConnectionTimeout).as((v)->(int) v.toMillis())
+				.to(requestConfigBuilder::setConnectTimeout);
+		propertyMapper.from(properties::getReadTimeout).as((v)->(int) v.toMillis())
+				.to(requestConfigBuilder::setSocketTimeout);
 
-		if(Validate.isNotEmpty(handlerProperties.getHeaders())){
-			handlerProperties.getHeaders().forEach(requestOptionsBuilder::addHeader);
+		if(Validate.isNotEmpty(properties.getHeaders())){
+			properties.getHeaders().forEach(requestOptionsBuilder::addHeader);
 		}
 
-		if(Validate.isNotEmpty(handlerProperties.getParameters())){
-			handlerProperties.getParameters().forEach(requestOptionsBuilder::addParameter);
+		if(Validate.isNotEmpty(properties.getParameters())){
+			properties.getParameters().forEach(requestOptionsBuilder::addParameter);
 		}
 
 		requestOptionsBuilder.setRequestConfig(requestConfigBuilder.build());
@@ -108,7 +110,7 @@ public class ElasticsearchLogHandlerConfiguration extends AbstractLogHandlerConf
 		final ElasticsearchLogHandlerFactoryBean logHandlerFactoryBean = new ElasticsearchLogHandlerFactoryBean();
 
 		elasticsearchTemplate.ifAvailable(logHandlerFactoryBean::setElasticsearchTemplate);
-		propertyMapper.from(handlerProperties::getIndexName).to(logHandlerFactoryBean::setIndexName);
+		propertyMapper.from(properties::getIndexName).to(logHandlerFactoryBean::setIndexName);
 
 		return logHandlerFactoryBean;
 	}

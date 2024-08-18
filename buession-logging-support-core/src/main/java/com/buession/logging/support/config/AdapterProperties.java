@@ -19,20 +19,17 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.mongodb.spring;
-
-import com.buession.logging.mongodb.handler.MongoLogHandler;
+package com.buession.logging.support.config;
 
 /**
- * MongoDB 日志处理器 {@link MongoLogHandler} 工厂 Bean 基类
+ * 适配器配置
  *
  * @author Yong.Teng
- * @since 0.0.1
+ * @since 1.0.0
  */
-@Deprecated
-public class MongoHandlerFactoryBean extends MongoLogHandlerFactoryBean {
+public interface AdapterProperties extends HandlerProperties {
 
 }

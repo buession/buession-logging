@@ -26,8 +26,6 @@ package com.buession.logging.springboot.autoconfigure.jdbc;
 
 import com.buession.jdbc.datasource.*;
 import com.buession.logging.core.handler.LogHandler;
-import com.buession.logging.jdbc.converter.DefaultLogDataConverter;
-import com.buession.logging.jdbc.converter.LogDataConverter;
 import com.buession.logging.jdbc.spring.DataSourceFactoryBean;
 import com.buession.logging.jdbc.spring.JdbcLogHandlerFactoryBean;
 import com.buession.logging.jdbc.spring.JdbcTemplateFactoryBean;
@@ -66,24 +64,25 @@ public class JdbcLogHandlerConfiguration extends AbstractLogHandlerConfiguration
 	public DataSourceFactoryBean dataSourceFactoryBean() {
 		final DataSourceFactoryBean dataSourceFactoryBean = new DataSourceFactoryBean();
 
-		propertyMapper.from(handlerProperties::getDriverClassName).to(dataSourceFactoryBean::setDriverClassName);
-		propertyMapper.from(handlerProperties::getUrl).to(dataSourceFactoryBean::setUrl);
-		propertyMapper.from(handlerProperties::getUsername).to(dataSourceFactoryBean::setUsername);
-		propertyMapper.from(handlerProperties::getPassword).to(dataSourceFactoryBean::setPassword);
-		propertyMapper.from(handlerProperties::getLoginTimeout).to(dataSourceFactoryBean::setLoginTimeout);
-		propertyMapper.from(handlerProperties::getConnectionProperties)
+		dataSourceFactoryBean.setDriverClassName(properties.getDriverClassName());
+		dataSourceFactoryBean.setUrl(properties.getUrl());
+
+		propertyMapper.from(properties::getUsername).to(dataSourceFactoryBean::setUsername);
+		propertyMapper.from(properties::getPassword).to(dataSourceFactoryBean::setPassword);
+		propertyMapper.from(properties::getLoginTimeout).to(dataSourceFactoryBean::setLoginTimeout);
+		propertyMapper.from(properties::getConnectionProperties)
 				.to(dataSourceFactoryBean::setConnectionProperties);
 
 		if(dataSourceFactoryBean.getDataSourceType().isAssignableFrom(Dbcp2DataSource.class)){
-			propertyMapper.from(handlerProperties::getDbcp2).to(dataSourceFactoryBean::setDataSourceConfiguration);
+			propertyMapper.from(properties::getDbcp2).to(dataSourceFactoryBean::setDataSourceConfiguration);
 		}else if(dataSourceFactoryBean.getDataSourceType().isAssignableFrom(DruidDataSource.class)){
-			propertyMapper.from(handlerProperties::getDruid).to(dataSourceFactoryBean::setDataSourceConfiguration);
+			propertyMapper.from(properties::getDruid).to(dataSourceFactoryBean::setDataSourceConfiguration);
 		}else if(dataSourceFactoryBean.getDataSourceType().isAssignableFrom(HikariDataSource.class)){
-			propertyMapper.from(handlerProperties::getHikari).to(dataSourceFactoryBean::setDataSourceConfiguration);
+			propertyMapper.from(properties::getHikari).to(dataSourceFactoryBean::setDataSourceConfiguration);
 		}else if(dataSourceFactoryBean.getDataSourceType().isAssignableFrom(OracleDataSource.class)){
-			propertyMapper.from(handlerProperties::getOracle).to(dataSourceFactoryBean::setDataSourceConfiguration);
+			propertyMapper.from(properties::getOracle).to(dataSourceFactoryBean::setDataSourceConfiguration);
 		}else if(dataSourceFactoryBean.getDataSourceType().isAssignableFrom(TomcatDataSource.class)){
-			propertyMapper.from(handlerProperties::getTomcat).to(dataSourceFactoryBean::setDataSourceConfiguration);
+			propertyMapper.from(properties::getTomcat).to(dataSourceFactoryBean::setDataSourceConfiguration);
 		}
 
 		return dataSourceFactoryBean;
@@ -95,18 +94,13 @@ public class JdbcLogHandlerConfiguration extends AbstractLogHandlerConfiguration
 
 		dataSourceFactory.ifAvailable((obj)->{
 			try{
-				jdbcTemplateFactoryBean.setDataSource(obj.getObject());
+				jdbcTemplateFactoryBean.setDataSource(obj.getObject().createDataSource());
 			}catch(Exception e){
 				throw new RuntimeException(e);
 			}
 		});
 
 		return jdbcTemplateFactoryBean;
-	}
-
-	@Bean(name = "loggingJdbcDataConverter")
-	public LogDataConverter logDataConverter() {
-		return new DefaultLogDataConverter();
 	}
 
 	@Bean
@@ -116,14 +110,17 @@ public class JdbcLogHandlerConfiguration extends AbstractLogHandlerConfiguration
 
 		jdbcTemplate.ifUnique(logHandlerFactoryBean::setJdbcTemplate);
 
-		propertyMapper.from(handlerProperties::getSql).to(logHandlerFactoryBean::setSql);
-		propertyMapper.from(handlerProperties::getIdGenerator).as(BeanUtils::instantiateClass)
+		logHandlerFactoryBean.setSql(properties.getSql());
+
+		propertyMapper.from(properties::getIdGenerator).as(BeanUtils::instantiateClass)
 				.to(logHandlerFactoryBean::setIdGenerator);
-		propertyMapper.from(handlerProperties::getDateTimeFormat).to(logHandlerFactoryBean::setDateTimeFormat);
-		propertyMapper.from(handlerProperties::getRequestParametersFormatter).as(BeanUtils::instantiateClass)
+		propertyMapper.from(properties::getDateTimeFormat).to(logHandlerFactoryBean::setDateTimeFormat);
+		propertyMapper.from(properties::getRequestParametersFormatter).as(BeanUtils::instantiateClass)
 				.to(logHandlerFactoryBean::setRequestParametersFormatter);
-		propertyMapper.from(handlerProperties::getExtraFormatter).as(BeanUtils::instantiateClass)
+		propertyMapper.from(properties::getExtraFormatter).as(BeanUtils::instantiateClass)
 				.to(logHandlerFactoryBean::setExtraFormatter);
+		propertyMapper.from(properties.getDataConverter()).as(BeanUtils::instantiateClass)
+				.to(logHandlerFactoryBean::setLogDataConverter);
 
 		return logHandlerFactoryBean;
 	}

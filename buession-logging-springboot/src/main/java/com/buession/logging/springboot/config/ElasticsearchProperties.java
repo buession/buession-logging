@@ -25,7 +25,7 @@
 package com.buession.logging.springboot.config;
 
 import com.buession.core.builder.ListBuilder;
-import com.buession.logging.support.config.HandlerProperties;
+import com.buession.logging.support.config.AdapterProperties;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -39,7 +39,7 @@ import java.util.Map;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class ElasticsearchProperties implements HandlerProperties, Serializable {
+public class ElasticsearchProperties implements AdapterProperties, Serializable {
 
 	private final static long serialVersionUID = -8119695487949928232L;
 

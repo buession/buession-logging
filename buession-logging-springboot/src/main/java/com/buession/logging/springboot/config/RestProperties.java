@@ -19,7 +19,7 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.springboot.config;
@@ -27,7 +27,7 @@ package com.buession.logging.springboot.config;
 import com.buession.logging.rest.core.JsonRequestBodyBuilder;
 import com.buession.logging.rest.core.RequestBodyBuilder;
 import com.buession.logging.rest.core.RequestMethod;
-import com.buession.logging.support.config.HandlerProperties;
+import com.buession.logging.support.config.AdapterProperties;
 
 import java.io.Serializable;
 
@@ -37,7 +37,7 @@ import java.io.Serializable;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class RestProperties implements HandlerProperties, Serializable {
+public class RestProperties implements AdapterProperties, Serializable {
 
 	private final static long serialVersionUID = -158997473471475854L;
 

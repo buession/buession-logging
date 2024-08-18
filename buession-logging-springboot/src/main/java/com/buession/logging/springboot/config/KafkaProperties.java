@@ -19,7 +19,7 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.springboot.config;
@@ -27,7 +27,7 @@ package com.buession.logging.springboot.config;
 import com.buession.logging.kafka.config.SecurityConfiguration;
 import com.buession.logging.kafka.config.SslConfiguration;
 import com.buession.logging.kafka.spring.ProducerFactory;
-import com.buession.logging.support.config.HandlerProperties;
+import com.buession.logging.support.config.AdapterProperties;
 import org.springframework.util.unit.DataSize;
 
 import java.io.Serializable;
@@ -41,7 +41,7 @@ import java.util.Map;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class KafkaProperties implements HandlerProperties, Serializable {
+public class KafkaProperties implements AdapterProperties, Serializable {
 
 	private final static long serialVersionUID = 922408714153127145L;
 

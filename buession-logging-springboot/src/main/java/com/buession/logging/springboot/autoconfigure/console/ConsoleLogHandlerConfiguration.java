@@ -58,8 +58,8 @@ public class ConsoleLogHandlerConfiguration extends AbstractLogHandlerConfigurat
 	public ConsoleLogHandlerFactoryBean logHandlerFactoryBean() {
 		final ConsoleLogHandlerFactoryBean logHandlerFactoryBean = new ConsoleLogHandlerFactoryBean();
 
-		propertyMapper.from(handlerProperties::getTemplate).to(logHandlerFactoryBean::setTemplate);
-		propertyMapper.from(handlerProperties::getFormatter).as(BeanUtils::instantiateClass)
+		propertyMapper.from(properties::getTemplate).to(logHandlerFactoryBean::setTemplate);
+		propertyMapper.from(properties::getFormatter).as(BeanUtils::instantiateClass)
 				.to(logHandlerFactoryBean::setFormatter);
 
 		return logHandlerFactoryBean;
