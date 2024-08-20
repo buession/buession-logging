@@ -25,6 +25,7 @@
 package com.buession.logging.springboot.config;
 
 import com.buession.logging.core.formatter.LogDataFormatter;
+import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.support.config.AdapterProperties;
 
 import java.io.Serializable;
@@ -38,6 +39,8 @@ import java.io.Serializable;
 public class FileProperties implements AdapterProperties, Serializable {
 
 	private final static long serialVersionUID = -8119695487949928232L;
+
+	public final static String PREFIX = LogProperties.PREFIX + ".file";
 
 	/**
 	 * 日志文件路径

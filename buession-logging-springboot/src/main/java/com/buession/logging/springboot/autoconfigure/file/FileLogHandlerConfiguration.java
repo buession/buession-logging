@@ -33,6 +33,7 @@ import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.FileProperties;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -59,7 +60,8 @@ public class FileLogHandlerConfiguration extends AbstractFileLogHandlerConfigura
 		this.properties = logProperties.getFile();
 	}
 
-	@Bean
+	@Bean(name = "loggingFileLogHandlerFactoryBeanConfigurer")
+	@ConditionalOnMissingBean(name = "loggingFileLogHandlerFactoryBeanConfigurer")
 	public FileLogHandlerFactoryBeanConfigurer fileLogHandlerFactoryBeanConfigurer() {
 		final FileLogHandlerFactoryBeanConfigurer configurer = new FileLogHandlerFactoryBeanConfigurer();
 
@@ -71,7 +73,7 @@ public class FileLogHandlerConfiguration extends AbstractFileLogHandlerConfigura
 
 	@Bean(name = Constants.LOG_HANDLER_BEAN_NAME)
 	public FileLogHandlerFactoryBean logHandlerFactoryBean(
-			ObjectProvider<FileLogHandlerFactoryBeanConfigurer> fileLogHandlerFactoryBeanConfigurer) {
+			@Qualifier("loggingFileLogHandlerFactoryBeanConfigurer") ObjectProvider<FileLogHandlerFactoryBeanConfigurer> fileLogHandlerFactoryBeanConfigurer) {
 		return super.logHandlerFactoryBean(fileLogHandlerFactoryBeanConfigurer);
 	}
 

@@ -22,26 +22,35 @@
  * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.console.spring.config;
+package com.buession.logging.file.spring.config;
 
-import com.buession.logging.console.spring.ConsoleLogHandlerFactoryBean;
+import com.buession.logging.file.spring.FileLogHandlerFactoryBean;
+import com.buession.logging.support.config.AbstractLogHandlerConfiguration;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.io.File;
 
 /**
  * @author Yong.Teng
  * @since 1.0.0
  */
 @Configuration(proxyBeanMethods = false)
-public abstract class AbstractConsoleLogHandlerConfiguration {
+public abstract class AbstractFileLogHandlerConfiguration extends AbstractLogHandlerConfiguration {
 
 	@Bean
-	public ConsoleLogHandlerFactoryBean logHandlerFactoryBean() {
-		final ConsoleLogHandlerFactoryBean logHandlerFactoryBean = new ConsoleLogHandlerFactoryBean();
-		configure(logHandlerFactoryBean);
+	public FileLogHandlerFactoryBean logHandlerFactoryBean(
+			ObjectProvider<FileLogHandlerFactoryBeanConfigurer> fileLogHandlerFactoryBeanConfigurer) {
+		FileLogHandlerFactoryBeanConfigurer configurer = fileLogHandlerFactoryBeanConfigurer.getIfAvailable();
+
+		final FileLogHandlerFactoryBean logHandlerFactoryBean = new FileLogHandlerFactoryBean();
+
+		propertyMapper.alwaysApplyingWhenHasText().from(configurer::getPath).as(File::new)
+				.to(logHandlerFactoryBean::setFile);
+		propertyMapper.from(configurer::getFormatter).to(logHandlerFactoryBean::setFormatter);
+
 		return logHandlerFactoryBean;
 	}
-
-	protected abstract void configure(ConsoleLogHandlerFactoryBean logHandlerFactoryBean);
 
 }

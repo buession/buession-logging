@@ -22,46 +22,46 @@
  * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.console.spring.config;
+package com.buession.logging.file.spring.config;
 
-import com.buession.logging.console.formatter.ConsoleLogDataFormatter;
-import com.buession.logging.console.spring.ConsoleLogHandlerFactoryBean;
+import com.buession.logging.core.formatter.LogDataFormatter;
+import com.buession.logging.file.spring.FileLogHandlerFactoryBean;
 
 /**
- * Configures {@link ConsoleLogHandlerFactoryBean} with sensible defaults.
+ * Configures {@link FileLogHandlerFactoryBean} with sensible defaults.
  *
  * @author Yong.Teng
  * @since 1.0.0
  */
-public class ConsoleLogHandlerFactoryBeanConfigurer {
+public class FileLogHandlerFactoryBeanConfigurer {
 
 	/**
-	 * 日志模板
+	 * 日志文件路径
 	 */
-	private String template;
+	private String path;
 
 	/**
 	 * 日志格式化
 	 */
-	private ConsoleLogDataFormatter<String> formatter;
+	private LogDataFormatter<String> formatter;
 
 	/**
-	 * 返回日志模板
+	 * 返回日志文件路径
 	 *
-	 * @return 日志模板
+	 * @return 日志文件路径
 	 */
-	public String getTemplate() {
-		return template;
+	public String getPath() {
+		return path;
 	}
 
 	/**
-	 * 设置日志模板
+	 * 设置日志文件路径
 	 *
-	 * @param template
-	 * 		日志模板
+	 * @param path
+	 * 		日志文件路径
 	 */
-	public void setTemplate(String template) {
-		this.template = template;
+	public void setPath(String path) {
+		this.path = path;
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class ConsoleLogHandlerFactoryBeanConfigurer {
 	 *
 	 * @return 日志格式化
 	 */
-	public ConsoleLogDataFormatter<String> getFormatter() {
+	public LogDataFormatter<String> getFormatter() {
 		return formatter;
 	}
 
@@ -79,7 +79,7 @@ public class ConsoleLogHandlerFactoryBeanConfigurer {
 	 * @param formatter
 	 * 		日志格式化
 	 */
-	public void setFormatter(ConsoleLogDataFormatter<String> formatter) {
+	public void setFormatter(LogDataFormatter<String> formatter) {
 		this.formatter = formatter;
 	}
 
