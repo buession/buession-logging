@@ -24,8 +24,14 @@
  */
 package com.buession.logging.springboot.config;
 
+import co.elastic.clients.json.JsonpMapper;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import com.buession.core.builder.ListBuilder;
+import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.support.config.AdapterProperties;
+import org.elasticsearch.client.RestClientBuilder;
+import org.springframework.data.elasticsearch.core.RefreshPolicy;
+import org.springframework.data.mapping.callback.EntityCallbacks;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -42,6 +48,8 @@ import java.util.Map;
 public class ElasticsearchProperties implements AdapterProperties, Serializable {
 
 	private final static long serialVersionUID = -8119695487949928232L;
+
+	public final static String PREFIX = LogProperties.PREFIX + ".elasticsearch";
 
 	/**
 	 * Elasticsearch URL 地址
@@ -61,12 +69,19 @@ public class ElasticsearchProperties implements AdapterProperties, Serializable 
 	/**
 	 * 连接超时
 	 */
-	private Duration connectionTimeout = Duration.ofSeconds(3);
+	private Duration connectionTimeout = Duration.ofMillis(RestClientBuilder.DEFAULT_CONNECT_TIMEOUT_MILLIS);
 
 	/**
 	 * 读取超时
 	 */
-	private Duration readTimeout = Duration.ofSeconds(10);
+	private Duration readTimeout = Duration.ofMillis(RestClientBuilder.DEFAULT_SOCKET_TIMEOUT_MILLIS);
+
+	/**
+	 * 路径前缀
+	 *
+	 * @since 1.0.0
+	 */
+	private String pathPrefix;
 
 	/**
 	 * 请求头
@@ -76,7 +91,7 @@ public class ElasticsearchProperties implements AdapterProperties, Serializable 
 	private Map<String, String> headers = new LinkedHashMap<>();
 
 	/**
-	 * 请求头
+	 * 请求参数
 	 *
 	 * @since 1.0.0
 	 */
@@ -86,6 +101,27 @@ public class ElasticsearchProperties implements AdapterProperties, Serializable 
 	 * 索引名称
 	 */
 	private String indexName;
+
+	/**
+	 * JSONP Mapper {@link JsonpMapper}
+	 *
+	 * @since 1.0.0
+	 */
+	private Class<? extends JsonpMapper> jsonpMapper = JacksonJsonpMapper.class;
+
+	/**
+	 * 刷新策略
+	 *
+	 * @since 1.0.0
+	 */
+	private RefreshPolicy refreshPolicy;
+
+	/**
+	 * {@link EntityCallbacks}
+	 *
+	 * @since 1.0.0
+	 */
+	private Class<? extends EntityCallbacks> entityCallbacks;
 
 	/**
 	 * 返回 Elasticsearch URL 地址
@@ -183,9 +219,34 @@ public class ElasticsearchProperties implements AdapterProperties, Serializable 
 	}
 
 	/**
+	 * 返回路径前缀
+	 *
+	 * @return 路径前缀
+	 *
+	 * @since 1.0.0
+	 */
+	public String getPathPrefix() {
+		return pathPrefix;
+	}
+
+	/**
+	 * 设置路径前缀
+	 *
+	 * @param pathPrefix
+	 * 		路径前缀
+	 *
+	 * @since 1.0.0
+	 */
+	public void setPathPrefix(String pathPrefix) {
+		this.pathPrefix = pathPrefix;
+	}
+
+	/**
 	 * 返回请求头
 	 *
 	 * @return 请求头
+	 *
+	 * @since 1.0.0
 	 */
 	public Map<String, String> getHeaders() {
 		return headers;
@@ -243,6 +304,75 @@ public class ElasticsearchProperties implements AdapterProperties, Serializable 
 	 */
 	public void setIndexName(String indexName) {
 		this.indexName = indexName;
+	}
+
+	/**
+	 * 返回 JSONP Mapper {@link JsonpMapper}
+	 *
+	 * @return JSONP Mapper {@link JsonpMapper}
+	 *
+	 * @since 1.0.0
+	 */
+	public Class<? extends JsonpMapper> getJsonpMapper() {
+		return jsonpMapper;
+	}
+
+	/**
+	 * 设置 JSONP Mapper {@link JsonpMapper}
+	 *
+	 * @param jsonpMapper
+	 * 		JSONP Mapper {@link JsonpMapper}
+	 *
+	 * @since 1.0.0
+	 */
+	public void setJsonpMapper(Class<? extends JsonpMapper> jsonpMapper) {
+		this.jsonpMapper = jsonpMapper;
+	}
+
+	/**
+	 * 返回刷新策略
+	 *
+	 * @return 刷新策略
+	 *
+	 * @since 1.0.0
+	 */
+	public RefreshPolicy getRefreshPolicy() {
+		return refreshPolicy;
+	}
+
+	/**
+	 * 设置刷新策略
+	 *
+	 * @param refreshPolicy
+	 * 		刷新策略
+	 *
+	 * @since 1.0.0
+	 */
+	public void setRefreshPolicy(RefreshPolicy refreshPolicy) {
+		this.refreshPolicy = refreshPolicy;
+	}
+
+	/**
+	 * 返回 {@link EntityCallbacks}
+	 *
+	 * @return {@link EntityCallbacks}
+	 *
+	 * @since 1.0.0
+	 */
+	public Class<? extends EntityCallbacks> getEntityCallbacks() {
+		return entityCallbacks;
+	}
+
+	/**
+	 * 设置  {@link EntityCallbacks}
+	 *
+	 * @param entityCallbacks
+	 *        {@link EntityCallbacks}
+	 *
+	 * @since 1.0.0
+	 */
+	public void setEntityCallbacks(Class<? extends EntityCallbacks> entityCallbacks) {
+		this.entityCallbacks = entityCallbacks;
 	}
 
 }

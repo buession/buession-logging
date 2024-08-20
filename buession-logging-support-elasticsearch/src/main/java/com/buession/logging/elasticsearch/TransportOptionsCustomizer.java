@@ -24,50 +24,25 @@
  */
 package com.buession.logging.elasticsearch;
 
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
-import org.elasticsearch.client.RestClientBuilder;
+import co.elastic.clients.transport.TransportOptions;
 
 /**
  * Callback interface that can be implemented by beans wishing to further customize the
- * {@link org.elasticsearch.client.RestClient} through a {@link RestClientBuilder} whilst
+ * {@link co.elastic.clients.elasticsearch.ElasticsearchClient} through a {@link TransportOptions} whilst
  * retaining default auto-configuration.
  *
  * @author Yong.Teng
  * @since 1.0.0
  */
 @FunctionalInterface
-public interface RestClientBuilderCustomizer {
+public interface TransportOptionsCustomizer {
 
 	/**
-	 * Customize the {@link RestClientBuilder}.
-	 * <p>
-	 * Possibly overrides customizations made with the {@code "spring.elasticsearch.rest"}
-	 * configuration properties namespace. For more targeted changes, see
-	 * {@link #customize(HttpAsyncClientBuilder)} and
-	 * {@link #customize(RequestConfig.Builder)}.
+	 * Customize the {@link TransportOptions}.
 	 *
-	 * @param builder
-	 * 		the builder to customize
+	 * @param options
+	 *        {@link TransportOptions}
 	 */
-	void customize(RestClientBuilder builder);
-
-	/**
-	 * Customize the {@link HttpAsyncClientBuilder}.
-	 *
-	 * @param builder
-	 * 		the builder
-	 */
-	default void customize(HttpAsyncClientBuilder builder) {
-	}
-
-	/**
-	 * Customize the {@link RequestConfig.Builder}.
-	 *
-	 * @param builder
-	 * 		the builder
-	 */
-	default void customize(RequestConfig.Builder builder) {
-	}
+	void customize(TransportOptions options);
 
 }

@@ -26,4 +26,4 @@
  * @author Yong.Teng
  * @since 1.0.0
  */
-package com.buession.logging.console.spring.config;
+package com.buession.logging.elasticsearch.spring.config;

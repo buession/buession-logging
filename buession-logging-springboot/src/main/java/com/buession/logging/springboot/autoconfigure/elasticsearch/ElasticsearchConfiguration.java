@@ -21,10 +21,203 @@
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
  * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
- */package com.buession.logging.springboot.autoconfigure.elasticsearch;/**
- * 
+ */
+package com.buession.logging.springboot.autoconfigure.elasticsearch;
+
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import com.buession.core.converter.mapper.PropertyMapper;
+import com.buession.core.validator.Validate;
+import com.buession.logging.elasticsearch.ElasticsearchCredentialsProvider;
+import com.buession.logging.elasticsearch.RestClientBuilderCustomizer;
+import com.buession.logging.elasticsearch.TransportOptionsCustomizer;
+import com.buession.logging.elasticsearch.spring.config.AbstractElasticsearchConfiguration;
+import com.buession.logging.elasticsearch.spring.config.ElasticsearchConfigurer;
+import com.buession.logging.springboot.autoconfigure.LogProperties;
+import com.buession.logging.springboot.config.ElasticsearchProperties;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.RefreshPolicy;
+import org.springframework.data.elasticsearch.core.convert.ElasticsearchConverter;
+import org.springframework.data.elasticsearch.core.convert.ElasticsearchCustomConversions;
+import org.springframework.data.elasticsearch.core.mapping.SimpleElasticsearchMappingContext;
+
+import java.net.URI;
+import java.time.Duration;
+
+/**
+ * Elasticsearch 日志处理器自动配置类
  *
  * @author Yong.Teng
  * @since 1.0.0
- */public class ElasticsearchConfiguration {
+ */
+@AutoConfiguration
+@EnableConfigurationProperties(LogProperties.class)
+@ConditionalOnProperty(prefix = ElasticsearchProperties.PREFIX, name = "enabled", havingValue = "true")
+public class ElasticsearchConfiguration extends AbstractElasticsearchConfiguration {
+
+	private final ElasticsearchProperties properties;
+
+	public ElasticsearchConfiguration(LogProperties logProperties) {
+		this.properties = logProperties.getElasticsearch();
+	}
+
+	@Bean(name = "loggingElasticsearchConverter")
+	@ConditionalOnMissingBean(name = "loggingElasticsearchConverter")
+	@Override
+	public ElasticsearchConverter elasticsearchEntityMapper(
+			SimpleElasticsearchMappingContext elasticsearchMappingContext,
+			ElasticsearchCustomConversions elasticsearchCustomConversions) {
+		return super.elasticsearchEntityMapper(elasticsearchMappingContext, elasticsearchCustomConversions);
+	}
+
+	@Bean(name = "loggingElasticsearchMappingContext")
+	@ConditionalOnMissingBean(name = "loggingElasticsearchMappingContext")
+	@Override
+	public SimpleElasticsearchMappingContext elasticsearchMappingContext(
+			ElasticsearchCustomConversions elasticsearchCustomConversions) {
+		return super.elasticsearchMappingContext(elasticsearchCustomConversions);
+	}
+
+	@Bean(name = "loggingElasticsearchCustomConversions")
+	@ConditionalOnMissingBean(name = "loggingElasticsearchCustomConversions")
+	@Override
+	public ElasticsearchCustomConversions elasticsearchCustomConversions() {
+		return super.elasticsearchCustomConversions();
+	}
+
+	@Bean(name = "loggingElasticsearchConfigurer")
+	@ConditionalOnMissingBean(name = "loggingElasticsearchConfigurer")
+	public ElasticsearchConfigurer elasticsearchConfigurer() {
+		final ElasticsearchConfigurer configurer = new ElasticsearchConfigurer();
+
+		configurer.setUrls(properties.getUrls());
+		configurer.setPathPrefix(properties.getPathPrefix());
+		configurer.setHeaders(properties.getHeaders());
+		configurer.setParameters(properties.getParameters());
+		propertyMapper.from(properties::getEntityCallbacks).as(BeanUtils::instantiateClass)
+				.to(configurer::setEntityCallbacks);
+
+		return configurer;
+	}
+
+	@Bean(name = "loggingElasticsearchRestClientBuilderCustomizer")
+	@ConditionalOnMissingBean(name = "loggingElasticsearchRestClientBuilderCustomizer")
+	@Override
+	public RestClientBuilderCustomizer restClientBuilderCustomizer() {
+		return new DefaultRestClientBuilderCustomizer(properties);
+	}
+
+	@Bean(name = "loggingElasticsearchRestClient")
+	@ConditionalOnMissingBean(name = "loggingElasticsearchRestClient")
+	@Override
+	public RestClient restClient(
+			@Qualifier("loggingElasticsearchConfigurer") ObjectProvider<ElasticsearchConfigurer> elasticsearchConfigurer,
+			@Qualifier("loggingElasticsearchRestClientBuilderCustomizer") ObjectProvider<RestClientBuilderCustomizer> builderCustomizers) {
+		return super.restClient(elasticsearchConfigurer, builderCustomizers);
+	}
+
+	@Bean(name = "loggingElasticsearchClient")
+	@Override
+	public ElasticsearchClient elasticsearchClient(
+			@Qualifier("loggingElasticsearchConfigurer") ObjectProvider<ElasticsearchConfigurer> elasticsearchConfigurer,
+			@Qualifier("loggingElasticsearchRestClient") ObjectProvider<RestClient> restClient,
+			@Qualifier("loggingElasticsearchTransportOptionsCustomizer") ObjectProvider<TransportOptionsCustomizer> transportOptionsCustomizer) {
+		return super.elasticsearchClient(elasticsearchConfigurer, restClient, transportOptionsCustomizer);
+	}
+
+	@Bean(name = "loggingElasticsearchTemplate")
+	@Override
+	public ElasticsearchTemplate elasticsearchTemplate(
+			@Qualifier("loggingElasticsearchConfigurer") ObjectProvider<ElasticsearchConfigurer> elasticsearchConfigurer,
+			@Qualifier("loggingElasticsearchClient") ObjectProvider<ElasticsearchClient> elasticsearchClient,
+			@Qualifier("loggingElasticsearchConverter") ObjectProvider<ElasticsearchConverter> elasticsearchConverter) {
+		return super.elasticsearchTemplate(elasticsearchConfigurer, elasticsearchClient, elasticsearchConverter);
+	}
+
+	@Override
+	protected RefreshPolicy refreshPolicy() {
+		return properties.getRefreshPolicy();
+	}
+
+	static class DefaultRestClientBuilderCustomizer implements RestClientBuilderCustomizer,
+			org.springframework.boot.autoconfigure.elasticsearch.RestClientBuilderCustomizer {
+
+		private final static PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
+
+		private final ElasticsearchProperties properties;
+
+		DefaultRestClientBuilderCustomizer(ElasticsearchProperties properties) {
+			this.properties = properties;
+		}
+
+		@Override
+		public void customize(RestClientBuilder builder) {
+		}
+
+		@Override
+		public void customize(HttpAsyncClientBuilder builder) {
+			final CredentialsProvider credentialsProvider = new ElasticsearchCredentialsProvider(
+					properties.getUsername(), properties.getPassword());
+
+			builder.setDefaultCredentialsProvider(credentialsProvider);
+
+			properties.getUrls()
+					.stream()
+					.map(this::toUri)
+					.filter(this::hasUserInfo)
+					.forEach((uri)->this.addUserInfoCredentials(uri, credentialsProvider));
+		}
+
+		@Override
+		public void customize(RequestConfig.Builder builder) {
+			propertyMapper.from(properties::getConnectionTimeout).asInt(Duration::toMillis)
+					.to(builder::setConnectTimeout);
+			propertyMapper.from(properties::getReadTimeout).asInt(Duration::toMillis).to(builder::setSocketTimeout);
+		}
+
+		private URI toUri(final String uri) {
+			try{
+				return URI.create(uri);
+			}catch(IllegalArgumentException ex){
+				return null;
+			}
+		}
+
+		private boolean hasUserInfo(final URI uri) {
+			return uri != null && Validate.hasText(uri.getUserInfo());
+		}
+
+		private void addUserInfoCredentials(final URI uri, final CredentialsProvider credentialsProvider) {
+			AuthScope authScope = new AuthScope(uri.getHost(), uri.getPort());
+			Credentials credentials = createUserInfoCredentials(uri.getUserInfo());
+			credentialsProvider.setCredentials(authScope, credentials);
+		}
+
+		private Credentials createUserInfoCredentials(final String userInfo) {
+			int delimiter = userInfo.indexOf(":");
+			if(delimiter == -1){
+				return new UsernamePasswordCredentials(userInfo, null);
+			}
+			String username = userInfo.substring(0, delimiter);
+			String password = userInfo.substring(delimiter + 1);
+			return new UsernamePasswordCredentials(username, password);
+		}
+
+	}
+
 }

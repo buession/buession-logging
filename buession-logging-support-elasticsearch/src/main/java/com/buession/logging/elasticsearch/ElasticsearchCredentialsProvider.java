@@ -21,10 +21,36 @@
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
  * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
- */package com.buession.logging.elasticsearch;/**
- * 
+ */
+package com.buession.logging.elasticsearch;
+
+import com.buession.core.validator.Validate;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+
+/**
+ * Elasticsearch 认证提供者
  *
  * @author Yong.Teng
  * @since 1.0.0
- */public class ElasticsearchCredentialsProvider {
+ */
+public class ElasticsearchCredentialsProvider extends BasicCredentialsProvider {
+
+	/**
+	 * 构造函数
+	 *
+	 * @param username
+	 * 		用户名
+	 * @param password
+	 * 		密码
+	 */
+	public ElasticsearchCredentialsProvider(final String username, final String password) {
+		if(Validate.hasText(username)){
+			Credentials credentials = new UsernamePasswordCredentials(username, password);
+			setCredentials(AuthScope.ANY, credentials);
+		}
+	}
+
 }

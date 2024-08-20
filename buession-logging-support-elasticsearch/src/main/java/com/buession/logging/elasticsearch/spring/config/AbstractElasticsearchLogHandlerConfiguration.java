@@ -22,19 +22,11 @@
  * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.springboot.autoconfigure.elasticsearch;
+package com.buession.logging.elasticsearch.spring.config;
 
-import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.elasticsearch.spring.ElasticsearchLogHandlerFactoryBean;
-import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
-import com.buession.logging.springboot.autoconfigure.LogProperties;
-import com.buession.logging.springboot.config.ElasticsearchProperties;
+import com.buession.logging.support.config.AbstractLogHandlerConfiguration;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
@@ -46,25 +38,19 @@ import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
  * @since 0.0.1
  */
 @Configuration(proxyBeanMethods = false)
-@EnableConfigurationProperties(LogProperties.class)
-@ConditionalOnMissingBean(LogHandler.class)
-@ConditionalOnClass({ElasticsearchLogHandlerFactoryBean.class})
-@ConditionalOnProperty(prefix = ElasticsearchProperties.PREFIX, name = "enabled", havingValue = "true")
-public class ElasticsearchLogHandlerConfiguration extends AbstractLogHandlerConfiguration<ElasticsearchProperties> {
-
-	public ElasticsearchLogHandlerConfiguration(LogProperties logProperties) {
-		super(logProperties.getElasticsearch());
-	}
+public abstract class AbstractElasticsearchLogHandlerConfiguration extends AbstractLogHandlerConfiguration {
 
 	@Bean
 	public ElasticsearchLogHandlerFactoryBean logHandlerFactoryBean(
-			@Qualifier("loggingElasticsearchTemplate") ObjectProvider<ElasticsearchTemplate> elasticsearchTemplate) {
+			ObjectProvider<ElasticsearchTemplate> elasticsearchTemplate) {
 		final ElasticsearchLogHandlerFactoryBean logHandlerFactoryBean = new ElasticsearchLogHandlerFactoryBean();
 
 		elasticsearchTemplate.ifAvailable(logHandlerFactoryBean::setElasticsearchTemplate);
-		propertyMapper.from(properties::getIndexName).to(logHandlerFactoryBean::setIndexName);
+		logHandlerFactoryBean.setIndexName(getIndexName());
 
 		return logHandlerFactoryBean;
 	}
+
+	protected abstract String getIndexName();
 
 }
