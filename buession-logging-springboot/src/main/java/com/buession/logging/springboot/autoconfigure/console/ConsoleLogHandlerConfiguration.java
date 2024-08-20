@@ -25,17 +25,20 @@
 package com.buession.logging.springboot.autoconfigure.console;
 
 import com.buession.logging.console.spring.ConsoleLogHandlerFactoryBean;
+import com.buession.logging.console.spring.config.AbstractConsoleLogHandlerConfiguration;
+import com.buession.logging.console.spring.config.ConsoleLogHandlerFactoryBeanConfigurer;
 import com.buession.logging.core.handler.LogHandler;
-import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
+import com.buession.logging.springboot.Constants;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.ConsoleProperties;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * 文件日志处理器自动配置类
@@ -43,26 +46,33 @@ import org.springframework.context.annotation.Configuration;
  * @author Yong.Teng
  * @since 0.0.4
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @EnableConfigurationProperties(LogProperties.class)
 @ConditionalOnMissingBean(LogHandler.class)
 @ConditionalOnClass({ConsoleLogHandlerFactoryBean.class})
-@ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "console.enabled", havingValue = "true")
-public class ConsoleLogHandlerConfiguration extends AbstractLogHandlerConfiguration<ConsoleProperties> {
+@ConditionalOnProperty(prefix = ConsoleProperties.PREFIX, name = "enabled", havingValue = "true")
+public class ConsoleLogHandlerConfiguration extends AbstractConsoleLogHandlerConfiguration {
+
+	private final ConsoleProperties properties;
 
 	public ConsoleLogHandlerConfiguration(LogProperties logProperties) {
-		super(logProperties.getConsole());
+		this.properties = logProperties.getConsole();
 	}
 
 	@Bean
-	public ConsoleLogHandlerFactoryBean logHandlerFactoryBean() {
-		final ConsoleLogHandlerFactoryBean logHandlerFactoryBean = new ConsoleLogHandlerFactoryBean();
+	public ConsoleLogHandlerFactoryBeanConfigurer consoleLogHandlerFactoryBeanConfigurer() {
+		final ConsoleLogHandlerFactoryBeanConfigurer configurer = new ConsoleLogHandlerFactoryBeanConfigurer();
 
-		propertyMapper.from(properties::getTemplate).to(logHandlerFactoryBean::setTemplate);
-		propertyMapper.from(properties::getFormatter).as(BeanUtils::instantiateClass)
-				.to(logHandlerFactoryBean::setFormatter);
+		configurer.setTemplate(properties.getTemplate());
+		propertyMapper.from(properties::getFormatter).as(BeanUtils::instantiateClass).to(configurer::setFormatter);
 
-		return logHandlerFactoryBean;
+		return configurer;
+	}
+
+	@Bean(name = Constants.LOG_HANDLER_BEAN_NAME)
+	public ConsoleLogHandlerFactoryBean logHandlerFactoryBean(
+			ObjectProvider<ConsoleLogHandlerFactoryBeanConfigurer> consoleLogHandlerFactoryBeanConfigurer) {
+		return super.logHandlerFactoryBean(consoleLogHandlerFactoryBeanConfigurer);
 	}
 
 }

@@ -47,7 +47,7 @@ public class ConsoleLogHandler extends AbstractLogHandler {
 	/**
 	 * 日志格式化
 	 */
-	private ConsoleLogDataFormatter<String> formatter = new DefaultConsoleLogDataFormatter();
+	private ConsoleLogDataFormatter formatter = new DefaultConsoleLogDataFormatter();
 
 	/**
 	 * 构造函数
@@ -68,7 +68,7 @@ public class ConsoleLogHandler extends AbstractLogHandler {
 	 * @param formatter
 	 * 		日志格式化
 	 */
-	public ConsoleLogHandler(final String template, final ConsoleLogDataFormatter<String> formatter) {
+	public ConsoleLogHandler(final String template, final ConsoleLogDataFormatter formatter) {
 		this(template);
 		Assert.isNull(formatter, "Formatter is null.");
 		this.formatter = formatter;

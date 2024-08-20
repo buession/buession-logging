@@ -46,7 +46,7 @@ public class ConsoleLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<Cons
 	/**
 	 * 日志格式化
 	 */
-	private ConsoleLogDataFormatter<String> formatter = new DefaultConsoleLogDataFormatter();
+	private ConsoleLogDataFormatter formatter = new DefaultConsoleLogDataFormatter();
 
 	/**
 	 * 返回日志模板
@@ -72,7 +72,7 @@ public class ConsoleLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<Cons
 	 *
 	 * @return 日志格式化
 	 */
-	public ConsoleLogDataFormatter<String> getFormatter() {
+	public ConsoleLogDataFormatter getFormatter() {
 		return formatter;
 	}
 
@@ -82,7 +82,7 @@ public class ConsoleLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<Cons
 	 * @param formatter
 	 * 		日志格式化
 	 */
-	public void setFormatter(ConsoleLogDataFormatter<String> formatter) {
+	public void setFormatter(ConsoleLogDataFormatter formatter) {
 		this.formatter = formatter;
 	}
 

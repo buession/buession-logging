@@ -19,25 +19,26 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.springboot.autoconfigure.file;
 
 import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.file.spring.FileLogHandlerFactoryBean;
-import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
+import com.buession.logging.file.spring.config.AbstractFileLogHandlerConfiguration;
+import com.buession.logging.file.spring.config.FileLogHandlerFactoryBeanConfigurer;
+import com.buession.logging.springboot.Constants;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.FileProperties;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-import java.io.File;
 
 /**
  * 文件日志处理器自动配置类
@@ -45,27 +46,33 @@ import java.io.File;
  * @author Yong.Teng
  * @since 0.0.1
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @EnableConfigurationProperties(LogProperties.class)
 @ConditionalOnMissingBean(LogHandler.class)
 @ConditionalOnClass({FileLogHandlerFactoryBean.class})
-@ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "file.enabled", havingValue = "true")
-public class FileLogHandlerConfiguration extends AbstractLogHandlerConfiguration<FileProperties> {
+@ConditionalOnProperty(prefix = FileProperties.PREFIX, name = "enabled", havingValue = "true")
+public class FileLogHandlerConfiguration extends AbstractFileLogHandlerConfiguration {
+
+	private final FileProperties properties;
 
 	public FileLogHandlerConfiguration(LogProperties logProperties) {
-		super(logProperties.getFile());
+		this.properties = logProperties.getFile();
 	}
 
 	@Bean
-	public FileLogHandlerFactoryBean logHandlerFactoryBean() {
-		final FileLogHandlerFactoryBean logHandlerFactoryBean = new FileLogHandlerFactoryBean();
+	public FileLogHandlerFactoryBeanConfigurer fileLogHandlerFactoryBeanConfigurer() {
+		final FileLogHandlerFactoryBeanConfigurer configurer = new FileLogHandlerFactoryBeanConfigurer();
 
-		logHandlerFactoryBean.setFile(new File(properties.getPath()));
+		configurer.setPath(properties.getPath());
+		propertyMapper.from(properties::getFormatter).as(BeanUtils::instantiateClass).to(configurer::setFormatter);
 
-		propertyMapper.from(properties::getFormatter).as(BeanUtils::instantiateClass)
-				.to(logHandlerFactoryBean::setFormatter);
+		return configurer;
+	}
 
-		return logHandlerFactoryBean;
+	@Bean(name = Constants.LOG_HANDLER_BEAN_NAME)
+	public FileLogHandlerFactoryBean logHandlerFactoryBean(
+			ObjectProvider<FileLogHandlerFactoryBeanConfigurer> fileLogHandlerFactoryBeanConfigurer) {
+		return super.logHandlerFactoryBean(fileLogHandlerFactoryBeanConfigurer);
 	}
 
 }

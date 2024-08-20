@@ -21,10 +21,32 @@
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
  * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
- */package com.buession.logging.console.spring.config;/**
- * 
- *
+ */
+package com.buession.logging.console.spring.config;
+
+import com.buession.logging.console.spring.ConsoleLogHandlerFactoryBean;
+import com.buession.logging.support.config.AbstractLogHandlerConfiguration;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+/**
  * @author Yong.Teng
  * @since 1.0.0
- */public class AbstractConsoleLogHandlerConfiguration {
+ */
+@Configuration(proxyBeanMethods = false)
+public abstract class AbstractConsoleLogHandlerConfiguration extends AbstractLogHandlerConfiguration {
+
+	@Bean
+	public ConsoleLogHandlerFactoryBean logHandlerFactoryBean(
+			ObjectProvider<ConsoleLogHandlerFactoryBeanConfigurer> consoleLogHandlerFactoryBeanConfigurer) {
+		ConsoleLogHandlerFactoryBeanConfigurer configurer = consoleLogHandlerFactoryBeanConfigurer.getIfAvailable();
+		final ConsoleLogHandlerFactoryBean logHandlerFactoryBean = new ConsoleLogHandlerFactoryBean();
+
+		logHandlerFactoryBean.setTemplate(configurer.getTemplate());
+		propertyMapper.from(configurer::getFormatter).to(logHandlerFactoryBean::setFormatter);
+
+		return logHandlerFactoryBean;
+	}
+
 }

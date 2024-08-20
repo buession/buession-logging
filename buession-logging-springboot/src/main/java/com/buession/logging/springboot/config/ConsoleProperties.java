@@ -25,6 +25,7 @@
 package com.buession.logging.springboot.config;
 
 import com.buession.logging.console.formatter.ConsoleLogDataFormatter;
+import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.support.config.AdapterProperties;
 
 import java.io.Serializable;
@@ -39,6 +40,8 @@ public class ConsoleProperties implements AdapterProperties, Serializable {
 
 	private final static long serialVersionUID = -8119695487949928232L;
 
+	public final static String PREFIX = LogProperties.PREFIX + ".console";
+
 	/**
 	 * 日志模板
 	 */
@@ -47,7 +50,7 @@ public class ConsoleProperties implements AdapterProperties, Serializable {
 	/**
 	 * 日志格式化
 	 */
-	private Class<? extends ConsoleLogDataFormatter<String>> formatter;
+	private Class<? extends ConsoleLogDataFormatter> formatter;
 
 	/**
 	 * 返回日志模板
@@ -73,7 +76,7 @@ public class ConsoleProperties implements AdapterProperties, Serializable {
 	 *
 	 * @return 日志格式化
 	 */
-	public Class<? extends ConsoleLogDataFormatter<String>> getFormatter() {
+	public Class<? extends ConsoleLogDataFormatter> getFormatter() {
 		return formatter;
 	}
 
@@ -83,7 +86,7 @@ public class ConsoleProperties implements AdapterProperties, Serializable {
 	 * @param formatter
 	 * 		日志格式化
 	 */
-	public void setFormatter(Class<? extends ConsoleLogDataFormatter<String>> formatter) {
+	public void setFormatter(Class<? extends ConsoleLogDataFormatter> formatter) {
 		this.formatter = formatter;
 	}
 

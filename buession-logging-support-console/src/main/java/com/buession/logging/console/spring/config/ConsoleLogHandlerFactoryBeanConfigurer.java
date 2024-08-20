@@ -21,10 +21,66 @@
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
  * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
- */package com.buession.logging.console.spring.config;/**
- * 
+ */
+package com.buession.logging.console.spring.config;
+
+import com.buession.logging.console.formatter.ConsoleLogDataFormatter;
+import com.buession.logging.console.spring.ConsoleLogHandlerFactoryBean;
+
+/**
+ * Configures {@link ConsoleLogHandlerFactoryBean} with sensible defaults.
  *
  * @author Yong.Teng
  * @since 1.0.0
- */public class ConsoleLogHandlerFactoryBeanConfigurer {
+ */
+public class ConsoleLogHandlerFactoryBeanConfigurer {
+
+	/**
+	 * 日志模板
+	 */
+	private String template;
+
+	/**
+	 * 日志格式化
+	 */
+	private ConsoleLogDataFormatter formatter;
+
+	/**
+	 * 返回日志模板
+	 *
+	 * @return 日志模板
+	 */
+	public String getTemplate() {
+		return template;
+	}
+
+	/**
+	 * 设置日志模板
+	 *
+	 * @param template
+	 * 		日志模板
+	 */
+	public void setTemplate(String template) {
+		this.template = template;
+	}
+
+	/**
+	 * 返回日志格式化
+	 *
+	 * @return 日志格式化
+	 */
+	public ConsoleLogDataFormatter getFormatter() {
+		return formatter;
+	}
+
+	/**
+	 * 设置日志格式化
+	 *
+	 * @param formatter
+	 * 		日志格式化
+	 */
+	public void setFormatter(ConsoleLogDataFormatter formatter) {
+		this.formatter = formatter;
+	}
+
 }

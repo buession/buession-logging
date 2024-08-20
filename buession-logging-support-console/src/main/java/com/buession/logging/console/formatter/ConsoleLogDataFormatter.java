@@ -30,13 +30,10 @@ import com.buession.logging.core.formatter.LogDataFormatter;
 /**
  * 控制台日志数据格式化
  *
- * @param <T>
- * 		格式化目标类型
- *
  * @author Yong.Teng
  * @since 0.0.4
  */
-public interface ConsoleLogDataFormatter<T> extends LogDataFormatter<T> {
+public interface ConsoleLogDataFormatter extends LogDataFormatter<String> {
 
 	/**
 	 * 日志参数数据格式化为 T 类型对象数据
@@ -48,6 +45,6 @@ public interface ConsoleLogDataFormatter<T> extends LogDataFormatter<T> {
 	 *
 	 * @return 日志参数数据格式化结果
 	 */
-	T format(final String template, final LogData logData);
+	String format(final String template, final LogData logData);
 
 }
