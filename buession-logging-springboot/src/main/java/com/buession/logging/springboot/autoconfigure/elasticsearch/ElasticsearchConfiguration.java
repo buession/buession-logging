@@ -27,6 +27,7 @@ package com.buession.logging.springboot.autoconfigure.elasticsearch;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.buession.core.converter.mapper.PropertyMapper;
 import com.buession.core.validator.Validate;
+import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.elasticsearch.ElasticsearchCredentialsProvider;
 import com.buession.logging.elasticsearch.RestClientBuilderCustomizer;
 import com.buession.logging.elasticsearch.TransportOptionsCustomizer;
@@ -67,6 +68,7 @@ import java.time.Duration;
  */
 @AutoConfiguration
 @EnableConfigurationProperties(LogProperties.class)
+@ConditionalOnMissingBean(LogHandler.class)
 @ConditionalOnProperty(prefix = ElasticsearchProperties.PREFIX, name = "enabled", havingValue = "true")
 public class ElasticsearchConfiguration extends AbstractElasticsearchConfiguration {
 
@@ -74,6 +76,21 @@ public class ElasticsearchConfiguration extends AbstractElasticsearchConfigurati
 
 	public ElasticsearchConfiguration(LogProperties logProperties) {
 		this.properties = logProperties.getElasticsearch();
+	}
+
+	@Bean(name = "loggingElasticsearchConfigurer")
+	@ConditionalOnMissingBean(name = "loggingElasticsearchConfigurer")
+	public ElasticsearchConfigurer elasticsearchConfigurer() {
+		final ElasticsearchConfigurer configurer = new ElasticsearchConfigurer();
+
+		configurer.setUrls(properties.getUrls());
+		configurer.setPathPrefix(properties.getPathPrefix());
+		configurer.setHeaders(properties.getHeaders());
+		configurer.setParameters(properties.getParameters());
+		propertyMapper.from(properties::getEntityCallbacks).as(BeanUtils::instantiateClass)
+				.to(configurer::setEntityCallbacks);
+
+		return configurer;
 	}
 
 	@Bean(name = "loggingElasticsearchConverter")
@@ -100,21 +117,6 @@ public class ElasticsearchConfiguration extends AbstractElasticsearchConfigurati
 		return super.elasticsearchCustomConversions();
 	}
 
-	@Bean(name = "loggingElasticsearchConfigurer")
-	@ConditionalOnMissingBean(name = "loggingElasticsearchConfigurer")
-	public ElasticsearchConfigurer elasticsearchConfigurer() {
-		final ElasticsearchConfigurer configurer = new ElasticsearchConfigurer();
-
-		configurer.setUrls(properties.getUrls());
-		configurer.setPathPrefix(properties.getPathPrefix());
-		configurer.setHeaders(properties.getHeaders());
-		configurer.setParameters(properties.getParameters());
-		propertyMapper.from(properties::getEntityCallbacks).as(BeanUtils::instantiateClass)
-				.to(configurer::setEntityCallbacks);
-
-		return configurer;
-	}
-
 	@Bean(name = "loggingElasticsearchRestClientBuilderCustomizer")
 	@ConditionalOnMissingBean(name = "loggingElasticsearchRestClientBuilderCustomizer")
 	@Override
@@ -125,28 +127,27 @@ public class ElasticsearchConfiguration extends AbstractElasticsearchConfigurati
 	@Bean(name = "loggingElasticsearchRestClient")
 	@ConditionalOnMissingBean(name = "loggingElasticsearchRestClient")
 	@Override
-	public RestClient restClient(
-			@Qualifier("loggingElasticsearchConfigurer") ObjectProvider<ElasticsearchConfigurer> elasticsearchConfigurer,
-			@Qualifier("loggingElasticsearchRestClientBuilderCustomizer") ObjectProvider<RestClientBuilderCustomizer> builderCustomizers) {
-		return super.restClient(elasticsearchConfigurer, builderCustomizers);
+	public RestClient restClient(@Qualifier("loggingElasticsearchConfigurer") ElasticsearchConfigurer configurer,
+								 @Qualifier("loggingElasticsearchRestClientBuilderCustomizer") ObjectProvider<RestClientBuilderCustomizer> builderCustomizers) {
+		return super.restClient(configurer, builderCustomizers);
 	}
 
 	@Bean(name = "loggingElasticsearchClient")
 	@Override
 	public ElasticsearchClient elasticsearchClient(
-			@Qualifier("loggingElasticsearchConfigurer") ObjectProvider<ElasticsearchConfigurer> elasticsearchConfigurer,
-			@Qualifier("loggingElasticsearchRestClient") ObjectProvider<RestClient> restClient,
+			@Qualifier("loggingElasticsearchConfigurer") ElasticsearchConfigurer configurer,
+			@Qualifier("loggingElasticsearchRestClient") RestClient restClient,
 			@Qualifier("loggingElasticsearchTransportOptionsCustomizer") ObjectProvider<TransportOptionsCustomizer> transportOptionsCustomizer) {
-		return super.elasticsearchClient(elasticsearchConfigurer, restClient, transportOptionsCustomizer);
+		return super.elasticsearchClient(configurer, restClient, transportOptionsCustomizer);
 	}
 
 	@Bean(name = "loggingElasticsearchTemplate")
 	@Override
 	public ElasticsearchTemplate elasticsearchTemplate(
-			@Qualifier("loggingElasticsearchConfigurer") ObjectProvider<ElasticsearchConfigurer> elasticsearchConfigurer,
-			@Qualifier("loggingElasticsearchClient") ObjectProvider<ElasticsearchClient> elasticsearchClient,
+			@Qualifier("loggingElasticsearchConfigurer") ElasticsearchConfigurer configurer,
+			@Qualifier("loggingElasticsearchClient") ElasticsearchClient elasticsearchClient,
 			@Qualifier("loggingElasticsearchConverter") ObjectProvider<ElasticsearchConverter> elasticsearchConverter) {
-		return super.elasticsearchTemplate(elasticsearchConfigurer, elasticsearchClient, elasticsearchConverter);
+		return super.elasticsearchTemplate(configurer, elasticsearchClient, elasticsearchConverter);
 	}
 
 	@Override

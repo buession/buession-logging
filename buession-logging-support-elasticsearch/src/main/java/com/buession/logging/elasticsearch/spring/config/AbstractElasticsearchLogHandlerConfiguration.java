@@ -26,7 +26,6 @@ package com.buession.logging.elasticsearch.spring.config;
 
 import com.buession.logging.elasticsearch.spring.ElasticsearchLogHandlerFactoryBean;
 import com.buession.logging.support.config.AbstractLogHandlerConfiguration;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
@@ -41,11 +40,10 @@ import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 public abstract class AbstractElasticsearchLogHandlerConfiguration extends AbstractLogHandlerConfiguration {
 
 	@Bean
-	public ElasticsearchLogHandlerFactoryBean logHandlerFactoryBean(
-			ObjectProvider<ElasticsearchTemplate> elasticsearchTemplate) {
+	public ElasticsearchLogHandlerFactoryBean logHandlerFactoryBean(ElasticsearchTemplate elasticsearchTemplate) {
 		final ElasticsearchLogHandlerFactoryBean logHandlerFactoryBean = new ElasticsearchLogHandlerFactoryBean();
 
-		elasticsearchTemplate.ifAvailable(logHandlerFactoryBean::setElasticsearchTemplate);
+		logHandlerFactoryBean.setElasticsearchTemplate(elasticsearchTemplate);
 		logHandlerFactoryBean.setIndexName(getIndexName());
 
 		return logHandlerFactoryBean;

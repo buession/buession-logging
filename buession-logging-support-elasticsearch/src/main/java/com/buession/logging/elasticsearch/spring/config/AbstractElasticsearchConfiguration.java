@@ -61,9 +61,8 @@ public abstract class AbstractElasticsearchConfiguration extends ElasticsearchCo
 	public abstract RestClientBuilderCustomizer restClientBuilderCustomizer();
 
 	@Bean
-	public RestClient restClient(ObjectProvider<ElasticsearchConfigurer> elasticsearchConfigurer,
+	public RestClient restClient(ElasticsearchConfigurer configurer,
 								 ObjectProvider<RestClientBuilderCustomizer> builderCustomizers) {
-		ElasticsearchConfigurer configurer = elasticsearchConfigurer.getIfAvailable();
 		Assert.isEmpty(configurer.getUrls(), "Property 'urls' is required");
 
 		final RestClientBuilder restClientBuilder = createRestClientBuilder(configurer, builderCustomizers);
@@ -71,36 +70,33 @@ public abstract class AbstractElasticsearchConfiguration extends ElasticsearchCo
 	}
 
 	@Bean
-	public ElasticsearchClient elasticsearchClient(ObjectProvider<ElasticsearchConfigurer> elasticsearchConfigurer,
-												   ObjectProvider<RestClient> restClient,
+	public ElasticsearchClient elasticsearchClient(ElasticsearchConfigurer configurer, RestClient restClient,
 												   ObjectProvider<TransportOptionsCustomizer> transportOptionsCustomizer) {
-		ElasticsearchConfigurer configurer = elasticsearchConfigurer.getIfAvailable();
 		final HeaderMap headers = configurer.getHeaders() == null ? null : new HeaderMap(configurer.getHeaders());
 		final TransportOptions transportOptions = new DefaultTransportOptions(headers, configurer.getParameters(),
 				null);
 
 		transportOptionsCustomizer.orderedStream().forEach((customizer)->customizer.customize(transportOptions));
 
-		return ElasticsearchClients.createImperative(restClient.getIfAvailable(), transportOptions);
+		return ElasticsearchClients.createImperative(restClient, transportOptions);
 	}
 
 	@Bean
-	public ElasticsearchTemplate elasticsearchTemplate(ObjectProvider<ElasticsearchConfigurer> elasticsearchConfigurer,
-													   ObjectProvider<ElasticsearchClient> elasticsearchClient,
+	public ElasticsearchTemplate elasticsearchTemplate(ElasticsearchConfigurer configurer,
+													   ElasticsearchClient elasticsearchClient,
 													   ObjectProvider<ElasticsearchConverter> elasticsearchConverter) {
-		final ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(
-				elasticsearchClient.getIfAvailable(), elasticsearchConverter.getIfAvailable());
+		final ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(elasticsearchClient,
+				elasticsearchConverter.getIfAvailable());
 
-		elasticsearchConfigurer.ifAvailable(
-				(configurer)->elasticsearchTemplate.setEntityCallbacks(configurer.getEntityCallbacks()));
+		propertyMapper.from(configurer::getEntityCallbacks).to(elasticsearchTemplate::setEntityCallbacks);
 		elasticsearchTemplate.setRefreshPolicy(refreshPolicy());
 
 		return elasticsearchTemplate;
 	}
 
-	private RestClientBuilder createRestClientBuilder(final ElasticsearchConfigurer elasticsearchConfigurer,
+	private RestClientBuilder createRestClientBuilder(final ElasticsearchConfigurer configurer,
 													  final ObjectProvider<RestClientBuilderCustomizer> builderCustomizers) {
-		final Node[] nodes = elasticsearchConfigurer.getUrls()
+		final Node[] nodes = configurer.getUrls()
 				.stream()
 				.map((url)->new Node(this.createHttpHost(url)))
 				.toArray(Node[]::new);
@@ -116,7 +112,7 @@ public abstract class AbstractElasticsearchConfiguration extends ElasticsearchCo
 			return requestConfigBuilder;
 		});
 
-		propertyMapper.from(elasticsearchConfigurer::getPathPrefix).to(builder::setPathPrefix);
+		propertyMapper.from(configurer::getPathPrefix).to(builder::setPathPrefix);
 
 		builderCustomizers.orderedStream().forEach((customizer)->customizer.customize(builder));
 

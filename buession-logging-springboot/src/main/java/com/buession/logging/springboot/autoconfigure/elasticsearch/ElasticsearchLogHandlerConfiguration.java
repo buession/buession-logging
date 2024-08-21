@@ -30,7 +30,6 @@ import com.buession.logging.elasticsearch.spring.config.AbstractElasticsearchLog
 import com.buession.logging.springboot.Constants;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.ElasticsearchProperties;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -60,8 +59,9 @@ public class ElasticsearchLogHandlerConfiguration extends AbstractElasticsearchL
 	}
 
 	@Bean(name = Constants.LOG_HANDLER_BEAN_NAME)
+	@Override
 	public ElasticsearchLogHandlerFactoryBean logHandlerFactoryBean(
-			@Qualifier("loggingElasticsearchTemplate") ObjectProvider<ElasticsearchTemplate> elasticsearchTemplate) {
+			@Qualifier("loggingElasticsearchTemplate") ElasticsearchTemplate elasticsearchTemplate) {
 		return super.logHandlerFactoryBean(elasticsearchTemplate);
 	}
 
