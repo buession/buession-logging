@@ -32,7 +32,7 @@ import com.buession.logging.springboot.Constants;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.ConsoleProperties;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -59,7 +59,8 @@ public class ConsoleLogHandlerConfiguration extends AbstractConsoleLogHandlerCon
 		this.properties = logProperties.getConsole();
 	}
 
-	@Bean
+	@Bean(name = "loggingConsoleLogHandlerFactoryBeanConfigurer")
+	@ConditionalOnMissingBean(name = "loggingConsoleLogHandlerFactoryBeanConfigurer")
 	public ConsoleLogHandlerFactoryBeanConfigurer consoleLogHandlerFactoryBeanConfigurer() {
 		final ConsoleLogHandlerFactoryBeanConfigurer configurer = new ConsoleLogHandlerFactoryBeanConfigurer();
 
@@ -70,9 +71,10 @@ public class ConsoleLogHandlerConfiguration extends AbstractConsoleLogHandlerCon
 	}
 
 	@Bean(name = Constants.LOG_HANDLER_BEAN_NAME)
+	@Override
 	public ConsoleLogHandlerFactoryBean logHandlerFactoryBean(
-			ObjectProvider<ConsoleLogHandlerFactoryBeanConfigurer> consoleLogHandlerFactoryBeanConfigurer) {
-		return super.logHandlerFactoryBean(consoleLogHandlerFactoryBeanConfigurer);
+			@Qualifier("loggingConsoleLogHandlerFactoryBeanConfigurer") ConsoleLogHandlerFactoryBeanConfigurer configurer) {
+		return super.logHandlerFactoryBean(configurer);
 	}
 
 }

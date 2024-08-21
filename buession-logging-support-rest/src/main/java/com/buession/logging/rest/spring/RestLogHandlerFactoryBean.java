@@ -19,16 +19,16 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.rest.spring;
 
 import com.buession.core.utils.Assert;
 import com.buession.httpclient.HttpClient;;
+import com.buession.logging.core.RequestMethod;
 import com.buession.logging.rest.core.JsonRequestBodyBuilder;
 import com.buession.logging.rest.core.RequestBodyBuilder;
-import com.buession.logging.rest.core.RequestMethod;
 import com.buession.logging.rest.handler.RestLogHandler;
 import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
 import org.springframework.beans.BeanUtils;

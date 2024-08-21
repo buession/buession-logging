@@ -22,65 +22,90 @@
  * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.file.spring.config;
+package com.buession.logging.rest.spring.config;
 
-import com.buession.logging.core.formatter.LogDataFormatter;
-import com.buession.logging.file.spring.FileLogHandlerFactoryBean;
+import com.buession.logging.core.RequestMethod;
+import com.buession.logging.rest.core.RequestBodyBuilder;
+import com.buession.logging.rest.spring.RestLogHandlerFactoryBean;
 
 /**
- * Configures {@link FileLogHandlerFactoryBean} with sensible defaults.
+ * Configures {@link RestLogHandlerFactoryBean} with sensible defaults.
  *
  * @author Yong.Teng
  * @since 1.0.0
  */
-public class FileLogHandlerFactoryBeanConfigurer {
+public class RestLogHandlerFactoryBeanConfigurer {
 
 	/**
-	 * 日志文件路径
+	 * Rest Url
 	 */
-	private String path;
+	private String url;
 
 	/**
-	 * 日志格式化
+	 * 请求方式 {@link RequestMethod}
 	 */
-	private LogDataFormatter<String> formatter;
+	private RequestMethod requestMethod;
 
 	/**
-	 * 返回日志文件路径
+	 * 请求体构建器
+	 */
+	private RequestBodyBuilder requestBodyBuilder;
+
+	/**
+	 * 返回 Rest Url
 	 *
-	 * @return 日志文件路径
+	 * @return Rest Url
 	 */
-	public String getPath() {
-		return path;
+	public String getUrl() {
+		return url;
 	}
 
 	/**
-	 * 设置日志文件路径
+	 * 设置 Rest Url
 	 *
-	 * @param path
-	 * 		日志文件路径
+	 * @param url
+	 * 		Rest Url
 	 */
-	public void setPath(String path) {
-		this.path = path;
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 	/**
-	 * 返回日志格式化
+	 * 返回请求方式 {@link RequestMethod}
 	 *
-	 * @return 日志格式化
+	 * @return 请求方式 {@link RequestMethod}
 	 */
-	public LogDataFormatter<String> getFormatter() {
-		return formatter;
+	public RequestMethod getRequestMethod() {
+		return requestMethod;
 	}
 
 	/**
-	 * 设置日志格式化
+	 * 设置请求方式 {@link RequestMethod}
 	 *
-	 * @param formatter
-	 * 		日志格式化
+	 * @param requestMethod
+	 * 		请求方式 {@link RequestMethod}
 	 */
-	public void setFormatter(LogDataFormatter<String> formatter) {
-		this.formatter = formatter;
+	public void setRequestMethod(RequestMethod requestMethod) {
+		this.requestMethod = requestMethod;
+	}
+
+	/**
+	 * 返回请求体构建器
+	 *
+	 * @return 请求体构建器
+	 */
+	public RequestBodyBuilder getRequestBodyBuilder() {
+		return requestBodyBuilder;
+	}
+
+	/**
+	 * 设置请求体构建器
+	 *
+	 * @param requestBodyBuilder
+	 * 		请求体构建器
+	 */
+	public void setRequestBodyBuilder(RequestBodyBuilder requestBodyBuilder) {
+		this.requestBodyBuilder = requestBodyBuilder;
 	}
 
 }

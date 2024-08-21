@@ -26,4 +26,4 @@
  * @author Yong.Teng
  * @since 1.0.0
  */
-package com.buession.logging.jdbc.spring.config;
+package com.buession.logging.rest.spring.config;

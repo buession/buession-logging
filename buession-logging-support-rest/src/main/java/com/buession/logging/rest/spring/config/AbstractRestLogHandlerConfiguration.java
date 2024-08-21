@@ -19,21 +19,14 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.springboot.autoconfigure.rest;
+package com.buession.logging.rest.spring.config;
 
-import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.rest.spring.RestLogHandlerFactoryBean;
-import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
-import com.buession.logging.springboot.autoconfigure.LogProperties;
-import com.buession.logging.springboot.config.RestProperties;
-import org.springframework.beans.BeanUtils;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import com.buession.logging.support.config.AbstractLogHandlerConfiguration;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -44,24 +37,18 @@ import org.springframework.context.annotation.Configuration;
  * @since 0.0.1
  */
 @Configuration(proxyBeanMethods = false)
-@EnableConfigurationProperties(LogProperties.class)
-@ConditionalOnMissingBean(LogHandler.class)
-@ConditionalOnClass({RestLogHandlerFactoryBean.class})
-@ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "rest.enabled", havingValue = "true")
-public class RestLogHandlerConfiguration extends AbstractLogHandlerConfiguration<RestProperties> {
-
-	public RestLogHandlerConfiguration(LogProperties logProperties) {
-		super(logProperties.getRest());
-	}
+public abstract class AbstractRestLogHandlerConfiguration extends AbstractLogHandlerConfiguration {
 
 	@Bean
-	public RestLogHandlerFactoryBean logHandlerFactoryBean() {
+	public RestLogHandlerFactoryBean logHandlerFactoryBean(
+			ObjectProvider<RestLogHandlerFactoryBeanConfigurer> restLogHandlerFactoryBeanConfigurer) {
+		RestLogHandlerFactoryBeanConfigurer configurer = restLogHandlerFactoryBeanConfigurer.getIfAvailable();
+
 		final RestLogHandlerFactoryBean logHandlerFactoryBean = new RestLogHandlerFactoryBean();
 
-		logHandlerFactoryBean.setUrl(properties.getUrl());
-		propertyMapper.from(properties::getRequestMethod).to(logHandlerFactoryBean::setRequestMethod);
-		propertyMapper.from(properties::getRequestBodyBuilder).as(BeanUtils::instantiateClass)
-				.to(logHandlerFactoryBean::setRequestBodyBuilder);
+		logHandlerFactoryBean.setUrl(configurer.getUrl());
+		propertyMapper.from(configurer::getRequestMethod).to(logHandlerFactoryBean::setRequestMethod);
+		propertyMapper.from(configurer::getRequestBodyBuilder).to(logHandlerFactoryBean::setRequestBodyBuilder);
 
 		return logHandlerFactoryBean;
 	}

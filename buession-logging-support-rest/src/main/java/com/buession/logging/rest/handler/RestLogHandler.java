@@ -19,7 +19,7 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.rest.handler;
@@ -30,10 +30,10 @@ import com.buession.httpclient.core.RequestBody;
 import com.buession.httpclient.core.Response;
 import com.buession.lang.Status;
 import com.buession.logging.core.LogData;
+import com.buession.logging.core.RequestMethod;
 import com.buession.logging.core.handler.AbstractLogHandler;
 import com.buession.logging.rest.core.JsonRequestBodyBuilder;
 import com.buession.logging.rest.core.RequestBodyBuilder;
-import com.buession.logging.rest.core.RequestMethod;
 
 /**
  * Rest 日志处理器
