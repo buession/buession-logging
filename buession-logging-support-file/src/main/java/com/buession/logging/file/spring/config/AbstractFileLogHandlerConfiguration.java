@@ -26,7 +26,6 @@ package com.buession.logging.file.spring.config;
 
 import com.buession.logging.file.spring.FileLogHandlerFactoryBean;
 import com.buession.logging.support.config.AbstractLogHandlerConfiguration;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -40,10 +39,7 @@ import java.io.File;
 public abstract class AbstractFileLogHandlerConfiguration extends AbstractLogHandlerConfiguration {
 
 	@Bean
-	public FileLogHandlerFactoryBean logHandlerFactoryBean(
-			ObjectProvider<FileLogHandlerFactoryBeanConfigurer> fileLogHandlerFactoryBeanConfigurer) {
-		FileLogHandlerFactoryBeanConfigurer configurer = fileLogHandlerFactoryBeanConfigurer.getIfAvailable();
-
+	public FileLogHandlerFactoryBean logHandlerFactoryBean(FileLogHandlerFactoryBeanConfigurer configurer) {
 		final FileLogHandlerFactoryBean logHandlerFactoryBean = new FileLogHandlerFactoryBean();
 
 		propertyMapper.alwaysApplyingWhenHasText().from(configurer::getPath).as(File::new)

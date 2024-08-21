@@ -32,7 +32,6 @@ import com.buession.logging.springboot.Constants;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.FileProperties;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -72,9 +71,10 @@ public class FileLogHandlerConfiguration extends AbstractFileLogHandlerConfigura
 	}
 
 	@Bean(name = Constants.LOG_HANDLER_BEAN_NAME)
+	@Override
 	public FileLogHandlerFactoryBean logHandlerFactoryBean(
-			@Qualifier("loggingFileLogHandlerFactoryBeanConfigurer") ObjectProvider<FileLogHandlerFactoryBeanConfigurer> fileLogHandlerFactoryBeanConfigurer) {
-		return super.logHandlerFactoryBean(fileLogHandlerFactoryBeanConfigurer);
+			@Qualifier("loggingFileLogHandlerFactoryBeanConfigurer") FileLogHandlerFactoryBeanConfigurer configurer) {
+		return super.logHandlerFactoryBean(configurer);
 	}
 
 }
