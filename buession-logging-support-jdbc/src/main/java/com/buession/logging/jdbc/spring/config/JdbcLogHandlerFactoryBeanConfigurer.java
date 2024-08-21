@@ -22,65 +22,165 @@
  * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.console.spring.config;
+package com.buession.logging.jdbc.spring.config;
 
-import com.buession.logging.console.formatter.ConsoleLogDataFormatter;
-import com.buession.logging.console.spring.ConsoleLogHandlerFactoryBean;
+import com.buession.core.id.IdGenerator;
+import com.buession.logging.core.formatter.MapFormatter;
+import com.buession.logging.jdbc.converter.LogDataConverter;
+import com.buession.logging.jdbc.spring.JdbcLogHandlerFactoryBean;
 
 /**
- * Configures {@link ConsoleLogHandlerFactoryBean} with sensible defaults.
+ * Configures {@link JdbcLogHandlerFactoryBean} with sensible defaults.
  *
  * @author Yong.Teng
  * @since 1.0.0
  */
-public class ConsoleLogHandlerFactoryBeanConfigurer {
+public class JdbcLogHandlerFactoryBeanConfigurer {
 
 	/**
-	 * 日志模板
+	 * SQL
 	 */
-	private String template;
+	private String sql;
 
 	/**
-	 * 日志格式化
+	 * ID 生成器
 	 */
-	private ConsoleLogDataFormatter<String> formatter;
+	private IdGenerator<?> idGenerator;
 
 	/**
-	 * 返回日志模板
+	 * 日期时间格式
+	 */
+	private String dateTimeFormat;
+
+	/**
+	 * 请求参数格式化为字符串
+	 */
+	private MapFormatter<Object> requestParametersFormatter;
+
+	/**
+	 * 附加参数格式化为字符串
+	 */
+	private MapFormatter<Object> extraFormatter;
+
+	/**
+	 * 数据转换器
+	 */
+	private LogDataConverter dataConverter;
+
+	/**
+	 * 返回 SQL
 	 *
-	 * @return 日志模板
+	 * @return SQL
 	 */
-	public String getTemplate() {
-		return template;
+	public String getSql() {
+		return sql;
 	}
 
 	/**
-	 * 设置日志模板
+	 * 设置 SQL
 	 *
-	 * @param template
-	 * 		日志模板
+	 * @param sql
+	 * 		SQL
 	 */
-	public void setTemplate(String template) {
-		this.template = template;
+	public void setSql(String sql) {
+		this.sql = sql;
 	}
 
 	/**
-	 * 返回日志格式化
+	 * 返回 ID 生成器
 	 *
-	 * @return 日志格式化
+	 * @return ID 生成器
 	 */
-	public ConsoleLogDataFormatter<String> getFormatter() {
-		return formatter;
+	public IdGenerator<?> getIdGenerator() {
+		return idGenerator;
 	}
 
 	/**
-	 * 设置日志格式化
+	 * 设置 ID 生成器
 	 *
-	 * @param formatter
-	 * 		日志格式化
+	 * @param idGenerator
+	 * 		ID 生成器
 	 */
-	public void setFormatter(ConsoleLogDataFormatter<String> formatter) {
-		this.formatter = formatter;
+	public void setIdGenerator(IdGenerator<?> idGenerator) {
+		this.idGenerator = idGenerator;
+	}
+
+	/**
+	 * 返回日期时间格式
+	 *
+	 * @return 日期时间格式
+	 */
+	public String getDateTimeFormat() {
+		return dateTimeFormat;
+	}
+
+	/**
+	 * 设置日期时间格式
+	 *
+	 * @param dateTimeFormat
+	 * 		日期时间格式
+	 */
+	public void setDateTimeFormat(String dateTimeFormat) {
+		this.dateTimeFormat = dateTimeFormat;
+	}
+
+	/**
+	 * 返回请求参数格式化为字符串
+	 *
+	 * @return 请求参数格式化为字符串
+	 */
+	public MapFormatter<Object> getRequestParametersFormatter() {
+		return requestParametersFormatter;
+	}
+
+	/**
+	 * 设置请求参数格式化为字符串
+	 *
+	 * @param requestParametersFormatter
+	 * 		请求参数格式化为字符串
+	 */
+	public void setRequestParametersFormatter(MapFormatter<Object> requestParametersFormatter) {
+		this.requestParametersFormatter = requestParametersFormatter;
+	}
+
+	/**
+	 * 返回附加参数格式化为字符串
+	 *
+	 * @return 附加参数格式化为字符串
+	 */
+	public MapFormatter<Object> getExtraFormatter() {
+		return extraFormatter;
+	}
+
+	/**
+	 * 设置附加参数格式化为字符串
+	 *
+	 * @param extraFormatter
+	 * 		附加参数格式化为字符串
+	 */
+	public void setExtraFormatter(MapFormatter<Object> extraFormatter) {
+		this.extraFormatter = extraFormatter;
+	}
+
+	/**
+	 * 返回数据转换器
+	 *
+	 * @return 数据转换器
+	 */
+	public LogDataConverter getDataConverter() {
+		return dataConverter;
+	}
+
+	/**
+	 * 设置数据转换器
+	 *
+	 * @param dataConverter
+	 * 		数据转换器
+	 *
+	 * @since 1.0.0
+	 */
+	public void setDataConverter(LogDataConverter dataConverter) {
+		this.dataConverter = dataConverter;
 	}
 
 }

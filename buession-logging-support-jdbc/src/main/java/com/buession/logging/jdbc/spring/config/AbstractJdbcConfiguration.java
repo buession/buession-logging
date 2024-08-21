@@ -22,20 +22,15 @@
  * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.springboot.autoconfigure.jdbc;
+package com.buession.logging.jdbc.spring.config;
 
+import com.buession.core.converter.mapper.PropertyMapper;
 import com.buession.core.utils.Assert;
 import com.buession.jdbc.config.*;
 import com.buession.jdbc.datasource.*;
 import com.buession.jdbc.datasource.pool.*;
-import com.buession.logging.springboot.autoconfigure.LogProperties;
-import com.buession.logging.springboot.config.JdbcProperties;
 import org.springframework.beans.BeanInstantiationException;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -47,24 +42,18 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * JDBC 日志处理器自动配置类
- *
  * @author Yong.Teng
  * @since 1.0.0
  */
 @Configuration(proxyBeanMethods = false)
-@EnableConfigurationProperties(LogProperties.class)
-@ConditionalOnProperty(prefix = JdbcProperties.PREFIX, name = "enabled", havingValue = "true")
-public class JdbcConfiguration {
+public abstract class AbstractJdbcConfiguration {
+
+	protected final static PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 
 	private final static Map<String, Class<? extends com.buession.jdbc.datasource.DataSource<?, ?>>> DATA_SOURCE_MAP =
 			new LinkedHashMap<>(5);
 
-	private final JdbcProperties properties;
-
 	private Class<? extends com.buession.jdbc.datasource.DataSource<?, ?>> dataSourceType;
-
-	private com.buession.jdbc.datasource.DataSource<?, ?> dataSource;
 
 	static {
 		DATA_SOURCE_MAP.put("org.apache.commons.dbcp2.BasicDataSource",
@@ -77,96 +66,89 @@ public class JdbcConfiguration {
 				TomcatDataSource.class);
 	}
 
-	public JdbcConfiguration(LogProperties logProperties) {
-		this.properties = logProperties.getJdbc();
-	}
+	@Bean
+	public DataSource dataSource(JdbcConfigurer configurer) {
+		Assert.isBlank(configurer.getDriverClassName(), "Property 'driverClassName' is required");
+		Assert.isBlank(configurer.getUrl(), "Property 'url' is required");
 
-	@Bean(name = "loggingJdbcDataSource")
-	public DataSource dataSource() {
-		Assert.isBlank(properties.getDriverClassName(), "Property 'driverClassName' is required");
-		Assert.isBlank(properties.getUrl(), "Property 'url' is required");
-
-		final Class<? extends com.buession.jdbc.datasource.DataSource<?, ?>> dataSourceClazz = getDataSourceType();
 		try{
+			final Class<? extends com.buession.jdbc.datasource.DataSource<?, ?>> dataSourceType = getDataSourceType();
 			final Constructor<? extends com.buession.jdbc.datasource.DataSource<?, ?>> constructor =
-					dataSourceClazz.getConstructor(String.class, String.class, String.class, String.class);
+					dataSourceType.getConstructor(String.class, String.class, String.class, String.class);
+			final com.buession.jdbc.datasource.DataSource<?, ?> dataSource = BeanUtils.instantiateClass(constructor,
+					configurer.getDriverClassName(), configurer.getUrl(), configurer.getUsername(),
+					configurer.getPassword());
 
-			this.dataSource = BeanUtils.instantiateClass(constructor, properties.getDriverClassName(),
-					properties.getUrl(), properties.getUsername(), properties.getPassword());
+			propertyMapper.from(configurer::getInitSQL).to(dataSource::setInitSQL);
+			propertyMapper.from(configurer::getConnectionProperties).to(dataSource::setConnectionProperties);
 
-			this.dataSource.setLoginTimeout(properties.getLoginTimeout());
-
-			this.dataSource.setInitSQL(properties.getInitSQL());
-
-			this.dataSource.setConnectionProperties(properties.getConnectionProperties());
-
-			if(dataSourceClazz.isAssignableFrom(Dbcp2DataSource.class)){
-				final Dbcp2Config dbcp2Config = properties.getDbcp2();
+			if(dataSourceType.isAssignableFrom(Dbcp2DataSource.class)){
+				final Dbcp2Config dbcp2Config = (Dbcp2Config) configurer.getConfig();
 
 				if(dbcp2Config != null){
-					Dbcp2DataSource dbcp2DataSource = (Dbcp2DataSource) this.dataSource;
+					Dbcp2DataSource dbcp2DataSource = (Dbcp2DataSource) dataSource;
 					Dbcp2PoolConfiguration poolConfiguration = new Dbcp2PoolConfiguration();
 
 					dbcp2DataSourceConfig(dbcp2DataSource, dbcp2Config, poolConfiguration);
 				}
-			}else if(dataSourceClazz.isAssignableFrom(DruidDataSource.class)){
-				final DruidConfig druidConfig = properties.getDruid();
+			}else if(dataSourceType.isAssignableFrom(DruidDataSource.class)){
+				final DruidConfig druidConfig = (DruidConfig) configurer.getConfig();
 
 				if(druidConfig != null){
-					DruidDataSource druidDataSource = (DruidDataSource) this.dataSource;
+					DruidDataSource druidDataSource = (DruidDataSource) dataSource;
 					DruidPoolConfiguration poolConfiguration = new DruidPoolConfiguration();
 
 					druidDataSourceConfig(druidDataSource, druidConfig, poolConfiguration);
 				}
-			}else if(dataSourceClazz.isAssignableFrom(HikariDataSource.class)){
-				final HikariConfig hikariConfig = properties.getHikari();
+			}else if(dataSourceType.isAssignableFrom(HikariDataSource.class)){
+				final HikariConfig hikariConfig = (HikariConfig) configurer.getConfig();
 
 				if(hikariConfig != null){
-					HikariDataSource hikariDataSource = (HikariDataSource) this.dataSource;
+					HikariDataSource hikariDataSource = (HikariDataSource) dataSource;
 					HikariPoolConfiguration poolConfiguration = new HikariPoolConfiguration();
 
 					hikariDataSourceConfig(hikariDataSource, hikariConfig, poolConfiguration);
 				}
-			}else if(dataSourceClazz.isAssignableFrom(OracleDataSource.class)){
-				final OracleConfig oracleConfig = properties.getOracle();
+			}else if(dataSourceType.isAssignableFrom(OracleDataSource.class)){
+				final OracleConfig oracleConfig = (OracleConfig) configurer.getConfig();
 
 				if(oracleConfig != null){
-					OracleDataSource oracleDataSource = (OracleDataSource) this.dataSource;
+					OracleDataSource oracleDataSource = (OracleDataSource) dataSource;
 					OraclePoolConfiguration poolConfiguration = new OraclePoolConfiguration();
 
 					oracleDataSourceConfig(oracleDataSource, oracleConfig, poolConfiguration);
 				}
-			}else if(dataSourceClazz.isAssignableFrom(TomcatDataSource.class)){
-				final TomcatConfig tomcatConfig = properties.getTomcat();
+			}else if(dataSourceType.isAssignableFrom(TomcatDataSource.class)){
+				final TomcatConfig tomcatConfig = (TomcatConfig) configurer.getConfig();
 
 				if(tomcatConfig != null){
-					TomcatDataSource tomcatDataSource = (TomcatDataSource) this.dataSource;
+					TomcatDataSource tomcatDataSource = (TomcatDataSource) dataSource;
 					TomcatPoolConfiguration poolConfiguration = new TomcatPoolConfiguration();
 
 					tomcatDataSourceConfig(tomcatDataSource, tomcatConfig, poolConfiguration);
 				}
 			}
 
-			return this.dataSource.createDataSource();
+			return dataSource.createDataSource();
 		}catch(NoSuchMethodException e){
-			throw new BeanInstantiationException(dataSourceClazz,
+			throw new BeanInstantiationException(dataSourceType,
 					"Can't specify more arguments than constructor parameters");
 		}
 	}
 
-	@Bean(name = "loggingJdbcTemplate")
-	public JdbcTemplate jdbcTemplate(@Qualifier("loggingJdbcDataSource") ObjectProvider<DataSource> dataSource) {
-		return new JdbcTemplate(dataSource.getIfAvailable());
+	@Bean
+	public JdbcTemplate jdbcTemplate(DataSource dataSource) {
+		return new JdbcTemplate(dataSource);
 	}
 
-	private Class<? extends com.buession.jdbc.datasource.DataSource<?, ?>> getDataSourceType() {
+	protected Class<? extends com.buession.jdbc.datasource.DataSource<?, ?>> getDataSourceType() {
 		if(this.dataSourceType != null){
 			return this.dataSourceType;
 		}
 
 		for(Map.Entry<String, Class<? extends com.buession.jdbc.datasource.DataSource<?, ?>>> e : DATA_SOURCE_MAP.entrySet()){
 			try{
-				ClassUtils.forName(e.getKey(), JdbcConfiguration.class.getClassLoader());
+				ClassUtils.forName(e.getKey(), getClass().getClassLoader());
 				this.dataSourceType = e.getValue();
 				return this.dataSourceType;
 			}catch(Exception ex){
@@ -178,16 +160,20 @@ public class JdbcConfiguration {
 	}
 
 	protected void baseDataSourceConfig(final com.buession.jdbc.datasource.DataSource<?, ?> dataSource,
-										final BaseConfig dataSourceConfig, final PoolConfiguration poolConfiguration) {
-		dataSource.setQueryTimeout(dataSourceConfig.getQueryTimeout());
-		dataSource.setDefaultTransactionIsolation(dataSourceConfig.getDefaultTransactionIsolation());
-		dataSource.setDefaultAutoCommit(dataSourceConfig.getDefaultAutoCommit());
-		dataSource.setAccessToUnderlyingConnectionAllowed(dataSourceConfig.getAccessToUnderlyingConnectionAllowed());
+										final BaseConfig dataSourceConfig) {
+		propertyMapper.from(dataSourceConfig::getLoginTimeout).to(dataSource::setLoginTimeout);
+		propertyMapper.from(dataSourceConfig::getLoginTimeout).to(dataSource::setLoginTimeout);
+		propertyMapper.from(dataSourceConfig::getQueryTimeout).to(dataSource::setQueryTimeout);
+		propertyMapper.from(dataSourceConfig::getDefaultTransactionIsolation)
+				.to(dataSource::setDefaultTransactionIsolation);
+		propertyMapper.from(dataSourceConfig::getDefaultAutoCommit).to(dataSource::setDefaultAutoCommit);
+		propertyMapper.from(dataSourceConfig::getAccessToUnderlyingConnectionAllowed)
+				.to(dataSource::setAccessToUnderlyingConnectionAllowed);
 	}
 
 	protected void dbcp2DataSourceConfig(final Dbcp2DataSource dataSource, final Dbcp2Config dataSourceConfig,
 										 final Dbcp2PoolConfiguration poolConfiguration) {
-		baseDataSourceConfig(dataSource, dataSourceConfig, poolConfiguration);
+		baseDataSourceConfig(dataSource, dataSourceConfig);
 
 		dataSource.setConnectionFactoryClassName(dataSourceConfig.getConnectionFactoryClassName());
 
@@ -222,7 +208,7 @@ public class JdbcConfiguration {
 
 	protected void druidDataSourceConfig(final DruidDataSource dataSource, final DruidConfig dataSourceConfig,
 										 final DruidPoolConfiguration poolConfiguration) {
-		baseDataSourceConfig(dataSource, dataSourceConfig, poolConfiguration);
+		baseDataSourceConfig(dataSource, dataSourceConfig);
 
 		dataSource.setUserCallbackClassName(dataSourceConfig.getUserCallbackClassName());
 		dataSource.setPasswordCallbackClassName(dataSourceConfig.getPasswordCallbackClassName());
@@ -307,7 +293,7 @@ public class JdbcConfiguration {
 	protected void hikariDataSourceConfig(final HikariDataSource dataSource, final HikariConfig dataSourceConfig,
 										  final HikariPoolConfiguration poolConfiguration) {
 		dataSource.setQueryTimeout(dataSourceConfig.getQueryTimeout());
-		baseDataSourceConfig(dataSource, dataSourceConfig, poolConfiguration);
+		baseDataSourceConfig(dataSource, dataSourceConfig);
 
 		dataSource.setJndiName(dataSourceConfig.getJndiName());
 
@@ -339,7 +325,7 @@ public class JdbcConfiguration {
 
 	protected void oracleDataSourceConfig(final OracleDataSource dataSource, final OracleConfig dataSourceConfig,
 										  final OraclePoolConfiguration poolConfiguration) {
-		baseDataSourceConfig(dataSource, dataSourceConfig, poolConfiguration);
+		baseDataSourceConfig(dataSource, dataSourceConfig);
 
 		dataSource.setNetworkProtocol(dataSourceConfig.getNetworkProtocol());
 		dataSource.setServerName(dataSourceConfig.getServerName());
@@ -390,7 +376,7 @@ public class JdbcConfiguration {
 
 	protected void tomcatDataSourceConfig(final TomcatDataSource dataSource, final TomcatConfig dataSourceConfig,
 										  final TomcatPoolConfiguration poolConfiguration) {
-		baseDataSourceConfig(dataSource, dataSourceConfig, poolConfiguration);
+		baseDataSourceConfig(dataSource, dataSourceConfig);
 
 		dataSource.setJndiName(dataSourceConfig.getJndiName());
 

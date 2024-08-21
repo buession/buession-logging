@@ -37,10 +37,10 @@ import com.buession.logging.jdbc.formatter.DefaultGeoFormatter;
 import com.buession.logging.core.formatter.GeoFormatter;
 import com.buession.logging.jdbc.formatter.JsonMapFormatter;
 import com.buession.logging.core.formatter.MapFormatter;
+import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.support.config.AdapterProperties;
 
 import java.io.Serializable;
-import java.time.Duration;
 import java.util.Properties;
 
 /**
@@ -52,6 +52,8 @@ import java.util.Properties;
 public class JdbcProperties implements AdapterProperties, Serializable {
 
 	private final static long serialVersionUID = -8823778313817319882L;
+
+	public final static String PREFIX = LogProperties.PREFIX + ".jdbc";
 
 	/**
 	 * 数据库驱动类名
@@ -72,13 +74,6 @@ public class JdbcProperties implements AdapterProperties, Serializable {
 	 * 数据库密码
 	 */
 	private String password;
-
-	/**
-	 * 登录超时
-	 *
-	 * @since 1.0.0
-	 */
-	private Duration loginTimeout;
 
 	/**
 	 * 设置一个SQL语句，在将每个新连接创建后，将其添加到池中之前执行该语句
@@ -247,29 +242,6 @@ public class JdbcProperties implements AdapterProperties, Serializable {
 	 */
 	public void setPassword(String password) {
 		this.password = password;
-	}
-
-	/**
-	 * 返回登录超时
-	 *
-	 * @return 登录超时
-	 *
-	 * @since 1.0.0
-	 */
-	public Duration getLoginTimeout() {
-		return loginTimeout;
-	}
-
-	/**
-	 * 设置登录超时
-	 *
-	 * @param loginTimeout
-	 * 		登录超时
-	 *
-	 * @since 1.0.0
-	 */
-	public void setLoginTimeout(Duration loginTimeout) {
-		this.loginTimeout = loginTimeout;
 	}
 
 	/**

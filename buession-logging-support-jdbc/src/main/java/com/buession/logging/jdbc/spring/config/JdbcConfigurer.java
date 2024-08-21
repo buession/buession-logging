@@ -22,140 +22,189 @@
  * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.elasticsearch.spring.config;
+package com.buession.logging.jdbc.spring.config;
 
-import org.elasticsearch.client.RestClient;
-import org.springframework.data.mapping.callback.EntityCallbacks;
+import com.buession.jdbc.config.Config;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
- * Configures {@link RestClient} with sensible defaults.
+ * Configures {@link JdbcTemplate} with sensible defaults.
  *
  * @author Yong.Teng
  * @since 1.0.0
  */
-public class ElasticsearchConfigurer {
+public class JdbcConfigurer {
 
 	/**
-	 * Elasticsearch URL 地址
+	 * 数据库驱动类名
 	 */
-	private List<String> urls;
+	private String driverClassName;
 
 	/**
-	 * 路径前缀
+	 * JDBC URL
 	 */
-	private String pathPrefix;
+	private String url;
 
 	/**
-	 * 请求头
+	 * 数据库账号
 	 */
-	private Map<String, String> headers;
+	private String username;
 
 	/**
-	 * 请求参数
+	 * 数据库密码
 	 */
-	private Map<String, String> parameters;
+	private String password;
 
 	/**
-	 * {@link EntityCallbacks}
+	 * 设置一个SQL语句，在将每个新连接创建后，将其添加到池中之前执行该语句
 	 */
-	private EntityCallbacks entityCallbacks;
+	private String initSQL;
 
 	/**
-	 * 返回 Elasticsearch URL 地址
+	 * 连接属性
+	 */
+	private Properties connectionProperties;
+
+	/**
+	 * {@link com.buession.jdbc.datasource.DataSource} 配置
+	 */
+	private Config config;
+
+	/**
+	 * 返回数据库驱动类名
 	 *
-	 * @return Elasticsearch URL 地址
+	 * @return 数据库驱动类名
 	 */
-	public List<String> getUrls() {
-		return urls;
+	public String getDriverClassName() {
+		return driverClassName;
 	}
 
 	/**
-	 * 设置 Elasticsearch URL 地址
+	 * 设置数据库驱动类名
 	 *
-	 * @param urls
-	 * 		Elasticsearch URL 地址
+	 * @param driverClassName
+	 * 		数据库驱动类名
 	 */
-	public void setUrls(List<String> urls) {
-		this.urls = urls;
+	public void setDriverClassName(String driverClassName) {
+		this.driverClassName = driverClassName;
 	}
 
 	/**
-	 * 返回路径前缀
+	 * 返回 JDBC URL
 	 *
-	 * @return 路径前缀
+	 * @return JDBC URL
 	 */
-	public String getPathPrefix() {
-		return pathPrefix;
+	public String getUrl() {
+		return url;
 	}
 
 	/**
-	 * 设置路径前缀
+	 * 设置 JDBC URL
 	 *
-	 * @param pathPrefix
-	 * 		路径前缀
+	 * @param url
+	 * 		JDBC URL
 	 */
-	public void setPathPrefix(String pathPrefix) {
-		this.pathPrefix = pathPrefix;
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 	/**
-	 * 返回请求头
+	 * 返回数据库账号
 	 *
-	 * @return 请求头
+	 * @return 数据库账号
 	 */
-	public Map<String, String> getHeaders() {
-		return headers;
+	public String getUsername() {
+		return username;
 	}
 
 	/**
-	 * 设置请求头
+	 * 设置数据库账号
 	 *
-	 * @param headers
-	 * 		请求头
+	 * @param username
+	 * 		数据库账号
 	 */
-	public void setHeaders(Map<String, String> headers) {
-		this.headers = headers;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	/**
-	 * 返回请求参数
+	 * 返回数据库密码
 	 *
-	 * @return 请求参数
+	 * @return 数据库密码
 	 */
-	public Map<String, String> getParameters() {
-		return parameters;
+	public String getPassword() {
+		return password;
 	}
 
 	/**
-	 * 设置请求参数
+	 * 设置数据库密码
 	 *
-	 * @param parameters
-	 * 		请求参数
+	 * @param password
+	 * 		数据库密码
 	 */
-	public void setParameters(Map<String, String> parameters) {
-		this.parameters = parameters;
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	/**
-	 * 返回 {@link EntityCallbacks}
+	 * 返回在将每个新连接创建后，将其添加到池中之前执行的SQL语句
 	 *
-	 * @return {@link EntityCallbacks}
+	 * @return 每个新连接创建后，将其添加到池中之前执行的SQL语句
 	 */
-	public EntityCallbacks getEntityCallbacks() {
-		return entityCallbacks;
+	public String getInitSQL() {
+		return initSQL;
 	}
 
 	/**
-	 * 设置  {@link EntityCallbacks}
+	 * 设置每个新连接创建后，将其添加到池中之前执行的SQL语句
 	 *
-	 * @param entityCallbacks
-	 *        {@link EntityCallbacks}
+	 * @param initSQL
+	 * 		每个新连接创建后，将其添加到池中之前执行的SQL语句
 	 */
-	public void setEntityCallbacks(EntityCallbacks entityCallbacks) {
-		this.entityCallbacks = entityCallbacks;
+	public void setInitSQL(String initSQL) {
+		this.initSQL = initSQL;
+	}
+
+	/**
+	 * 返回连接属性
+	 *
+	 * @return 连接属性
+	 */
+	public Properties getConnectionProperties() {
+		return connectionProperties;
+	}
+
+	/**
+	 * 设置连接属性
+	 *
+	 * @param connectionProperties
+	 * 		连接属性
+	 */
+	public void setConnectionProperties(Properties connectionProperties) {
+		this.connectionProperties = connectionProperties;
+	}
+
+	/**
+	 * 返回 {@link com.buession.jdbc.datasource.DataSource} 配置
+	 *
+	 * @return {@link com.buession.jdbc.datasource.DataSource} 配置
+	 */
+	public Config getConfig() {
+		return config;
+	}
+
+	/**
+	 * 设置 {@link com.buession.jdbc.datasource.DataSource} 配置
+	 *
+	 * @param config
+	 *        {@link com.buession.jdbc.datasource.DataSource} 配置
+	 */
+	public void setConfig(Config config) {
+		this.config = config;
 	}
 
 }
