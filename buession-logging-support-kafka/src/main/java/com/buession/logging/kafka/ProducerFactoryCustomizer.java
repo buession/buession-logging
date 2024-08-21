@@ -21,10 +21,26 @@
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
  * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
- */package com.buession.logging.kafka;/**
- * 
+ */
+package com.buession.logging.kafka;
+
+import org.springframework.kafka.core.DefaultKafkaProducerFactory;
+
+/**
+ * Callback interface for customizing {@code DefaultKafkaProducerFactory} beans.
  *
  * @author Yong.Teng
  * @since 1.0.0
- */public interface ProducerFactoryCustomizer {
+ */
+@FunctionalInterface
+public interface ProducerFactoryCustomizer {
+
+	/**
+	 * Customize the {@link DefaultKafkaProducerFactory}.
+	 *
+	 * @param producerFactory
+	 * 		the producer factory to customize
+	 */
+	void customize(DefaultKafkaProducerFactory<?, ?> producerFactory);
+
 }

@@ -22,19 +22,9 @@
  * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.springboot.autoconfigure.kafka;
+package com.buession.logging.kafka.spring.config;
 
-import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.kafka.spring.KafkaLogHandlerFactoryBean;
-import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
-import com.buession.logging.springboot.autoconfigure.LogProperties;
-import com.buession.logging.springboot.config.KafkaProperties;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -46,26 +36,18 @@ import org.springframework.kafka.core.KafkaTemplate;
  * @since 0.0.1
  */
 @Configuration(proxyBeanMethods = false)
-@EnableConfigurationProperties(LogProperties.class)
-@ConditionalOnMissingBean(LogHandler.class)
-@ConditionalOnClass({KafkaLogHandlerFactoryBean.class})
-@ConditionalOnProperty(prefix = KafkaProperties.PREFIX, name = "enabled", havingValue = "true")
-public class KafkaLogHandlerConfiguration extends AbstractLogHandlerConfiguration<KafkaProperties> {
-
-	public KafkaLogHandlerConfiguration(LogProperties logProperties) {
-		super(logProperties.getKafka());
-	}
+public abstract class AbstractKafkaLogHandlerConfiguration {
 
 	@Bean
-	public KafkaLogHandlerFactoryBean logHandlerFactoryBean(
-			@Qualifier("loggingKafkaTemplate") ObjectProvider<KafkaTemplate<String, Object>> kafkaTemplate) {
+	public KafkaLogHandlerFactoryBean logHandlerFactoryBean(KafkaTemplate<String, Object> kafkaTemplate) {
 		final KafkaLogHandlerFactoryBean logHandlerFactoryBean = new KafkaLogHandlerFactoryBean();
 
-		kafkaTemplate.ifAvailable(logHandlerFactoryBean::setKafkaTemplate);
-
-		logHandlerFactoryBean.setTopic(properties.getTopic());
+		logHandlerFactoryBean.setKafkaTemplate(kafkaTemplate);
+		logHandlerFactoryBean.setTopic(getTopic());
 
 		return logHandlerFactoryBean;
 	}
+
+	protected abstract String getTopic();
 
 }

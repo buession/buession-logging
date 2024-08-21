@@ -22,18 +22,12 @@
  * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.springboot.autoconfigure.kafka;
+package com.buession.logging.kafka.spring.config;
 
 import com.buession.core.converter.mapper.PropertyMapper;
 import com.buession.core.utils.Assert;
-import com.buession.logging.springboot.autoconfigure.LogProperties;
-import com.buession.logging.springboot.config.KafkaProperties;
+import com.buession.logging.kafka.ProducerFactoryCustomizer;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.kafka.DefaultKafkaProducerFactoryCustomizer;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
@@ -50,49 +44,39 @@ import org.springframework.kafka.support.converter.JsonMessageConverter;
  * @since 0.0.1
  */
 @Configuration(proxyBeanMethods = false)
-@EnableConfigurationProperties(LogProperties.class)
-@ConditionalOnProperty(prefix = KafkaProperties.PREFIX, name = "enabled", havingValue = "true")
-public class KafkaConfiguration {
+public abstract class AbstractKafkaConfiguration {
 
-	private final static PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
+	protected final static PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 
-	private final KafkaProperties properties;
-
-	public KafkaConfiguration(LogProperties logProperties) {
-		this.properties = logProperties.getKafka();
-	}
-
-	@Bean(name = "loggingKafkaProducerFactory")
-	@ConditionalOnMissingBean(name = "loggingKafkaProducerFactory")
-	public ProducerFactory<String, Object> producerFactory(
-			ObjectProvider<DefaultKafkaProducerFactoryCustomizer> customizers) {
-		Assert.isNull(properties.getBootstrapServers(), "Property 'bootstrapServers' is required");
+	@Bean
+	public ProducerFactory<String, Object> producerFactory(KafkaConfigurer configurer,
+														   ObjectProvider<ProducerFactoryCustomizer> producerFactoryCustomizers) {
+		Assert.isNull(configurer.getBootstrapServers(), "Property 'bootstrapServers' is required");
 
 		final DefaultKafkaProducerFactory<String, Object> producerFactory = new DefaultKafkaProducerFactory<>(
-				properties.buildProperties());
+				configurer.getConfigs());
 
-		propertyMapper.from(properties.getTransactionIdPrefix()).to(producerFactory::setTransactionIdPrefix);
-		customizers.orderedStream().forEach((customizer)->customizer.customize(producerFactory));
+		producerFactory.setTransactionIdPrefix(configurer.getTransactionIdPrefix());
+
+		producerFactoryCustomizers.orderedStream().forEach((customizer)->customizer.customize(producerFactory));
 
 		return producerFactory;
 	}
 
-	@Bean(name = "loggingKafkaProducerListener")
-	@ConditionalOnMissingBean(name = "loggingKafkaProducerListener")
+	@Bean
 	public LoggingProducerListener<String, Object> kafkaProducerListener() {
 		return new LoggingProducerListener<>();
 	}
 
-	@Bean(name = "loggingKafkaTemplate")
-	public KafkaTemplate<String, Object> kafkaTemplate(@Qualifier("loggingKafkaProducerFactory")
-													   ObjectProvider<ProducerFactory<String, Object>> producerFactory,
-													   @Qualifier("loggingKafkaProducerListener") ProducerListener<String, Object> kafkaProducerListener) {
-		final KafkaTemplate<String, Object> kafkaTemplate = new KafkaTemplate<>(producerFactory.getIfAvailable());
+	@Bean
+	public KafkaTemplate<String, Object> kafkaTemplate(KafkaConfigurer configurer,
+													   ProducerFactory<String, Object> producerFactory,
+													   ProducerListener<String, Object> kafkaProducerListener) {
+		final KafkaTemplate<String, Object> kafkaTemplate = new KafkaTemplate<>(producerFactory);
 
 		kafkaTemplate.setProducerListener(kafkaProducerListener);
 		kafkaTemplate.setMessageConverter(new JsonMessageConverter());
-		propertyMapper.from(properties::getTopic).to(kafkaTemplate::setDefaultTopic);
-		propertyMapper.from(properties::getTransactionIdPrefix).to(kafkaTemplate::setTransactionIdPrefix);
+		kafkaTemplate.setTransactionIdPrefix(configurer.getTransactionIdPrefix());
 
 		return kafkaTemplate;
 	}

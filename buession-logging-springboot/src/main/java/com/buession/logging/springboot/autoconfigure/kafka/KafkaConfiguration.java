@@ -24,32 +24,23 @@
  */
 package com.buession.logging.springboot.autoconfigure.kafka;
 
-import com.buession.core.utils.Assert;
-import com.buession.core.utils.StringUtils;
-import com.buession.core.validator.Validate;
 import com.buession.logging.core.handler.LogHandler;
-import com.buession.logging.kafka.core.Properties;
-import com.buession.logging.kafka.spring.KafkaLogHandlerFactoryBean;
-import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
+import com.buession.logging.kafka.ProducerFactoryCustomizer;
+import com.buession.logging.kafka.spring.config.AbstractKafkaConfiguration;
+import com.buession.logging.kafka.spring.config.KafkaConfigurer;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.KafkaProperties;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.LoggingProducerListener;
-import org.springframework.kafka.support.converter.JsonMessageConverter;
-import org.springframework.kafka.support.serializer.JsonSerializer;
-import org.springframework.util.unit.DataSize;
+import org.springframework.kafka.support.ProducerListener;
 
 /**
  * Kafka 日志处理器自动配置类
@@ -57,84 +48,53 @@ import org.springframework.util.unit.DataSize;
  * @author Yong.Teng
  * @since 0.0.1
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @EnableConfigurationProperties(LogProperties.class)
 @ConditionalOnMissingBean(LogHandler.class)
-@ConditionalOnClass({KafkaLogHandlerFactoryBean.class})
 @ConditionalOnProperty(prefix = KafkaProperties.PREFIX, name = "enabled", havingValue = "true")
-public class KafkaLogHandlerConfiguration extends AbstractLogHandlerConfiguration<KafkaProperties> {
+public class KafkaConfiguration extends AbstractKafkaConfiguration {
 
-	public KafkaLogHandlerConfiguration(LogProperties logProperties) {
-		super(logProperties.getKafka());
+	private final KafkaProperties properties;
+
+	public KafkaConfiguration(LogProperties logProperties) {
+		this.properties = logProperties.getKafka();
+	}
+
+	@Bean(name = "loggingKafkaConfigurer")
+	@ConditionalOnMissingBean(name = "loggingKafkaConfigurer")
+	public KafkaConfigurer kafkaConfigurer() {
+		final KafkaConfigurer configurer = new KafkaConfigurer();
+
+		configurer.setBootstrapServers(properties.getBootstrapServers());
+		configurer.setConfigs(properties.buildProperties());
+		configurer.setTransactionIdPrefix(properties.getTransactionIdPrefix());
+
+		return configurer;
 	}
 
 	@Bean(name = "loggingKafkaProducerFactory")
 	@ConditionalOnMissingBean(name = "loggingKafkaProducerFactory")
-	public ProducerFactory<String, Object> producerFactory() {
-		Assert.isNull(properties.getBootstrapServers(), "Property 'bootstrapServers' is required");
-
-		final Properties properties = new Properties();
-
-		propertyMapper.from(this.properties::getBootstrapServers)
-				.as((bootstrapServers)->StringUtils.join(bootstrapServers, ','))
-				.to(properties.in(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
-		propertyMapper.from(this.properties::getClientId).to(properties.in(ProducerConfig.CLIENT_ID_CONFIG));
-		propertyMapper.from(this.properties::getAcks).to(properties.in(ProducerConfig.ACKS_CONFIG));
-		propertyMapper.from(this.properties::getBatchSize).asInt(DataSize::toBytes)
-				.to(properties.in(ProducerConfig.BATCH_SIZE_CONFIG));
-		propertyMapper.from(this.properties::getBufferMemory).as(DataSize::toBytes)
-				.to(properties.in(ProducerConfig.BUFFER_MEMORY_CONFIG));
-		propertyMapper.from(this.properties::getCompressionType)
-				.to(properties.in(ProducerConfig.COMPRESSION_TYPE_CONFIG));
-		propertyMapper.from(this.properties::getRetries).to(properties.in(ProducerConfig.RETRIES_CONFIG));
-		propertyMapper.from(this.properties::getSslConfiguration)
-				.to(properties.in(ProducerConfig.TRANSACTIONAL_ID_CONFIG));
-		propertyMapper.from(StringSerializer.class.getName())
-				.to(properties.in(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG));
-		propertyMapper.from(JsonSerializer.class.getName())
-				.to(properties.in(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG));
-
-		if(this.properties.getSslConfiguration() != null){
-			properties.putAll(this.properties.getSslConfiguration().buildProperties());
-		}
-
-		if(this.properties.getSecurityConfiguration() != null){
-			properties.putAll(this.properties.getSecurityConfiguration().buildProperties());
-		}
-
-		if(Validate.isNotEmpty(this.properties.getProperties())){
-			properties.putAll(this.properties.getProperties());
-		}
-
-		final DefaultKafkaProducerFactory<String, Object> producerFactory = new DefaultKafkaProducerFactory<>(
-				properties);
-
-		propertyMapper.from(this.properties.getTransactionIdPrefix()).to(producerFactory::setTransactionIdPrefix);
-
-		return producerFactory;
+	@Override
+	public ProducerFactory<String, Object> producerFactory(
+			@Qualifier("loggingKafkaConfigurer") KafkaConfigurer configurer,
+			ObjectProvider<ProducerFactoryCustomizer> producerFactoryCustomizers) {
+		return super.producerFactory(configurer, producerFactoryCustomizers);
 	}
 
-	@Bean(name = "loggingKafkaKafkaTemplate")
-	public KafkaTemplate<String, Object> kafkaTemplate(@Qualifier("loggingKafkaProducerFactory")
-													   ObjectProvider<ProducerFactory<String, Object>> producerFactory) {
-		final KafkaTemplate<String, Object> kafkaTemplate = new KafkaTemplate<>(producerFactory.getIfAvailable());
-
-		kafkaTemplate.setProducerListener(new LoggingProducerListener<>());
-		kafkaTemplate.setMessageConverter(new JsonMessageConverter());
-
-		return kafkaTemplate;
+	@Bean(name = "loggingKafkaProducerListener")
+	@ConditionalOnMissingBean(name = "loggingKafkaProducerListener")
+	@Override
+	public LoggingProducerListener<String, Object> kafkaProducerListener() {
+		return super.kafkaProducerListener();
 	}
 
-	@Bean
-	public KafkaLogHandlerFactoryBean logHandlerFactoryBean(
-			@Qualifier("loggingKafkaKafkaTemplate") ObjectProvider<KafkaTemplate<String, Object>> kafkaTemplate) {
-		final KafkaLogHandlerFactoryBean logHandlerFactoryBean = new KafkaLogHandlerFactoryBean();
-
-		kafkaTemplate.ifAvailable(logHandlerFactoryBean::setKafkaTemplate);
-
-		logHandlerFactoryBean.setTopic(properties.getTopic());
-
-		return logHandlerFactoryBean;
+	@Bean(name = "loggingKafkaTemplate")
+	@Override
+	public KafkaTemplate<String, Object> kafkaTemplate(@Qualifier("loggingKafkaConfigurer") KafkaConfigurer configurer,
+													   @Qualifier("loggingKafkaProducerFactory")
+													   ProducerFactory<String, Object> producerFactory,
+													   @Qualifier("loggingKafkaProducerListener") ProducerListener<String, Object> kafkaProducerListener) {
+		return super.kafkaTemplate(configurer, producerFactory, kafkaProducerListener);
 	}
 
 }
