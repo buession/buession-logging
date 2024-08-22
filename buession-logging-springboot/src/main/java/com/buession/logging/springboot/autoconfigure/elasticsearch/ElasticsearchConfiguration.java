@@ -31,6 +31,7 @@ import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.elasticsearch.ElasticsearchCredentialsProvider;
 import com.buession.logging.elasticsearch.RestClientBuilderCustomizer;
 import com.buession.logging.elasticsearch.TransportOptionsCustomizer;
+import com.buession.logging.elasticsearch.spring.ElasticsearchLogHandlerFactoryBean;
 import com.buession.logging.elasticsearch.spring.config.AbstractElasticsearchConfiguration;
 import com.buession.logging.elasticsearch.spring.config.ElasticsearchConfigurer;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
@@ -47,6 +48,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -69,6 +71,7 @@ import java.time.Duration;
 @AutoConfiguration
 @EnableConfigurationProperties(LogProperties.class)
 @ConditionalOnMissingBean(LogHandler.class)
+@ConditionalOnClass({ElasticsearchLogHandlerFactoryBean.class})
 @ConditionalOnProperty(prefix = ElasticsearchProperties.PREFIX, name = "enabled", havingValue = "true")
 public class ElasticsearchConfiguration extends AbstractElasticsearchConfiguration {
 

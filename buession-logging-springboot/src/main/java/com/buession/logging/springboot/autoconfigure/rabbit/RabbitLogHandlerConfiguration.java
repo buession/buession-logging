@@ -52,10 +52,10 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "rabbit.enabled", havingValue = "true")
 public class RabbitLogHandlerConfiguration extends AbstractRabbitLogHandlerConfiguration {
 
-	private final RabbitProperties properties;
+	private final RabbitProperties rabbitProperties;
 
 	public RabbitLogHandlerConfiguration(LogProperties logProperties) {
-		this.properties = logProperties.getRabbit();
+		this.rabbitProperties = logProperties.getRabbit();
 	}
 
 	@Bean(name = "loggingRabbitLogHandlerFactoryBeanConfigurer")
@@ -63,8 +63,8 @@ public class RabbitLogHandlerConfiguration extends AbstractRabbitLogHandlerConfi
 	protected RabbitLogHandlerFactoryBeanConfigurer rabbitLogHandlerFactoryBeanConfigurer() {
 		final RabbitLogHandlerFactoryBeanConfigurer configurer = new RabbitLogHandlerFactoryBeanConfigurer();
 
-		configurer.setExchange(properties.getExchange());
-		configurer.setRoutingKey(properties.getRoutingKey());
+		configurer.setExchange(rabbitProperties.getExchange());
+		configurer.setRoutingKey(rabbitProperties.getRoutingKey());
 
 		return configurer;
 	}

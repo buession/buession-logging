@@ -52,10 +52,10 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnProperty(prefix = FileProperties.PREFIX, name = "enabled", havingValue = "true")
 public class FileLogHandlerConfiguration extends AbstractFileLogHandlerConfiguration {
 
-	private final FileProperties properties;
+	private final FileProperties fileProperties;
 
 	public FileLogHandlerConfiguration(LogProperties logProperties) {
-		this.properties = logProperties.getFile();
+		this.fileProperties = logProperties.getFile();
 	}
 
 	@Bean(name = "loggingFileLogHandlerFactoryBeanConfigurer")
@@ -63,13 +63,13 @@ public class FileLogHandlerConfiguration extends AbstractFileLogHandlerConfigura
 	public FileLogHandlerFactoryBeanConfigurer fileLogHandlerFactoryBeanConfigurer() {
 		final FileLogHandlerFactoryBeanConfigurer configurer = new FileLogHandlerFactoryBeanConfigurer();
 
-		configurer.setPath(properties.getPath());
-		propertyMapper.from(properties::getFormatter).as(BeanUtils::instantiateClass).to(configurer::setFormatter);
+		configurer.setPath(fileProperties.getPath());
+		propertyMapper.from(fileProperties::getFormatter).as(BeanUtils::instantiateClass).to(configurer::setFormatter);
 
 		return configurer;
 	}
 
-	@Bean(name = Constants.LOG_HANDLER_BEAN_NAME)
+	@Bean
 	@Override
 	public FileLogHandlerFactoryBean logHandlerFactoryBean(
 			@Qualifier("loggingFileLogHandlerFactoryBeanConfigurer") FileLogHandlerFactoryBeanConfigurer configurer) {

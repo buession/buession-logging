@@ -26,12 +26,14 @@ package com.buession.logging.springboot.autoconfigure.jdbc;
 
 import com.buession.jdbc.datasource.*;
 import com.buession.logging.core.handler.LogHandler;
+import com.buession.logging.jdbc.spring.JdbcLogHandlerFactoryBean;
 import com.buession.logging.jdbc.spring.config.AbstractJdbcConfiguration;
 import com.buession.logging.jdbc.spring.config.JdbcConfigurer;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.JdbcProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -49,13 +51,14 @@ import javax.sql.DataSource;
 @AutoConfiguration
 @EnableConfigurationProperties(LogProperties.class)
 @ConditionalOnMissingBean(LogHandler.class)
+@ConditionalOnClass({JdbcLogHandlerFactoryBean.class})
 @ConditionalOnProperty(prefix = JdbcProperties.PREFIX, name = "enabled", havingValue = "true")
 public class JdbcConfiguration extends AbstractJdbcConfiguration {
 
-	private final JdbcProperties properties;
+	private final JdbcProperties jdbcProperties;
 
 	public JdbcConfiguration(LogProperties logProperties) {
-		this.properties = logProperties.getJdbc();
+		this.jdbcProperties = logProperties.getJdbc();
 	}
 
 	@Bean(name = "loggingJdbcConfigurer")
@@ -63,24 +66,24 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
 	public JdbcConfigurer jdbcConfigurer() {
 		final JdbcConfigurer configurer = new JdbcConfigurer();
 
-		configurer.setDriverClassName(properties.getDriverClassName());
-		configurer.setUrl(properties.getUrl());
-		configurer.setUsername(properties.getUsername());
-		configurer.setPassword(properties.getPassword());
-		configurer.setInitSQL(properties.getInitSQL());
-		configurer.setConnectionProperties(properties.getConnectionProperties());
+		configurer.setDriverClassName(jdbcProperties.getDriverClassName());
+		configurer.setUrl(jdbcProperties.getUrl());
+		configurer.setUsername(jdbcProperties.getUsername());
+		configurer.setPassword(jdbcProperties.getPassword());
+		configurer.setInitSQL(jdbcProperties.getInitSQL());
+		configurer.setConnectionProperties(jdbcProperties.getConnectionProperties());
 
 		final Class<? extends com.buession.jdbc.datasource.DataSource<?, ?>> dataSourceType = getDataSourceType();
 		if(dataSourceType.isAssignableFrom(Dbcp2DataSource.class)){
-			configurer.setConfig(properties.getDbcp2());
+			configurer.setConfig(jdbcProperties.getDbcp2());
 		}else if(dataSourceType.isAssignableFrom(DruidDataSource.class)){
-			configurer.setConfig(properties.getDruid());
+			configurer.setConfig(jdbcProperties.getDruid());
 		}else if(dataSourceType.isAssignableFrom(HikariDataSource.class)){
-			configurer.setConfig(properties.getHikari());
+			configurer.setConfig(jdbcProperties.getHikari());
 		}else if(dataSourceType.isAssignableFrom(OracleDataSource.class)){
-			configurer.setConfig(properties.getOracle());
+			configurer.setConfig(jdbcProperties.getOracle());
 		}else if(dataSourceType.isAssignableFrom(TomcatDataSource.class)){
-			configurer.setConfig(properties.getTomcat());
+			configurer.setConfig(jdbcProperties.getTomcat());
 		}
 
 		return configurer;

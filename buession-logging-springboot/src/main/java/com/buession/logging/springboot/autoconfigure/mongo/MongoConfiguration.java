@@ -25,6 +25,7 @@
 package com.buession.logging.springboot.autoconfigure.mongo;
 
 import com.buession.logging.core.handler.LogHandler;
+import com.buession.logging.mongodb.spring.MongoLogHandlerFactoryBean;
 import com.buession.logging.mongodb.spring.config.AbstractMongoConfiguration;
 import com.buession.logging.mongodb.spring.config.MongoConfigurer;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
@@ -33,6 +34,7 @@ import com.mongodb.client.MongoClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -52,6 +54,7 @@ import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 @AutoConfiguration
 @EnableConfigurationProperties(LogProperties.class)
 @ConditionalOnMissingBean(LogHandler.class)
+@ConditionalOnClass({MongoLogHandlerFactoryBean.class})
 @ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "mongo.enabled", havingValue = "true")
 public class MongoConfiguration extends AbstractMongoConfiguration {
 

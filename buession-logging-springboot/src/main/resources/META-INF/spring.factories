@@ -1,11 +1,17 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.buession.logging.springboot.autoconfigure.console.ConsoleLogHandlerConfiguration, \
+  com.buession.logging.springboot.autoconfigure.elasticsearch.ElasticsearchConfiguration, \
   com.buession.logging.springboot.autoconfigure.elasticsearch.ElasticsearchLogHandlerConfiguration, \
   com.buession.logging.springboot.autoconfigure.file.FileLogHandlerConfiguration, \
+  com.buession.logging.springboot.autoconfigure.jdbc.JdbcConfiguration, \
   com.buession.logging.springboot.autoconfigure.jdbc.JdbcLogHandlerConfiguration, \
+  com.buession.logging.springboot.autoconfigure.kafka.KafkaConfiguration, \
   com.buession.logging.springboot.autoconfigure.kafka.KafkaLogHandlerConfiguration, \
+  com.buession.logging.springboot.autoconfigure.mongo.MongoConfiguration, \
   com.buession.logging.springboot.autoconfigure.mongo.MongoLogHandlerConfiguration, \
+  com.buession.logging.springboot.autoconfigure.rabbit.RabbitConfiguration, \
   com.buession.logging.springboot.autoconfigure.rabbit.RabbitLogHandlerConfiguration, \
+  com.buession.logging.springboot.autoconfigure.rest.HttpClientConfiguration, \
   com.buession.logging.springboot.autoconfigure.rest.RestLogHandlerConfiguration, \
   com.buession.logging.springboot.autoconfigure.LogConfiguration, \
   com.buession.logging.springboot.autoconfigure.AnnotationProcessorConfiguration

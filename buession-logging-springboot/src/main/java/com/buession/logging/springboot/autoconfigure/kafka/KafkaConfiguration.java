@@ -26,6 +26,7 @@ package com.buession.logging.springboot.autoconfigure.kafka;
 
 import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.kafka.ProducerFactoryCustomizer;
+import com.buession.logging.kafka.spring.KafkaLogHandlerFactoryBean;
 import com.buession.logging.kafka.spring.config.AbstractKafkaConfiguration;
 import com.buession.logging.kafka.spring.config.KafkaConfigurer;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
@@ -33,6 +34,7 @@ import com.buession.logging.springboot.config.KafkaProperties;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -51,13 +53,14 @@ import org.springframework.kafka.support.ProducerListener;
 @AutoConfiguration
 @EnableConfigurationProperties(LogProperties.class)
 @ConditionalOnMissingBean(LogHandler.class)
+@ConditionalOnClass({KafkaLogHandlerFactoryBean.class})
 @ConditionalOnProperty(prefix = KafkaProperties.PREFIX, name = "enabled", havingValue = "true")
 public class KafkaConfiguration extends AbstractKafkaConfiguration {
 
-	private final KafkaProperties properties;
+	private final KafkaProperties kafkaProperties;
 
 	public KafkaConfiguration(LogProperties logProperties) {
-		this.properties = logProperties.getKafka();
+		this.kafkaProperties = logProperties.getKafka();
 	}
 
 	@Bean(name = "loggingKafkaConfigurer")
@@ -65,9 +68,9 @@ public class KafkaConfiguration extends AbstractKafkaConfiguration {
 	public KafkaConfigurer kafkaConfigurer() {
 		final KafkaConfigurer configurer = new KafkaConfigurer();
 
-		configurer.setBootstrapServers(properties.getBootstrapServers());
-		configurer.setConfigs(properties.buildProperties());
-		configurer.setTransactionIdPrefix(properties.getTransactionIdPrefix());
+		configurer.setBootstrapServers(kafkaProperties.getBootstrapServers());
+		configurer.setConfigs(kafkaProperties.buildProperties());
+		configurer.setTransactionIdPrefix(kafkaProperties.getTransactionIdPrefix());
 
 		return configurer;
 	}

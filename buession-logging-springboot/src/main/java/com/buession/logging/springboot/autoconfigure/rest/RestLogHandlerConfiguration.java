@@ -55,10 +55,10 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "rest.enabled", havingValue = "true")
 public class RestLogHandlerConfiguration extends AbstractRestLogHandlerConfiguration {
 
-	private final RestProperties properties;
+	private final RestProperties restProperties;
 
 	public RestLogHandlerConfiguration(LogProperties logProperties) {
-		this.properties = logProperties.getRest();
+		this.restProperties = logProperties.getRest();
 	}
 
 	@Bean(name = "loggingRestLogHandlerFactoryBeanConfigurer")
@@ -66,9 +66,9 @@ public class RestLogHandlerConfiguration extends AbstractRestLogHandlerConfigura
 	public RestLogHandlerFactoryBeanConfigurer restLogHandlerFactoryBeanConfigurer() {
 		final RestLogHandlerFactoryBeanConfigurer configurer = new RestLogHandlerFactoryBeanConfigurer();
 
-		configurer.setUrl(properties.getUrl());
-		configurer.setRequestMethod(properties.getRequestMethod());
-		propertyMapper.from(properties::getRequestBodyBuilder).as(BeanUtils::instantiateClass)
+		configurer.setUrl(restProperties.getUrl());
+		configurer.setRequestMethod(restProperties.getRequestMethod());
+		propertyMapper.from(restProperties::getRequestBodyBuilder).as(BeanUtils::instantiateClass)
 				.to(configurer::setRequestBodyBuilder);
 
 		return configurer;

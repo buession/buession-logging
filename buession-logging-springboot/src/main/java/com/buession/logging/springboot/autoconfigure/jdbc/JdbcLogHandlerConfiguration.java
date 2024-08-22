@@ -53,10 +53,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @ConditionalOnProperty(prefix = JdbcProperties.PREFIX, name = "enabled", havingValue = "true")
 public class JdbcLogHandlerConfiguration extends AbstractJdbcLogHandlerConfiguration {
 
-	private final JdbcProperties properties;
+	private final JdbcProperties jdbcProperties;
 
 	public JdbcLogHandlerConfiguration(LogProperties logProperties) {
-		this.properties = logProperties.getJdbc();
+		this.jdbcProperties = logProperties.getJdbc();
 	}
 
 	@Bean(name = "loggingJdbcLogHandlerFactoryBeanConfigurer")
@@ -64,15 +64,15 @@ public class JdbcLogHandlerConfiguration extends AbstractJdbcLogHandlerConfigura
 	public JdbcLogHandlerFactoryBeanConfigurer jdbcLogHandlerFactoryBeanConfigurer() {
 		final JdbcLogHandlerFactoryBeanConfigurer configurer = new JdbcLogHandlerFactoryBeanConfigurer();
 
-		configurer.setSql(properties.getSql());
-		propertyMapper.from(properties::getIdGenerator).as(BeanUtils::instantiateClass)
+		configurer.setSql(jdbcProperties.getSql());
+		propertyMapper.from(jdbcProperties::getIdGenerator).as(BeanUtils::instantiateClass)
 				.to(configurer::setIdGenerator);
-		configurer.setDateTimeFormat(properties.getDateTimeFormat());
-		propertyMapper.from(properties::getRequestParametersFormatter).as(BeanUtils::instantiateClass)
+		configurer.setDateTimeFormat(jdbcProperties.getDateTimeFormat());
+		propertyMapper.from(jdbcProperties::getRequestParametersFormatter).as(BeanUtils::instantiateClass)
 				.to(configurer::setRequestParametersFormatter);
-		propertyMapper.from(properties::getExtraFormatter).as(BeanUtils::instantiateClass)
+		propertyMapper.from(jdbcProperties::getExtraFormatter).as(BeanUtils::instantiateClass)
 				.to(configurer::setExtraFormatter);
-		propertyMapper.from(properties.getDataConverter()).as(BeanUtils::instantiateClass)
+		propertyMapper.from(jdbcProperties.getDataConverter()).as(BeanUtils::instantiateClass)
 				.to(configurer::setDataConverter);
 
 		return configurer;

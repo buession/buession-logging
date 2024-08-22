@@ -51,10 +51,10 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 @ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "mongo.enabled", havingValue = "true")
 public class MongoLogHandlerConfiguration extends AbstractMongoLogHandlerConfiguration {
 
-	private final MongoProperties properties;
+	private final MongoProperties mongoProperties;
 
 	public MongoLogHandlerConfiguration(LogProperties logProperties) {
-		this.properties = logProperties.getMongo();
+		this.mongoProperties = logProperties.getMongo();
 	}
 
 	@Bean
@@ -66,7 +66,7 @@ public class MongoLogHandlerConfiguration extends AbstractMongoLogHandlerConfigu
 
 	@Override
 	protected String getCollectionName() {
-		return properties.getCollectionName();
+		return mongoProperties.getCollectionName();
 	}
 
 }

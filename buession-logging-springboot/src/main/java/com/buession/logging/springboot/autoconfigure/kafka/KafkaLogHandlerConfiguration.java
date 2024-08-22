@@ -51,10 +51,10 @@ import org.springframework.kafka.core.KafkaTemplate;
 @ConditionalOnProperty(prefix = KafkaProperties.PREFIX, name = "enabled", havingValue = "true")
 public class KafkaLogHandlerConfiguration extends AbstractKafkaLogHandlerConfiguration {
 
-	private final KafkaProperties properties;
+	private final KafkaProperties kafkaProperties;
 
 	public KafkaLogHandlerConfiguration(LogProperties logProperties) {
-		this.properties = logProperties.getKafka();
+		this.kafkaProperties = logProperties.getKafka();
 	}
 
 	@Bean
@@ -66,7 +66,7 @@ public class KafkaLogHandlerConfiguration extends AbstractKafkaLogHandlerConfigu
 
 	@Override
 	protected String getTopic() {
-		return properties.getTopic();
+		return kafkaProperties.getTopic();
 	}
 
 }
