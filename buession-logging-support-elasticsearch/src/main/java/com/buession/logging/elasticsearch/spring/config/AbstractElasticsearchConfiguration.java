@@ -62,10 +62,10 @@ public abstract class AbstractElasticsearchConfiguration extends ElasticsearchCo
 
 	@Bean
 	public RestClient restClient(ElasticsearchConfigurer configurer,
-								 ObjectProvider<RestClientBuilderCustomizer> builderCustomizers) {
+								 ObjectProvider<RestClientBuilderCustomizer> restClientBuilderCustomizer) {
 		Assert.isEmpty(configurer.getUrls(), "Property 'urls' is required");
 
-		final RestClientBuilder restClientBuilder = createRestClientBuilder(configurer, builderCustomizers);
+		final RestClientBuilder restClientBuilder = createRestClientBuilder(configurer, restClientBuilderCustomizer);
 		return restClientBuilder.build();
 	}
 
@@ -95,7 +95,7 @@ public abstract class AbstractElasticsearchConfiguration extends ElasticsearchCo
 	}
 
 	private RestClientBuilder createRestClientBuilder(final ElasticsearchConfigurer configurer,
-													  final ObjectProvider<RestClientBuilderCustomizer> builderCustomizers) {
+													  final ObjectProvider<RestClientBuilderCustomizer> restClientBuilderCustomizer) {
 		final Node[] nodes = configurer.getUrls()
 				.stream()
 				.map((url)->new Node(this.createHttpHost(url)))
@@ -103,18 +103,19 @@ public abstract class AbstractElasticsearchConfiguration extends ElasticsearchCo
 		final RestClientBuilder builder = RestClient.builder(nodes);
 
 		builder.setHttpClientConfigCallback((httpClientBuilder)->{
-			builderCustomizers.orderedStream().forEach((customizer)->customizer.customize(httpClientBuilder));
+			restClientBuilderCustomizer.orderedStream().forEach((customizer)->customizer.customize(httpClientBuilder));
 			return httpClientBuilder;
 		});
 
 		builder.setRequestConfigCallback((requestConfigBuilder)->{
-			builderCustomizers.orderedStream().forEach((customizer)->customizer.customize(requestConfigBuilder));
+			restClientBuilderCustomizer.orderedStream()
+					.forEach((customizer)->customizer.customize(requestConfigBuilder));
 			return requestConfigBuilder;
 		});
 
 		propertyMapper.from(configurer::getPathPrefix).to(builder::setPathPrefix);
 
-		builderCustomizers.orderedStream().forEach((customizer)->customizer.customize(builder));
+		restClientBuilderCustomizer.orderedStream().forEach((customizer)->customizer.customize(builder));
 
 		return builder;
 	}

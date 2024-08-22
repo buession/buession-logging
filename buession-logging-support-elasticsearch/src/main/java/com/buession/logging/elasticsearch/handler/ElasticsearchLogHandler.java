@@ -24,12 +24,11 @@
  */
 package com.buession.logging.elasticsearch.handler;
 
-;
 import com.buession.core.utils.Assert;
 import com.buession.lang.Status;
 import com.buession.logging.core.LogData;
 import com.buession.logging.core.handler.AbstractLogHandler;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.IndexOperations;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 
@@ -42,36 +41,78 @@ import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 public class ElasticsearchLogHandler extends AbstractLogHandler {
 
 	/**
-	 * {@link ElasticsearchOperations}
+	 * {@link ElasticsearchTemplate}
+	 *
+	 * @since 1.0.0
 	 */
-	private final ElasticsearchOperations elasticsearchOperations;
+	private final ElasticsearchTemplate elasticsearchTemplate;
+
+	/**
+	 * 是否自动创建索引
+	 *
+	 * @since 1.0.0
+	 */
+	private boolean autoCreateIndex = true;
 
 	private final IndexOperations indexOperations;
 
 	private final IndexCoordinates indexCoordinates;
 
+	private boolean initialized = false;
+
 	/**
 	 * 构造函数
 	 *
-	 * @param elasticsearchOperations
-	 *        {@link ElasticsearchOperations}
+	 * @param elasticsearchTemplate
+	 *        {@link ElasticsearchTemplate}
 	 * @param indexName
 	 * 		索引名称
 	 */
-	public ElasticsearchLogHandler(final ElasticsearchOperations elasticsearchOperations, final String indexName) {
-		Assert.isNull(elasticsearchOperations, "ElasticsearchOperations cloud not be null.");
+	public ElasticsearchLogHandler(final ElasticsearchTemplate elasticsearchTemplate, final String indexName) {
+		Assert.isNull(elasticsearchTemplate, "ElasticsearchTemplate cloud not be null.");
 		Assert.isNull(indexName, "Index name cloud not be blank, empty or null.");
 
-		this.elasticsearchOperations = elasticsearchOperations;
+		this.elasticsearchTemplate = elasticsearchTemplate;
 		this.indexCoordinates = IndexCoordinates.of(indexName);
-		this.indexOperations = elasticsearchOperations.indexOps(this.indexCoordinates);
+		this.indexOperations = elasticsearchTemplate.indexOps(this.indexCoordinates);
+	}
 
-		createIndex();
+	/**
+	 * 返回是否自动创建索引
+	 *
+	 * @return 是否自动创建索引
+	 *
+	 * @since 1.0.0
+	 */
+	public boolean isAutoCreateIndex() {
+		return autoCreateIndex;
+	}
+
+	/**
+	 * 设置是否自动创建索引
+	 *
+	 * @param autoCreateIndex
+	 * 		是否自动创建索引
+	 *
+	 * @since 1.0.0
+	 */
+	public void setAutoCreateIndex(boolean autoCreateIndex) {
+		this.autoCreateIndex = autoCreateIndex;
 	}
 
 	@Override
 	protected Status doHandle(final LogData logData) throws Exception {
-		elasticsearchOperations.save(logData, indexCoordinates);
+		if(initialized == false){
+			synchronized(this){
+				if(initialized == false){
+					if(autoCreateIndex){
+						createIndex();
+					}
+					initialized = true;
+				}
+			}
+		}
+		elasticsearchTemplate.save(logData, indexCoordinates);
 		return Status.SUCCESS;
 	}
 

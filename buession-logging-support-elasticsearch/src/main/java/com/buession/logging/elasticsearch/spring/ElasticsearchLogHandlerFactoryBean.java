@@ -48,6 +48,13 @@ public class ElasticsearchLogHandlerFactoryBean extends BaseLogHandlerFactoryBea
 	private String indexName;
 
 	/**
+	 * 是否自动创建索引
+	 *
+	 * @since 1.0.0
+	 */
+	private Boolean autoCreateIndex = true;
+
+	/**
 	 * 返回 {@link ElasticsearchTemplate}
 	 *
 	 * @return {@link ElasticsearchTemplate}
@@ -85,6 +92,40 @@ public class ElasticsearchLogHandlerFactoryBean extends BaseLogHandlerFactoryBea
 		this.indexName = indexName;
 	}
 
+	/**
+	 * 返回是否自动创建索引
+	 *
+	 * @return 是否自动创建索引
+	 *
+	 * @since 1.0.0
+	 */
+	public Boolean isAutoCreateIndex() {
+		return getAutoCreateIndex();
+	}
+
+	/**
+	 * 返回是否自动创建索引
+	 *
+	 * @return 是否自动创建索引
+	 *
+	 * @since 1.0.0
+	 */
+	public Boolean getAutoCreateIndex() {
+		return autoCreateIndex;
+	}
+
+	/**
+	 * 设置是否自动创建索引
+	 *
+	 * @param autoCreateIndex
+	 * 		是否自动创建索引
+	 *
+	 * @since 1.0.0
+	 */
+	public void setAutoCreateIndex(Boolean autoCreateIndex) {
+		this.autoCreateIndex = autoCreateIndex;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.isNull(getElasticsearchTemplate(), "Property 'elasticsearchTemplate' is required");
@@ -92,6 +133,9 @@ public class ElasticsearchLogHandlerFactoryBean extends BaseLogHandlerFactoryBea
 
 		if(logHandler == null){
 			logHandler = new ElasticsearchLogHandler(getElasticsearchTemplate(), getIndexName());
+			if(autoCreateIndex){
+				logHandler.setAutoCreateIndex(autoCreateIndex);
+			}
 		}
 	}
 

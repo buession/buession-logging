@@ -103,6 +103,13 @@ public class ElasticsearchProperties implements AdapterProperties, Serializable 
 	private String indexName;
 
 	/**
+	 * 是否自动创建索引
+	 *
+	 * @since 1.0.0
+	 */
+	private Boolean autoCreateIndex;
+
+	/**
 	 * JSONP Mapper {@link JsonpMapper}
 	 *
 	 * @since 1.0.0
@@ -304,6 +311,34 @@ public class ElasticsearchProperties implements AdapterProperties, Serializable 
 	 */
 	public void setIndexName(String indexName) {
 		this.indexName = indexName;
+	}
+
+	/**
+	 * 返回是否自动创建索引
+	 *
+	 * @return 是否自动创建索引
+	 */
+	public Boolean isAutoCreateIndex() {
+		return getAutoCreateIndex();
+	}
+
+	/**
+	 * 返回是否自动创建索引
+	 *
+	 * @return 是否自动创建索引
+	 */
+	public Boolean getAutoCreateIndex() {
+		return autoCreateIndex;
+	}
+
+	/**
+	 * 设置是否自动创建索引
+	 *
+	 * @param autoCreateIndex
+	 * 		是否自动创建索引
+	 */
+	public void setAutoCreateIndex(Boolean autoCreateIndex) {
+		this.autoCreateIndex = autoCreateIndex;
 	}
 
 	/**

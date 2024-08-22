@@ -27,7 +27,7 @@ package com.buession.logging.springboot.autoconfigure.elasticsearch;
 import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.elasticsearch.spring.ElasticsearchLogHandlerFactoryBean;
 import com.buession.logging.elasticsearch.spring.config.AbstractElasticsearchLogHandlerConfiguration;
-import com.buession.logging.springboot.Constants;
+import com.buession.logging.elasticsearch.spring.config.ElasticsearchLogHandlerFactoryBeanConfigurer;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.ElasticsearchProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -52,22 +52,29 @@ import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 @ConditionalOnProperty(prefix = ElasticsearchProperties.PREFIX, name = "enabled", havingValue = "true")
 public class ElasticsearchLogHandlerConfiguration extends AbstractElasticsearchLogHandlerConfiguration {
 
-	private final ElasticsearchProperties properties;
+	private final ElasticsearchProperties elasticsearchProperties;
 
 	public ElasticsearchLogHandlerConfiguration(LogProperties logProperties) {
-		this.properties = logProperties.getElasticsearch();
+		this.elasticsearchProperties = logProperties.getElasticsearch();
 	}
 
-	@Bean(name = Constants.LOG_HANDLER_BEAN_NAME)
+	@Bean(name = "loggingElasticsearchLogHandlerFactoryBeanConfigurer")
+	@ConditionalOnMissingBean(name = "loggingElasticsearchLogHandlerFactoryBeanConfigurer")
+	public ElasticsearchLogHandlerFactoryBeanConfigurer elasticsearchLogHandlerFactoryBeanConfigurer() {
+		final ElasticsearchLogHandlerFactoryBeanConfigurer configurer = new ElasticsearchLogHandlerFactoryBeanConfigurer();
+
+		configurer.setIndexName(elasticsearchProperties.getIndexName());
+		configurer.setAutoCreateIndex(elasticsearchProperties.getAutoCreateIndex());
+
+		return configurer;
+	}
+
+	@Bean
 	@Override
 	public ElasticsearchLogHandlerFactoryBean logHandlerFactoryBean(
-			@Qualifier("loggingElasticsearchTemplate") ElasticsearchTemplate elasticsearchTemplate) {
-		return super.logHandlerFactoryBean(elasticsearchTemplate);
-	}
-
-	@Override
-	protected String getIndexName() {
-		return properties.getIndexName();
+			@Qualifier("loggingElasticsearchTemplate") ElasticsearchTemplate elasticsearchTemplate,
+			@Qualifier("loggingElasticsearchLogHandlerFactoryBeanConfigurer") ElasticsearchLogHandlerFactoryBeanConfigurer configurer) {
+		return super.logHandlerFactoryBean(elasticsearchTemplate, configurer);
 	}
 
 }

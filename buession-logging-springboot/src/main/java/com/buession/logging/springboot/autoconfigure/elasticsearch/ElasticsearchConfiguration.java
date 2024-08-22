@@ -72,10 +72,10 @@ import java.time.Duration;
 @ConditionalOnProperty(prefix = ElasticsearchProperties.PREFIX, name = "enabled", havingValue = "true")
 public class ElasticsearchConfiguration extends AbstractElasticsearchConfiguration {
 
-	private final ElasticsearchProperties properties;
+	private final ElasticsearchProperties elasticsearchProperties;
 
 	public ElasticsearchConfiguration(LogProperties logProperties) {
-		this.properties = logProperties.getElasticsearch();
+		this.elasticsearchProperties = logProperties.getElasticsearch();
 	}
 
 	@Bean(name = "loggingElasticsearchConfigurer")
@@ -83,11 +83,11 @@ public class ElasticsearchConfiguration extends AbstractElasticsearchConfigurati
 	public ElasticsearchConfigurer elasticsearchConfigurer() {
 		final ElasticsearchConfigurer configurer = new ElasticsearchConfigurer();
 
-		configurer.setUrls(properties.getUrls());
-		configurer.setPathPrefix(properties.getPathPrefix());
-		configurer.setHeaders(properties.getHeaders());
-		configurer.setParameters(properties.getParameters());
-		propertyMapper.from(properties::getEntityCallbacks).as(BeanUtils::instantiateClass)
+		configurer.setUrls(elasticsearchProperties.getUrls());
+		configurer.setPathPrefix(elasticsearchProperties.getPathPrefix());
+		configurer.setHeaders(elasticsearchProperties.getHeaders());
+		configurer.setParameters(elasticsearchProperties.getParameters());
+		propertyMapper.from(elasticsearchProperties::getEntityCallbacks).as(BeanUtils::instantiateClass)
 				.to(configurer::setEntityCallbacks);
 
 		return configurer;
@@ -121,15 +121,15 @@ public class ElasticsearchConfiguration extends AbstractElasticsearchConfigurati
 	@ConditionalOnMissingBean(name = "loggingElasticsearchRestClientBuilderCustomizer")
 	@Override
 	public RestClientBuilderCustomizer restClientBuilderCustomizer() {
-		return new DefaultRestClientBuilderCustomizer(properties);
+		return new DefaultRestClientBuilderCustomizer(elasticsearchProperties);
 	}
 
 	@Bean(name = "loggingElasticsearchRestClient")
 	@ConditionalOnMissingBean(name = "loggingElasticsearchRestClient")
 	@Override
 	public RestClient restClient(@Qualifier("loggingElasticsearchConfigurer") ElasticsearchConfigurer configurer,
-								 @Qualifier("loggingElasticsearchRestClientBuilderCustomizer") ObjectProvider<RestClientBuilderCustomizer> builderCustomizers) {
-		return super.restClient(configurer, builderCustomizers);
+								 @Qualifier("loggingElasticsearchRestClientBuilderCustomizer") ObjectProvider<RestClientBuilderCustomizer> restClientBuilderCustomizer) {
+		return super.restClient(configurer, restClientBuilderCustomizer);
 	}
 
 	@Bean(name = "loggingElasticsearchClient")
@@ -152,7 +152,7 @@ public class ElasticsearchConfiguration extends AbstractElasticsearchConfigurati
 
 	@Override
 	protected RefreshPolicy refreshPolicy() {
-		return properties.getRefreshPolicy();
+		return elasticsearchProperties.getRefreshPolicy();
 	}
 
 	static class DefaultRestClientBuilderCustomizer implements RestClientBuilderCustomizer,
@@ -160,10 +160,10 @@ public class ElasticsearchConfiguration extends AbstractElasticsearchConfigurati
 
 		private final static PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 
-		private final ElasticsearchProperties properties;
+		private final ElasticsearchProperties elasticsearchProperties;
 
-		DefaultRestClientBuilderCustomizer(ElasticsearchProperties properties) {
-			this.properties = properties;
+		DefaultRestClientBuilderCustomizer(ElasticsearchProperties elasticsearchProperties) {
+			this.elasticsearchProperties = elasticsearchProperties;
 		}
 
 		@Override
@@ -173,11 +173,11 @@ public class ElasticsearchConfiguration extends AbstractElasticsearchConfigurati
 		@Override
 		public void customize(HttpAsyncClientBuilder builder) {
 			final CredentialsProvider credentialsProvider = new ElasticsearchCredentialsProvider(
-					properties.getUsername(), properties.getPassword());
+					elasticsearchProperties.getUsername(), elasticsearchProperties.getPassword());
 
 			builder.setDefaultCredentialsProvider(credentialsProvider);
 
-			properties.getUrls()
+			elasticsearchProperties.getUrls()
 					.stream()
 					.map(this::toUri)
 					.filter(this::hasUserInfo)
@@ -186,9 +186,10 @@ public class ElasticsearchConfiguration extends AbstractElasticsearchConfigurati
 
 		@Override
 		public void customize(RequestConfig.Builder builder) {
-			propertyMapper.from(properties::getConnectionTimeout).asInt(Duration::toMillis)
+			propertyMapper.from(elasticsearchProperties::getConnectionTimeout).asInt(Duration::toMillis)
 					.to(builder::setConnectTimeout);
-			propertyMapper.from(properties::getReadTimeout).asInt(Duration::toMillis).to(builder::setSocketTimeout);
+			propertyMapper.from(elasticsearchProperties::getReadTimeout).asInt(Duration::toMillis)
+					.to(builder::setSocketTimeout);
 		}
 
 		private URI toUri(final String uri) {

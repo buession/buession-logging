@@ -25,30 +25,70 @@
 package com.buession.logging.elasticsearch.spring.config;
 
 import com.buession.logging.elasticsearch.spring.ElasticsearchLogHandlerFactoryBean;
-import com.buession.logging.support.config.AbstractLogHandlerConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 
 /**
- * Elasticsearch 日志处理器自动配置类
+ * Configures {@link ElasticsearchLogHandlerFactoryBean} with sensible defaults.
  *
  * @author Yong.Teng
- * @since 0.0.1
+ * @since 1.0.0
  */
-@Configuration(proxyBeanMethods = false)
-public abstract class AbstractElasticsearchLogHandlerConfiguration extends AbstractLogHandlerConfiguration {
+public class ElasticsearchLogHandlerFactoryBeanConfigurer {
 
-	@Bean
-	public ElasticsearchLogHandlerFactoryBean logHandlerFactoryBean(ElasticsearchTemplate elasticsearchTemplate,
-																	ElasticsearchLogHandlerFactoryBeanConfigurer configurer) {
-		final ElasticsearchLogHandlerFactoryBean logHandlerFactoryBean = new ElasticsearchLogHandlerFactoryBean();
+	/**
+	 * 索引名称
+	 */
+	private String indexName;
 
-		logHandlerFactoryBean.setElasticsearchTemplate(elasticsearchTemplate);
-		propertyMapper.from(configurer.getIndexName()).to(logHandlerFactoryBean::setIndexName);
-		propertyMapper.from(configurer.getAutoCreateIndex()).to(logHandlerFactoryBean::setAutoCreateIndex);
+	/**
+	 * 是否自动创建索引
+	 */
+	private Boolean autoCreateIndex;
 
-		return logHandlerFactoryBean;
+	/**
+	 * 返回索引名称
+	 *
+	 * @return 索引名称
+	 */
+	public String getIndexName() {
+		return indexName;
+	}
+
+	/**
+	 * 设置索引名称
+	 *
+	 * @param indexName
+	 * 		索引名称
+	 */
+	public void setIndexName(String indexName) {
+		this.indexName = indexName;
+	}
+
+	/**
+	 * 返回是否自动创建索引
+	 *
+	 * @return 是否自动创建索引
+	 */
+	public Boolean isAutoCreateIndex() {
+		return getAutoCreateIndex();
+	}
+
+	/**
+	 * 返回是否自动创建索引
+	 *
+	 * @return 是否自动创建索引
+	 */
+	public Boolean getAutoCreateIndex() {
+		return autoCreateIndex;
+	}
+
+	/**
+	 * 设置是否自动创建索引
+	 *
+	 * @param autoCreateIndex
+	 * 		是否自动创建索引
+	 */
+	public void setAutoCreateIndex(Boolean autoCreateIndex) {
+		this.autoCreateIndex = autoCreateIndex;
 	}
 
 }
