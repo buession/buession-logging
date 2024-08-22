@@ -22,14 +22,16 @@
  * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.springboot.autoconfigure.console;
+package com.buession.logging.springboot.autoconfigure.rest;
 
-import com.buession.logging.console.spring.ConsoleLogHandlerFactoryBean;
-import com.buession.logging.console.spring.config.AbstractConsoleLogHandlerConfiguration;
-import com.buession.logging.console.spring.config.ConsoleLogHandlerFactoryBeanConfigurer;
+import com.buession.httpclient.HttpClient;
 import com.buession.logging.core.handler.LogHandler;
+import com.buession.logging.rest.spring.RestLogHandlerFactoryBean;
+import com.buession.logging.rest.spring.config.AbstractRestLogHandlerConfiguration;
+import com.buession.logging.rest.spring.config.RestLogHandlerFactoryBeanConfigurer;
+import com.buession.logging.springboot.Constants;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
-import com.buession.logging.springboot.config.ConsoleProperties;
+import com.buession.logging.springboot.config.RestProperties;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -40,41 +42,43 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 
 /**
- * 文件日志处理器自动配置类
+ * Rest 日志处理器自动配置类
  *
  * @author Yong.Teng
- * @since 0.0.4
+ * @since 0.0.1
  */
 @AutoConfiguration
 @EnableConfigurationProperties(LogProperties.class)
 @ConditionalOnMissingBean(LogHandler.class)
-@ConditionalOnClass({ConsoleLogHandlerFactoryBean.class})
-@ConditionalOnProperty(prefix = ConsoleProperties.PREFIX, name = "enabled", havingValue = "true")
-public class ConsoleLogHandlerConfiguration extends AbstractConsoleLogHandlerConfiguration {
+@ConditionalOnClass({RestLogHandlerFactoryBean.class})
+@ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "rest.enabled", havingValue = "true")
+public class RestLogHandlerConfiguration extends AbstractRestLogHandlerConfiguration {
 
-	private final ConsoleProperties consoleProperties;
+	private final RestProperties properties;
 
-	public ConsoleLogHandlerConfiguration(LogProperties logProperties) {
-		this.consoleProperties = logProperties.getConsole();
+	public RestLogHandlerConfiguration(LogProperties logProperties) {
+		this.properties = logProperties.getRest();
 	}
 
-	@Bean(name = "loggingConsoleLogHandlerFactoryBeanConfigurer")
-	@ConditionalOnMissingBean(name = "loggingConsoleLogHandlerFactoryBeanConfigurer")
-	public ConsoleLogHandlerFactoryBeanConfigurer consoleLogHandlerFactoryBeanConfigurer() {
-		final ConsoleLogHandlerFactoryBeanConfigurer configurer = new ConsoleLogHandlerFactoryBeanConfigurer();
+	@Bean(name = "loggingRestLogHandlerFactoryBeanConfigurer")
+	@ConditionalOnMissingBean(name = "loggingRestLogHandlerFactoryBeanConfigurer")
+	public RestLogHandlerFactoryBeanConfigurer restLogHandlerFactoryBeanConfigurer() {
+		final RestLogHandlerFactoryBeanConfigurer configurer = new RestLogHandlerFactoryBeanConfigurer();
 
-		configurer.setTemplate(consoleProperties.getTemplate());
-		propertyMapper.from(consoleProperties::getFormatter).as(BeanUtils::instantiateClass)
-				.to(configurer::setFormatter);
+		configurer.setUrl(properties.getUrl());
+		configurer.setRequestMethod(properties.getRequestMethod());
+		propertyMapper.from(properties::getRequestBodyBuilder).as(BeanUtils::instantiateClass)
+				.to(configurer::setRequestBodyBuilder);
 
 		return configurer;
 	}
 
-	@Bean
+	@Bean(name = Constants.LOG_HANDLER_BEAN_NAME)
 	@Override
-	public ConsoleLogHandlerFactoryBean logHandlerFactoryBean(
-			@Qualifier("loggingConsoleLogHandlerFactoryBeanConfigurer") ConsoleLogHandlerFactoryBeanConfigurer configurer) {
-		return super.logHandlerFactoryBean(configurer);
+	public RestLogHandlerFactoryBean logHandlerFactoryBean(
+			@Qualifier("loggingRestLogHandlerFactoryBeanConfigurer") RestLogHandlerFactoryBeanConfigurer configurer,
+			HttpClient httpClient) {
+		return super.logHandlerFactoryBean(configurer, httpClient);
 	}
 
 }
