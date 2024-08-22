@@ -28,7 +28,6 @@ import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.jdbc.spring.JdbcLogHandlerFactoryBean;
 import com.buession.logging.jdbc.spring.config.AbstractJdbcLogHandlerConfiguration;
 import com.buession.logging.jdbc.spring.config.JdbcLogHandlerFactoryBeanConfigurer;
-import com.buession.logging.springboot.Constants;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.JdbcProperties;
 import org.springframework.beans.BeanUtils;
@@ -79,7 +78,7 @@ public class JdbcLogHandlerConfiguration extends AbstractJdbcLogHandlerConfigura
 		return configurer;
 	}
 
-	@Bean(name = Constants.LOG_HANDLER_BEAN_NAME)
+	@Bean
 	@Override
 	public JdbcLogHandlerFactoryBean logHandlerFactoryBean(
 			@Qualifier("loggingJdbcLogHandlerFactoryBeanConfigurer") JdbcLogHandlerFactoryBeanConfigurer configurer,

@@ -24,9 +24,8 @@
  */
 package com.buession.logging.jdbc.spring.config;
 
-import com.buession.core.converter.mapper.PropertyMapper;
-import com.buession.core.utils.Assert;
 import com.buession.logging.jdbc.spring.JdbcLogHandlerFactoryBean;
+import com.buession.logging.support.config.AbstractLogHandlerConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -38,15 +37,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * @since 0.0.1
  */
 @Configuration(proxyBeanMethods = false)
-public abstract class AbstractJdbcLogHandlerConfiguration {
-
-	protected final static PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
+public abstract class AbstractJdbcLogHandlerConfiguration extends AbstractLogHandlerConfiguration {
 
 	@Bean
 	public JdbcLogHandlerFactoryBean logHandlerFactoryBean(JdbcLogHandlerFactoryBeanConfigurer configurer,
 														   JdbcTemplate jdbcTemplate) {
-		Assert.isBlank(configurer.getSql(), "Property 'sql' is required");
-
 		final JdbcLogHandlerFactoryBean logHandlerFactoryBean = new JdbcLogHandlerFactoryBean();
 
 		logHandlerFactoryBean.setJdbcTemplate(jdbcTemplate);
