@@ -24,6 +24,7 @@
  */
 package com.buession.logging.rabbitmq.support;
 
+import com.buession.core.Configurer;
 import com.buession.core.Customizer;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.AbstractMessageListenerContainer;
@@ -35,7 +36,7 @@ import org.springframework.retry.support.RetryTemplate;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public interface RabbitRetryTemplateCustomizer extends Customizer<RabbitRetryTemplateCustomizer.Target, RetryTemplate> {
+public interface RabbitRetryTemplateCustomizer extends Configurer<RabbitRetryTemplateCustomizer.Target, RetryTemplate> {
 
 	enum Target {
 

@@ -25,17 +25,13 @@
 package com.buession.logging.rest.spring;
 
 import com.buession.core.utils.Assert;
+import com.buession.httpclient.HttpAsyncClient;
 import com.buession.httpclient.HttpClient;;
 import com.buession.logging.core.RequestMethod;
 import com.buession.logging.rest.core.JsonRequestBodyBuilder;
 import com.buession.logging.rest.core.RequestBodyBuilder;
 import com.buession.logging.rest.handler.RestLogHandler;
 import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
-import org.springframework.beans.BeanUtils;
-import org.springframework.util.ClassUtils;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Rest 日志处理器 {@link RestLogHandler} 工厂 Bean 基类
@@ -45,11 +41,19 @@ import java.util.Map;
  */
 public class RestLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<RestLogHandler> {
 
-	private static final Map<String, String> NATIVE_HTTPCLIENT_TYPES = new LinkedHashMap<>();
+	/**
+	 * {@link HttpClient}
+	 *
+	 * @since 1.0.0
+	 */
+	private HttpClient httpClient;
 
-	private ClassLoader classLoader;
-
-	private Class<? extends HttpClient> httpClientType;
+	/**
+	 * {@link HttpAsyncClient}
+	 *
+	 * @since 1.0.0
+	 */
+	private HttpAsyncClient httpAsyncClient;
 
 	/**
 	 * Rest Url
@@ -66,17 +70,50 @@ public class RestLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<RestLog
 	 */
 	private RequestBodyBuilder requestBodyBuilder = new JsonRequestBodyBuilder();
 
-	static {
-		NATIVE_HTTPCLIENT_TYPES.put("org.apache.http.client.HttpClient", "com.buession.httpclient.ApacheHttpClient");
-		NATIVE_HTTPCLIENT_TYPES.put("okhttp3.OkHttpClient", "com.buession.httpclient.OkHttpHttpClient");
+	/**
+	 * 访问 {@link HttpClient}
+	 *
+	 * @return {@link HttpClient}
+	 *
+	 * @since 1.0.0
+	 */
+	public HttpClient getHttpClient() {
+		return httpClient;
 	}
 
-	public ClassLoader getClassLoader() {
-		return classLoader;
+	/**
+	 * 设置 {@link HttpClient}
+	 *
+	 * @param httpClient
+	 *        {@link HttpClient}
+	 *
+	 * @since 1.0.0
+	 */
+	public void setHttpClient(HttpClient httpClient) {
+		this.httpClient = httpClient;
 	}
 
-	public void setClassLoader(ClassLoader classLoader) {
-		this.classLoader = classLoader;
+	/**
+	 * 返回 {@link HttpAsyncClient}
+	 *
+	 * @return {@link HttpAsyncClient}
+	 *
+	 * @since 1.0.0
+	 */
+	public HttpAsyncClient getHttpAsyncClient() {
+		return httpAsyncClient;
+	}
+
+	/**
+	 * 设置 {@link HttpAsyncClient}
+	 *
+	 * @param httpAsyncClient
+	 *        {@link HttpAsyncClient}
+	 *
+	 * @since 1.0.0
+	 */
+	public void setHttpAsyncClient(HttpAsyncClient httpAsyncClient) {
+		this.httpAsyncClient = httpAsyncClient;
 	}
 
 	/**
@@ -139,36 +176,22 @@ public class RestLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<RestLog
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.isBlank(getUrl(), "Property 'url' is required");
+		Assert.isTrue(getHttpClient() == null && getHttpAsyncClient() == null,
+				"Property 'httpClient' or 'httpAsyncClient' is required");
 
 		if(logHandler == null){
-			final Class<? extends HttpClient> httpClientType = findHttpClientType();
-			final HttpClient httpClient = BeanUtils.instantiateClass(httpClientType);
-
-			logHandler = new RestLogHandler(httpClient, getUrl(), getRequestMethod());
+			if(getHttpAsyncClient() != null){
+				logHandler = getRequestMethod() == null ? new RestLogHandler(getHttpAsyncClient(), getUrl()) :
+						new RestLogHandler(getHttpAsyncClient(), getUrl(), getRequestMethod());
+			}else{
+				logHandler = getRequestMethod() == null ? new RestLogHandler(getHttpClient(), getUrl()) :
+						new RestLogHandler(getHttpClient(), getUrl(), getRequestMethod());
+			}
 
 			if(getRequestBodyBuilder() != null){
 				logHandler.setRequestBodyBuilder(getRequestBodyBuilder());
 			}
 		}
-	}
-
-	@SuppressWarnings({"unchecked"})
-	private Class<? extends HttpClient> findHttpClientType() {
-		if(this.httpClientType != null){
-			return this.httpClientType;
-		}
-
-		for(Map.Entry<String, String> e : NATIVE_HTTPCLIENT_TYPES.entrySet()){
-			try{
-				ClassUtils.forName(e.getKey(), classLoader);
-				this.httpClientType = (Class<? extends HttpClient>) ClassUtils.forName(e.getValue(), classLoader);
-				return this.httpClientType;
-			}catch(Exception ex){
-				// Swallow and continue
-			}
-		}
-
-		throw new IllegalStateException("No supported HttpClient type found");
 	}
 
 }

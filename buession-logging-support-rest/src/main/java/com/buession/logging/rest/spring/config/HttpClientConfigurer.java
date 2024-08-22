@@ -24,36 +24,66 @@
  */
 package com.buession.logging.rest.spring.config;
 
-import com.buession.httpclient.HttpAsyncClient;
-import com.buession.httpclient.HttpClient;
+import com.buession.httpclient.conn.nio.IOReactorConfig;
+import com.buession.httpclient.core.Configuration;
 import com.buession.logging.rest.spring.RestLogHandlerFactoryBean;
-import com.buession.logging.support.config.AbstractLogHandlerConfiguration;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+
+import java.util.concurrent.ThreadFactory;
 
 /**
- * Rest 日志处理器自动配置类
+ * Configures {@link RestLogHandlerFactoryBean} with sensible defaults.
  *
  * @author Yong.Teng
- * @since 0.0.1
+ * @since 1.0.0
  */
-@Configuration(proxyBeanMethods = false)
-public abstract class AbstractRestLogHandlerConfiguration extends AbstractLogHandlerConfiguration {
+public class HttpClientConfigurer extends Configuration {
 
-	@Bean
-	public RestLogHandlerFactoryBean logHandlerFactoryBean(RestLogHandlerFactoryBeanConfigurer configurer,
-														   ObjectProvider<HttpClient> httpClient,
-														   ObjectProvider<HttpAsyncClient> httpAsyncClient) {
-		final RestLogHandlerFactoryBean logHandlerFactoryBean = new RestLogHandlerFactoryBean();
+	private ApacheClient apacheClient;
 
-		httpClient.ifAvailable(logHandlerFactoryBean::setHttpClient);
-		httpAsyncClient.ifAvailable(logHandlerFactoryBean::setHttpAsyncClient);
-		logHandlerFactoryBean.setUrl(configurer.getUrl());
-		logHandlerFactoryBean.setRequestMethod(configurer.getRequestMethod());
-		logHandlerFactoryBean.setRequestBodyBuilder(configurer.getRequestBodyBuilder());
+	private OkHttp okHttp;
 
-		return logHandlerFactoryBean;
+	public ApacheClient getApacheClient() {
+		return apacheClient;
+	}
+
+	public void setApacheClient(ApacheClient apacheClient) {
+		this.apacheClient = apacheClient;
+	}
+
+	public OkHttp getOkHttp() {
+		return okHttp;
+	}
+
+	public void setOkHttp(OkHttp okHttp) {
+		this.okHttp = okHttp;
+	}
+
+	public final static class ApacheClient {
+
+		private IOReactorConfig ioReactor;
+
+		private ThreadFactory threadFactory;
+
+		public IOReactorConfig getIoReactor() {
+			return ioReactor;
+		}
+
+		public void setIoReactor(IOReactorConfig ioReactor) {
+			this.ioReactor = ioReactor;
+		}
+
+		public ThreadFactory getThreadFactory() {
+			return threadFactory;
+		}
+
+		public void setThreadFactory(ThreadFactory threadFactory) {
+			this.threadFactory = threadFactory;
+		}
+
+	}
+
+	public final static class OkHttp {
+
 	}
 
 }

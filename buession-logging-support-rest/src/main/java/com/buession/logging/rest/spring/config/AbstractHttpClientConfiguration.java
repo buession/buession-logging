@@ -24,9 +24,17 @@
  */
 package com.buession.logging.rest.spring.config;
 
-import com.buession.httpclient.HttpClient;
-import com.buession.logging.rest.spring.RestLogHandlerFactoryBean;
-import com.buession.logging.support.config.AbstractLogHandlerConfiguration;
+import com.buession.core.converter.mapper.PropertyMapper;
+import com.buession.httpclient.ApacheHttpAsyncClient;
+import com.buession.httpclient.OkHttpHttpAsyncClient;
+import com.buession.httpclient.OkHttpHttpClient;
+import com.buession.httpclient.conn.Apache5ClientConnectionManager;
+import com.buession.httpclient.conn.Apache5NioClientConnectionManager;
+import com.buession.httpclient.conn.ApacheClientConnectionManager;
+import com.buession.httpclient.conn.ApacheNioClientConnectionManager;
+import com.buession.httpclient.conn.OkHttpClientConnectionManager;
+import com.buession.httpclient.conn.OkHttpNioClientConnectionManager;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -37,19 +45,116 @@ import org.springframework.context.annotation.Configuration;
  * @since 0.0.1
  */
 @Configuration(proxyBeanMethods = false)
-public abstract class AbstractRestLogHandlerConfiguration extends AbstractLogHandlerConfiguration {
+public abstract class AbstractHttpClientConfiguration {
 
-	@Bean
-	public RestLogHandlerFactoryBean logHandlerFactoryBean(RestLogHandlerFactoryBeanConfigurer configurer,
-														   HttpClient httpClient) {
-		final RestLogHandlerFactoryBean logHandlerFactoryBean = new RestLogHandlerFactoryBean();
+	protected final static PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 
-		logHandlerFactoryBean.setHttpClient(httpClient);
-		logHandlerFactoryBean.setUrl(configurer.getUrl());
-		propertyMapper.from(configurer::getRequestMethod).to(logHandlerFactoryBean::setRequestMethod);
-		propertyMapper.from(configurer::getRequestBodyBuilder).to(logHandlerFactoryBean::setRequestBodyBuilder);
+	protected abstract static class AbstractApacheHttpClientConfiguration extends AbstractHttpClientConfiguration {
 
-		return logHandlerFactoryBean;
+		@Bean
+		public com.buession.httpclient.apache.ApacheClientConnectionManager apache5ClientConnectionManager(
+				HttpClientConfigurer httpClientConfigurer) {
+			return new Apache5ClientConnectionManager(httpClientConfigurer);
+		}
+
+		@Bean
+		public com.buession.httpclient.apache.ApacheClientConnectionManager apacheClientConnectionManager(
+				HttpClientConfigurer httpClientConfigurer) {
+			return new ApacheClientConnectionManager(httpClientConfigurer);
+		}
+
+		@Bean
+		public com.buession.httpclient.ApacheHttpClient httpClient(
+				ObjectProvider<com.buession.httpclient.apache.ApacheClientConnectionManager> clientConnectionManager) {
+			final com.buession.httpclient.ApacheHttpClient apacheHttpClient = new com.buession.httpclient.ApacheHttpClient();
+
+			clientConnectionManager.ifAvailable(apacheHttpClient::setConnectionManager);
+
+			return apacheHttpClient;
+		}
+
+	}
+
+	protected abstract static class AbstractAsyncApacheHttpClientConfiguration extends AbstractHttpClientConfiguration {
+
+		@Bean
+		public com.buession.httpclient.apache.ApacheNioClientConnectionManager apache5NioClientConnectionManager(
+				HttpClientConfigurer httpClientConfigurer) {
+			final Apache5NioClientConnectionManager clientConnectionManager = new Apache5NioClientConnectionManager(
+					httpClientConfigurer);
+			final HttpClientConfigurer.ApacheClient apacheClient = httpClientConfigurer.getApacheClient();
+
+			if(apacheClient != null){
+				propertyMapper.from(apacheClient::getIoReactor).to(clientConnectionManager::setIoReactorConfig);
+				propertyMapper.from(apacheClient::getThreadFactory).to(clientConnectionManager::setThreadFactory);
+			}
+
+			return clientConnectionManager;
+		}
+
+		@Bean
+		public com.buession.httpclient.apache.ApacheNioClientConnectionManager apacheNioClientConnectionManager(
+				HttpClientConfigurer httpClientConfigurer) {
+			final ApacheNioClientConnectionManager clientConnectionManager = new ApacheNioClientConnectionManager(
+					httpClientConfigurer);
+			final HttpClientConfigurer.ApacheClient apacheClient = httpClientConfigurer.getApacheClient();
+
+			if(apacheClient != null){
+				propertyMapper.from(apacheClient::getIoReactor).to(clientConnectionManager::setIoReactorConfig);
+				propertyMapper.from(apacheClient::getThreadFactory).to(clientConnectionManager::setThreadFactory);
+			}
+
+			return clientConnectionManager;
+		}
+
+		@Bean
+		public ApacheHttpAsyncClient httpAsyncClient(
+				ObjectProvider<com.buession.httpclient.apache.ApacheNioClientConnectionManager> clientConnectionManager) {
+			final ApacheHttpAsyncClient apacheHttpAsyncClient = new ApacheHttpAsyncClient();
+
+			clientConnectionManager.ifAvailable(apacheHttpAsyncClient::setConnectionManager);
+
+			return apacheHttpAsyncClient;
+		}
+
+	}
+
+	protected abstract static class AbstractOkHttpClientConfiguration extends AbstractHttpClientConfiguration {
+
+		@Bean
+		public OkHttpClientConnectionManager okHttpClientConnectionManager(HttpClientConfigurer httpClientConfigurer) {
+			return new OkHttpClientConnectionManager(httpClientConfigurer);
+		}
+
+		@Bean
+		public OkHttpHttpClient httpClient(ObjectProvider<OkHttpClientConnectionManager> clientConnectionManager) {
+			final OkHttpHttpClient okHttpClient = new OkHttpHttpClient();
+
+			clientConnectionManager.ifAvailable(okHttpClient::setConnectionManager);
+
+			return okHttpClient;
+		}
+
+	}
+
+	protected static abstract class AbstractAsyncOkHttpClientConfiguration extends AbstractHttpClientConfiguration {
+
+		@Bean
+		public OkHttpNioClientConnectionManager okHttpNioClientConnectionManager(
+				HttpClientConfigurer httpClientConfigurer) {
+			return new OkHttpNioClientConnectionManager(httpClientConfigurer);
+		}
+
+		@Bean
+		public OkHttpHttpAsyncClient httpClient(
+				ObjectProvider<OkHttpNioClientConnectionManager> clientConnectionManager) {
+			final OkHttpHttpAsyncClient okHttpHttpAsyncClient = new OkHttpHttpAsyncClient();
+
+			clientConnectionManager.ifAvailable(okHttpHttpAsyncClient::setConnectionManager);
+
+			return okHttpHttpAsyncClient;
+		}
+
 	}
 
 }
