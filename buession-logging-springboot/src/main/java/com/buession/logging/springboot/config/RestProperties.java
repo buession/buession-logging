@@ -24,9 +24,9 @@
  */
 package com.buession.logging.springboot.config;
 
+import com.buession.logging.core.RequestMethod;
 import com.buession.logging.rest.core.JsonRequestBodyBuilder;
 import com.buession.logging.rest.core.RequestBodyBuilder;
-import com.buession.logging.rest.core.RequestMethod;
 import com.buession.logging.support.config.AdapterProperties;
 
 import java.io.Serializable;

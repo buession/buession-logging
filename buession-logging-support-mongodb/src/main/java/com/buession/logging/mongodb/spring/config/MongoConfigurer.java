@@ -22,34 +22,29 @@
  * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.springboot.config;
+package com.buession.logging.mongodb.spring.config;
 
 import com.buession.dao.mongodb.core.ReadConcern;
 import com.buession.dao.mongodb.core.ReadPreference;
 import com.buession.dao.mongodb.core.WriteConcern;
 import com.buession.logging.mongodb.core.PoolConfiguration;
-import com.buession.logging.support.config.AdapterProperties;
 import com.mongodb.connection.ClusterConnectionMode;
 import com.mongodb.connection.ClusterType;
 import com.mongodb.connection.ServerMonitoringMode;
 import com.mongodb.selector.ServerSelector;
 import org.bson.UuidRepresentation;
-import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.data.mapping.model.FieldNamingStrategy;
-import org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
-import java.io.Serializable;
 import java.time.Duration;
 
 /**
- * MongoDB 日志配置
+ * Configures {@link MongoTemplate} with sensible defaults.
  *
  * @author Yong.Teng
- * @since 0.0.1
+ * @since 3.0.0
  */
-public class MongoProperties implements AdapterProperties, Serializable {
-
-	private final static long serialVersionUID = -8119695487949928232L;
+public class MongoConfigurer {
 
 	/**
 	 * MongoDB 主机地址
@@ -59,7 +54,7 @@ public class MongoProperties implements AdapterProperties, Serializable {
 	/**
 	 * MongoDB 端口
 	 */
-	private int port = 27017;
+	private Integer port;
 
 	/**
 	 * 用户名
@@ -72,9 +67,14 @@ public class MongoProperties implements AdapterProperties, Serializable {
 	private String password;
 
 	/**
+	 * 认证数据库名称
+	 */
+	private String authenticationDatabase;
+
+	/**
 	 * Mongo database URI.
 	 */
-	private String url = "mongodb://localhost/test";
+	private String url;
 
 	/**
 	 * 副本集名称
@@ -87,39 +87,19 @@ public class MongoProperties implements AdapterProperties, Serializable {
 	private String databaseName;
 
 	/**
-	 * 认证数据库名称
-	 */
-	private String authenticationDatabase;
-
-	/**
-	 * Collection 名称
-	 */
-	private String collectionName;
-
-	/**
 	 * 连接超时
 	 */
-	private Duration connectionTimeout = Duration.ofSeconds(1);
+	private Duration connectionTimeout;
 
 	/**
 	 * 读取超时
 	 */
-	private Duration readTimeout = Duration.ofSeconds(3);
+	private Duration readTimeout;
 
 	/**
 	 * Representation to use when converting a UUID to a BSON binary value.
 	 */
-	private UuidRepresentation uuidRepresentation = UuidRepresentation.JAVA_LEGACY;
-
-	/**
-	 * Whether to enable auto-index creation.
-	 */
-	private Boolean autoIndexCreation;
-
-	/**
-	 * Fully qualified name of the FieldNamingStrategy to use.
-	 */
-	private Class<? extends FieldNamingStrategy> fieldNamingStrategy = SnakeCaseFieldNamingStrategy.class;
+	private UuidRepresentation uuidRepresentation;
 
 	/**
 	 * {@link ReadPreference}
@@ -129,33 +109,37 @@ public class MongoProperties implements AdapterProperties, Serializable {
 	/**
 	 * {@link ReadConcern}
 	 */
-	private ReadConcern readConcern = ReadConcern.AVAILABLE;
+	private ReadConcern readConcern;
 
 	/**
 	 * {@link WriteConcern}
 	 */
-	private WriteConcern writeConcern = WriteConcern.ACKNOWLEDGED;
+	private WriteConcern writeConcern;
+
+	/**
+	 * Whether to enable auto-index creation.
+	 */
+	private Boolean autoIndexCreation;
+
+	/**
+	 * Fully qualified name of the FieldNamingStrategy to use.
+	 */
+	private FieldNamingStrategy fieldNamingStrategy;
 
 	/**
 	 * 集群配置
-	 *
-	 * @since 1.0.0
 	 */
-	@NestedConfigurationProperty
 	private Cluster cluster;
 
 	/**
 	 * 服务端配置
-	 *
-	 * @since 1.0.0
 	 */
 	private Server server;
 
 	/**
 	 * 连接池配置
 	 */
-	@NestedConfigurationProperty
-	private PoolConfiguration pool = new PoolConfiguration();
+	private PoolConfiguration pool;
 
 	/**
 	 * 返回 MongoDB 主机地址
@@ -181,7 +165,7 @@ public class MongoProperties implements AdapterProperties, Serializable {
 	 *
 	 * @return MongoDB 端口
 	 */
-	public int getPort() {
+	public Integer getPort() {
 		return port;
 	}
 
@@ -191,7 +175,7 @@ public class MongoProperties implements AdapterProperties, Serializable {
 	 * @param port
 	 * 		MongoDB 端口
 	 */
-	public void setPort(int port) {
+	public void setPort(Integer port) {
 		this.port = port;
 	}
 
@@ -231,6 +215,25 @@ public class MongoProperties implements AdapterProperties, Serializable {
 	 */
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	/**
+	 * 返回认证数据库名称
+	 *
+	 * @return 认证数据库名称
+	 */
+	public String getAuthenticationDatabase() {
+		return authenticationDatabase;
+	}
+
+	/**
+	 * 设置认证数据库名称
+	 *
+	 * @param authenticationDatabase
+	 * 		认证数据库名称
+	 */
+	public void setAuthenticationDatabase(String authenticationDatabase) {
+		this.authenticationDatabase = authenticationDatabase;
 	}
 
 	/**
@@ -291,44 +294,6 @@ public class MongoProperties implements AdapterProperties, Serializable {
 	}
 
 	/**
-	 * 返回认证数据库名称
-	 *
-	 * @return 认证数据库名称
-	 */
-	public String getAuthenticationDatabase() {
-		return authenticationDatabase;
-	}
-
-	/**
-	 * 设置认证数据库名称
-	 *
-	 * @param authenticationDatabase
-	 * 		认证数据库名称
-	 */
-	public void setAuthenticationDatabase(String authenticationDatabase) {
-		this.authenticationDatabase = authenticationDatabase;
-	}
-
-	/**
-	 * 返回 Collection 名称
-	 *
-	 * @return Collection 名称
-	 */
-	public String getCollectionName() {
-		return collectionName;
-	}
-
-	/**
-	 * 设置 Collection 名称
-	 *
-	 * @param collectionName
-	 * 		Collection 名称
-	 */
-	public void setCollectionName(String collectionName) {
-		this.collectionName = collectionName;
-	}
-
-	/**
 	 * 返回连接超时
 	 *
 	 * @return 连接超时
@@ -383,44 +348,6 @@ public class MongoProperties implements AdapterProperties, Serializable {
 	 */
 	public void setUuidRepresentation(UuidRepresentation uuidRepresentation) {
 		this.uuidRepresentation = uuidRepresentation;
-	}
-
-	/**
-	 * Return enable auto-index creation.
-	 *
-	 * @return true / false
-	 */
-	public Boolean getAutoIndexCreation() {
-		return autoIndexCreation;
-	}
-
-	/**
-	 * Sets enable auto-index creation.
-	 *
-	 * @param autoIndexCreation
-	 * 		enable auto-index creation.
-	 */
-	public void setAutoIndexCreation(Boolean autoIndexCreation) {
-		this.autoIndexCreation = autoIndexCreation;
-	}
-
-	/**
-	 * Return fully qualified name of the FieldNamingStrategy to use.
-	 *
-	 * @return Fully qualified name of the FieldNamingStrategy to use.
-	 */
-	public Class<? extends FieldNamingStrategy> getFieldNamingStrategy() {
-		return fieldNamingStrategy;
-	}
-
-	/**
-	 * Sets fully qualified name of the FieldNamingStrategy to use.
-	 *
-	 * @param fieldNamingStrategy
-	 * 		Fully qualified name of the FieldNamingStrategy to use.
-	 */
-	public void setFieldNamingStrategy(Class<? extends FieldNamingStrategy> fieldNamingStrategy) {
-		this.fieldNamingStrategy = fieldNamingStrategy;
 	}
 
 	/**
@@ -481,11 +408,56 @@ public class MongoProperties implements AdapterProperties, Serializable {
 	}
 
 	/**
+	 * Return enable auto-index creation.
+	 *
+	 * @return true / false
+	 */
+	public Boolean isAutoIndexCreation() {
+		return getAutoIndexCreation();
+	}
+
+	/**
+	 * Return enable auto-index creation.
+	 *
+	 * @return true / false
+	 */
+	public Boolean getAutoIndexCreation() {
+		return autoIndexCreation;
+	}
+
+	/**
+	 * Sets enable auto-index creation.
+	 *
+	 * @param autoIndexCreation
+	 * 		enable auto-index creation.
+	 */
+	public void setAutoIndexCreation(Boolean autoIndexCreation) {
+		this.autoIndexCreation = autoIndexCreation;
+	}
+
+	/**
+	 * Return fully qualified name of the FieldNamingStrategy to use.
+	 *
+	 * @return Fully qualified name of the FieldNamingStrategy to use.
+	 */
+	public FieldNamingStrategy getFieldNamingStrategy() {
+		return fieldNamingStrategy;
+	}
+
+	/**
+	 * Sets fully qualified name of the FieldNamingStrategy to use.
+	 *
+	 * @param fieldNamingStrategy
+	 * 		Fully qualified name of the FieldNamingStrategy to use.
+	 */
+	public void setFieldNamingStrategy(FieldNamingStrategy fieldNamingStrategy) {
+		this.fieldNamingStrategy = fieldNamingStrategy;
+	}
+
+	/**
 	 * 返回集群配置
 	 *
 	 * @return 集群配置
-	 *
-	 * @since 1.0.0
 	 */
 	public Cluster getCluster() {
 		return cluster;
@@ -496,8 +468,6 @@ public class MongoProperties implements AdapterProperties, Serializable {
 	 *
 	 * @param cluster
 	 * 		集群配置
-	 *
-	 * @since 1.0.0
 	 */
 	public void setCluster(Cluster cluster) {
 		this.cluster = cluster;
@@ -561,7 +531,7 @@ public class MongoProperties implements AdapterProperties, Serializable {
 		/**
 		 * Server 选择器
 		 */
-		private Class<? extends ServerSelector> serverSelector;
+		private ServerSelector serverSelector;
 
 		/**
 		 * Server 选择超时
@@ -616,7 +586,7 @@ public class MongoProperties implements AdapterProperties, Serializable {
 		 *
 		 * @return Server 选择器
 		 */
-		public Class<? extends ServerSelector> getServerSelector() {
+		public ServerSelector getServerSelector() {
 			return serverSelector;
 		}
 
@@ -626,7 +596,7 @@ public class MongoProperties implements AdapterProperties, Serializable {
 		 * @param serverSelector
 		 * 		Server 选择器
 		 */
-		public void setServerSelector(Class<? extends ServerSelector> serverSelector) {
+		public void setServerSelector(ServerSelector serverSelector) {
 			this.serverSelector = serverSelector;
 		}
 

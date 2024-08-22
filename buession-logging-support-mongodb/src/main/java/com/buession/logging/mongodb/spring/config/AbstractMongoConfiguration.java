@@ -24,31 +24,36 @@
  */
 package com.buession.logging.mongodb.spring.config;
 
+import com.buession.core.converter.mapper.PropertyMapper;
 import com.buession.core.validator.Validate;
-import com.buession.logging.mongodb.spring.MongoLogHandlerFactoryBean;
+import com.buession.dao.mongodb.core.ReadConcern;
+import com.buession.dao.mongodb.core.ReadPreference;
+import com.buession.dao.mongodb.core.WriteConcern;
+import com.buession.logging.mongodb.core.PoolConfiguration;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClient;
+import com.mongodb.connection.ClusterSettings;
 import com.mongodb.connection.ConnectionPoolSettings;
+import com.mongodb.connection.ServerSettings;
 import com.mongodb.connection.SocketSettings;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mapping.model.FieldNamingStrategy;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
-import org.springframework.data.mongodb.core.MongoClientFactoryBean;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
-import org.springframework.data.mongodb.core.convert.DbRefResolver;
-import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
+import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
+import org.springframework.lang.Nullable;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * MongoDb 日志处理器自动配置类
@@ -57,154 +62,155 @@ import java.util.concurrent.TimeUnit;
  * @since 0.0.1
  */
 @Configuration(proxyBeanMethods = false)
-public abstract class AbstractMongoLogHandlerConfiguration {
+public abstract class AbstractMongoConfiguration extends AbstractMongoClientConfiguration {
+
+	protected final static PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
+
+	private final MongoConfigurer mongoConfigurer;
+
+	public AbstractMongoConfiguration(MongoConfigurer mongoConfigurer) {
+		this.mongoConfigurer = mongoConfigurer;
+	}
 
 	@Bean
-	public MongoClientFactoryBean mongoClient() {
-		final MongoClientFactoryBean mongoClientFactoryBean = new MongoClientFactoryBean();
+	@Override
+	public MongoClient mongoClient() {
+		return super.mongoClient();
+	}
 
-		if(Validate.hasText(properties.getUrl())){
-			propertyMapper.from(properties::getUrl).as(ConnectionString::new)
-					.to(mongoClientFactoryBean::setConnectionString);
-		}else{
-			mongoClientFactoryBean.setHost(properties.getHost());
-			propertyMapper.from(properties::getPort).to(mongoClientFactoryBean::setPort);
+	@Bean
+	public MappingMongoConverter mappingMongoConverter(MongoDatabaseFactory databaseFactory,
+													   MongoCustomConversions customConversions,
+													   MongoMappingContext mappingContext) {
+		final MappingMongoConverter mappingMongoConverter = super.mappingMongoConverter(databaseFactory,
+				customConversions, mappingContext);
+
+		mappingMongoConverter.setTypeMapper(new DefaultMongoTypeMapper(null, mappingContext));
+
+		return mappingMongoConverter;
+	}
+
+	@Override
+	protected void configureClientSettings(MongoClientSettings.Builder builder) {
+		if(Validate.hasText(mongoConfigurer.getUrl())){
+			builder.applyConnectionString(new ConnectionString(mongoConfigurer.getUrl()));
+		}else if(Validate.hasText(mongoConfigurer.getHost())){
+			ServerAddress serverAddress = mongoConfigurer.getPort() == null ?
+					new ServerAddress(mongoConfigurer.getHost()) : new ServerAddress(mongoConfigurer.getHost(),
+					mongoConfigurer.getPort());
+			builder.applyToClusterSettings((cluster)->cluster.hosts(Collections.singletonList(serverAddress)));
 		}
-		propertyMapper.from(properties::getReplicaSetName).to(mongoClientFactoryBean::setReplicaSet);
 
-		if(properties.getUsername() != null && properties.getPassword() != null){
-			final String database =
-					properties.getAuthenticationDatabase() ==
-							null ? properties.getDatabaseName() : properties.getAuthenticationDatabase();
-			final MongoCredential credential = MongoCredential.createCredential(properties.getUsername(),
-					database, properties.getPassword().toCharArray());
+		if(Validate.isBlank(mongoConfigurer.getUrl()) && Validate.hasText(mongoConfigurer.getUsername())
+				&& Validate.hasText(mongoConfigurer.getPassword())){
+			String database = Validate.hasText(mongoConfigurer.getAuthenticationDatabase())
+					? mongoConfigurer.getAuthenticationDatabase() : mongoConfigurer.getDatabaseName();
+			final MongoCredential credential = MongoCredential.createCredential(mongoConfigurer.getUsername(),
+					database, mongoConfigurer.getPassword().toCharArray());
 
-			mongoClientFactoryBean.setCredential(new MongoCredential[]{credential});
+			builder.credential(credential);
 		}
 
-		final MongoClientSettings.Builder mongoClientSettingsBuilder = MongoClientSettings.builder();
+		if(Validate.hasText(mongoConfigurer.getReplicaSetName())){
+			builder.applyToClusterSettings(
+					(cluster)->cluster.requiredReplicaSetName(mongoConfigurer.getReplicaSetName()));
+		}
 
-		propertyMapper.from(properties::getReadPreference).as(ReadPreference::getValue)
-				.to(mongoClientSettingsBuilder::readPreference);
-		propertyMapper.from(properties::getReadConcern).as(
-				ReadConcern::getValue).to(mongoClientSettingsBuilder::readConcern);
-		propertyMapper.from(properties::getWriteConcern).as(
-				WriteConcern::getValue).to(mongoClientSettingsBuilder::writeConcern);
-		propertyMapper.from(properties::getUuidRepresentation)
-				.to(mongoClientSettingsBuilder::uuidRepresentation);
+		builder.applyToClusterSettings(($builder)->{
+			MongoConfigurer.Cluster cluster = mongoConfigurer.getCluster();
 
-		mongoClientSettingsBuilder.applyToSocketSettings(($builder)->{
+			if(cluster != null){
+				final ClusterSettings.Builder clusterBuilder = ClusterSettings.builder();
+
+				propertyMapper.from(cluster::getConnectionMode).to(clusterBuilder::mode);
+				propertyMapper.from(cluster::getClusterType).to(clusterBuilder::requiredClusterType);
+				propertyMapper.from(cluster::getServerSelector).to(clusterBuilder::serverSelector);
+				applySettings((value)->clusterBuilder.serverSelectionTimeout(value.toMillis(), TimeUnit.MILLISECONDS),
+						cluster.getServerSelectionTimeout());
+				applySettings((value)->clusterBuilder.localThreshold(value.toMillis(), TimeUnit.MILLISECONDS),
+						cluster.getLocalThreshold());
+			}
+		}).applyToSocketSettings(($builder)->{
 			final SocketSettings.Builder socketBuilder = SocketSettings.builder();
 
-			if(properties.getConnectionTimeout() != null){
-				socketBuilder.connectTimeout((int) properties.getConnectionTimeout().toMillis(),
-						TimeUnit.MILLISECONDS);
-			}
-			if(properties.getReadTimeout() != null){
-				socketBuilder.readTimeout((int) properties.getReadTimeout().toMillis(), TimeUnit.MILLISECONDS);
-			}
+			applySettings((value)->socketBuilder.connectTimeout(value.toMillis(), TimeUnit.MILLISECONDS),
+					mongoConfigurer.getConnectionTimeout());
+			applySettings((value)->socketBuilder.readTimeout(value.toMillis(), TimeUnit.MILLISECONDS),
+					mongoConfigurer.getReadTimeout());
 
 			$builder.applySettings(socketBuilder.build());
+		}).applyToServerSettings(($builder)->{
+			MongoConfigurer.Server server = mongoConfigurer.getServer();
+
+			if(server != null){
+				final ServerSettings.Builder serverBuilder = ServerSettings.builder();
+
+				if(server.getHeartbeatFrequency() != null){
+					applySettings((value)->serverBuilder.heartbeatFrequency(value.toMillis(), TimeUnit.MILLISECONDS),
+							server.getHeartbeatFrequency());
+					applySettings((value)->serverBuilder.minHeartbeatFrequency(value.toMillis(), TimeUnit.MILLISECONDS),
+							server.getMinHeartbeatFrequency());
+					propertyMapper.from(server::getServerMonitoringMode).to(serverBuilder::serverMonitoringMode);
+				}
+			}
+		}).applyToSslSettings(($builder)->{
+
 		}).applyToConnectionPoolSettings(($builder)->{
-			if(properties.getPool() != null){
+			PoolConfiguration poolConfiguration = mongoConfigurer.getPool();
+
+			if(poolConfiguration != null){
 				final ConnectionPoolSettings.Builder poolBuilder = ConnectionPoolSettings.builder();
 
-				propertyMapper.from(properties.getPool()::getMinSize).to(poolBuilder::minSize);
-				propertyMapper.from(properties.getPool()::getMaxSize).to(poolBuilder::maxSize);
+				propertyMapper.from(poolConfiguration::getMinSize).to(poolBuilder::minSize);
+				propertyMapper.from(poolConfiguration::getMaxSize).to(poolBuilder::maxSize);
 
-				if(properties.getPool().getMaxWaitTime() != null){
-					poolBuilder.maxWaitTime(properties.getPool().getMaxWaitTime().toMillis(),
-							TimeUnit.MILLISECONDS);
-				}
-				if(properties.getPool().getMaxConnectionLifeTime() != null){
-					poolBuilder.maxConnectionLifeTime(properties.getPool().getMaxConnectionLifeTime().toMillis(),
-							TimeUnit.MILLISECONDS);
-				}
-				if(properties.getPool().getMaxConnectionIdleTime() != null){
-					poolBuilder.maxConnectionIdleTime(properties.getPool().getMaxConnectionIdleTime().toMillis(),
-							TimeUnit.MILLISECONDS);
-				}
-				if(properties.getPool().getMaintenanceInitialDelay() != null){
-					poolBuilder.maintenanceInitialDelay(
-							properties.getPool().getMaintenanceInitialDelay().toMillis(),
-							TimeUnit.MILLISECONDS);
-				}
-				if(properties.getPool().getMaintenanceFrequency() != null){
-					poolBuilder.maintenanceFrequency(properties.getPool().getMaintenanceFrequency().toMillis(),
-							TimeUnit.MILLISECONDS);
-				}
-				if(properties.getPool().getMaxConnecting() > 0){
-					poolBuilder.maxConnecting(properties.getPool().getMaxConnecting());
-				}
+				applySettings((value)->poolBuilder.maxWaitTime(value.toMillis(), TimeUnit.MILLISECONDS),
+						poolConfiguration.getMaxWaitTime());
+				applySettings((value)->poolBuilder.maxConnectionLifeTime(value.toMillis(), TimeUnit.MILLISECONDS),
+						poolConfiguration.getMaxConnectionLifeTime());
+				applySettings((value)->poolBuilder.maxConnectionIdleTime(value.toMillis(), TimeUnit.MILLISECONDS),
+						poolConfiguration.getMaxConnectionIdleTime());
+				applySettings((value)->poolBuilder.maintenanceInitialDelay(value.toMillis(), TimeUnit.MILLISECONDS),
+						poolConfiguration.getMaintenanceInitialDelay());
+				applySettings((value)->poolBuilder.maintenanceFrequency(value.toMillis(), TimeUnit.MILLISECONDS),
+						poolConfiguration.getMaintenanceFrequency());
+
+				propertyMapper.from(poolConfiguration::getMaxConnecting).to(poolBuilder::maxConnecting);
 
 				$builder.applySettings(poolBuilder.build());
 			}
 		});
 
-		return mongoClientFactoryBean;
+		propertyMapper.from(mongoConfigurer::getUuidRepresentation).to(builder::uuidRepresentation);
+		propertyMapper.from(mongoConfigurer::getReadPreference).as(ReadPreference::getValue)
+				.to(builder::readPreference);
+		propertyMapper.from(mongoConfigurer::getReadConcern).as(ReadConcern::getValue).to(builder::readConcern);
+		propertyMapper.from(mongoConfigurer::getWriteConcern).as(WriteConcern::getValue).to(builder::writeConcern);
 	}
 
-	@Bean
-	public MongoDatabaseFactory mongoDatabaseFactory(ObjectProvider<MongoClient> mongoClient) {
-		String databaseName;
-
-		if(Validate.hasText(properties.getDatabaseName())){
-			databaseName = properties.getDatabaseName();
+	@Override
+	protected String getDatabaseName() {
+		if(Validate.hasText(mongoConfigurer.getDatabaseName())){
+			return mongoConfigurer.getDatabaseName();
 		}else{
-			databaseName = new ConnectionString(properties.getUrl()).getDatabase();
+			return new ConnectionString(mongoConfigurer.getUrl()).getDatabase();
 		}
-
-		return new SimpleMongoClientDatabaseFactory(mongoClient.getIfAvailable(), databaseName);
 	}
 
-	@Bean
-	public MongoCustomConversions mongoCustomConversions() {
-		return new MongoCustomConversions(Collections.emptyList());
+	@Override
+	protected boolean autoIndexCreation() {
+		return mongoConfigurer.getAutoIndexCreation();
 	}
 
-	@Bean
-	public MongoMappingContext mongoMappingContext(ObjectProvider<MongoCustomConversions> mongoCustomConversion) {
-		final MongoMappingContext mappingContext = new MongoMappingContext();
-
-		propertyMapper.from(properties::getAutoIndexCreation).to(mappingContext::setAutoIndexCreation);
-		propertyMapper.from(properties::getFieldNamingStrategy).as(BeanUtils::instantiateClass
-																  ).to(mappingContext::setFieldNamingStrategy);
-		mappingContext.setSimpleTypeHolder(mongoCustomConversion.getIfAvailable().getSimpleTypeHolder());
-
-		return mappingContext;
-
+	@Override
+	protected FieldNamingStrategy fieldNamingStrategy() {
+		return Optional.ofNullable(mongoConfigurer.getFieldNamingStrategy()).orElse(super.fieldNamingStrategy());
 	}
 
-	@Bean
-	public MappingMongoConverter mappingMongoConverter(ObjectProvider<MongoDatabaseFactory> mongoDatabaseFactory,
-													   ObjectProvider<MongoMappingContext> mongoMappingContext,
-													   ObjectProvider<MongoCustomConversions> mongoCustomConversion) {
-		final DbRefResolver dbRefResolver = new DefaultDbRefResolver(mongoDatabaseFactory.getIfAvailable());
-		final MappingMongoConverter mappingConverter = new MappingMongoConverter(dbRefResolver,
-				mongoMappingContext.getIfAvailable());
-
-		mappingConverter.setTypeMapper(new DefaultMongoTypeMapper(null, mongoMappingContext.getIfAvailable()));
-		mappingConverter.setCustomConversions(mongoCustomConversion.getIfAvailable());
-		return mappingConverter;
+	protected <T> void applySettings(Consumer<T> settingsBuilder, @Nullable T value) {
+		if(value != null){
+			settingsBuilder.accept(value);
+		}
 	}
-
-	@Bean
-	public MongoTemplate mongoTemplate(ObjectProvider<MongoDatabaseFactory> mongoDatabaseFactory,
-									   ObjectProvider<MappingMongoConverter> mappingMongoConverter) {
-		return new MongoTemplate(mongoDatabaseFactory.getIfAvailable(), mappingMongoConverter.getIfAvailable());
-	}
-
-	@Bean
-	public MongoLogHandlerFactoryBean logHandlerFactoryBean(ObjectProvider<MongoTemplate> mongoTemplate) {
-		final MongoLogHandlerFactoryBean logHandlerFactoryBean = new MongoLogHandlerFactoryBean();
-
-		mongoTemplate.ifAvailable(logHandlerFactoryBean::setMongoTemplate);
-
-		logHandlerFactoryBean.setCollectionName(getCollectionName());
-
-		return logHandlerFactoryBean;
-	}
-
-	protected abstract String getCollectionName();
 
 }

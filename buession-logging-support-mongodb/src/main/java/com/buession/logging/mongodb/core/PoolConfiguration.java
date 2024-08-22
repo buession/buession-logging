@@ -54,7 +54,7 @@ public class PoolConfiguration implements Serializable {
 
 	private Duration maintenanceFrequency;
 
-	private int maxConnecting;
+	private Integer maxConnecting;
 
 	private List<ConnectionPoolListener> connectionPoolListeners;
 
@@ -114,11 +114,11 @@ public class PoolConfiguration implements Serializable {
 		this.maintenanceFrequency = maintenanceFrequency;
 	}
 
-	public int getMaxConnecting() {
+	public Integer getMaxConnecting() {
 		return maxConnecting;
 	}
 
-	public void setMaxConnecting(int maxConnecting) {
+	public void setMaxConnecting(Integer maxConnecting) {
 		this.maxConnecting = maxConnecting;
 	}
 
@@ -129,4 +129,5 @@ public class PoolConfiguration implements Serializable {
 	public void setConnectionPoolListeners(List<ConnectionPoolListener> connectionPoolListeners) {
 		this.connectionPoolListeners = connectionPoolListeners;
 	}
+
 }

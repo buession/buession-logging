@@ -27,7 +27,6 @@ package com.buession.logging.springboot.autoconfigure.kafka;
 import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.kafka.spring.KafkaLogHandlerFactoryBean;
 import com.buession.logging.kafka.spring.config.AbstractKafkaLogHandlerConfiguration;
-import com.buession.logging.springboot.Constants;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.KafkaProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -58,7 +57,7 @@ public class KafkaLogHandlerConfiguration extends AbstractKafkaLogHandlerConfigu
 		this.properties = logProperties.getKafka();
 	}
 
-	@Bean(name = Constants.LOG_HANDLER_BEAN_NAME)
+	@Bean
 	@Override
 	public KafkaLogHandlerFactoryBean logHandlerFactoryBean(
 			@Qualifier("loggingKafkaTemplate") KafkaTemplate<String, Object> kafkaTemplate) {

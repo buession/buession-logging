@@ -24,10 +24,19 @@
  */
 package com.buession.logging.springboot.config;
 
+import com.buession.core.builder.ListBuilder;
+import com.buession.core.converter.mapper.PropertyMapper;
+import com.buession.core.utils.StringUtils;
+import com.buession.core.validator.Validate;
+import com.buession.logging.kafka.config.KafkaConfiguration;
 import com.buession.logging.kafka.config.SecurityConfiguration;
 import com.buession.logging.kafka.config.SslConfiguration;
-import com.buession.logging.kafka.spring.ProducerFactory;
+import com.buession.logging.kafka.core.Constants;
+import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.support.config.AdapterProperties;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.util.unit.DataSize;
 
 import java.io.Serializable;
@@ -41,15 +50,17 @@ import java.util.Map;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class KafkaProperties implements AdapterProperties, Serializable {
+public class KafkaProperties implements AdapterProperties, KafkaConfiguration, Serializable {
 
 	private final static long serialVersionUID = 922408714153127145L;
+
+	public final static String PREFIX = LogProperties.PREFIX + ".kafka";
 
 	/**
 	 * Comma-delimited list of host:port pairs to use for establishing the initial
 	 * connections to the Kafka cluster. Applies to all components unless overridden.
 	 */
-	private List<String> bootstrapServers = ProducerFactory.DEFAULT_BOOTSTRAP_SERVERS;
+	private List<String> bootstrapServers = ListBuilder.of("localhost:9092");
 
 	/**
 	 * ID to pass to the server when making requests. Used for server-side logging.
@@ -59,7 +70,7 @@ public class KafkaProperties implements AdapterProperties, Serializable {
 	/**
 	 * Topic 名称
 	 */
-	private String topic;
+	private String topic = Constants.DEFAULT_TOPIC;
 
 	/**
 	 * 事务 ID 前缀
@@ -349,6 +360,45 @@ public class KafkaProperties implements AdapterProperties, Serializable {
 	 */
 	public void setProperties(Map<String, String> properties) {
 		this.properties = properties;
+	}
+
+	@Override
+	public Map<String, Object> buildProperties() {
+		PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
+		Map<String, Object> properties = new HashMap<>();
+
+		propertyMapper.from(this::getBootstrapServers)
+				.as((bootstrapServers)->StringUtils.join(bootstrapServers, ','))
+				.to((value)->properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, value));
+		propertyMapper.from(this::getClientId).to((value)->properties.put(ProducerConfig.CLIENT_ID_CONFIG, value));
+		propertyMapper.from(this::getAcks).to((value)->properties.put(ProducerConfig.ACKS_CONFIG, value));
+		propertyMapper.from(this::getBatchSize).asInt(DataSize::toBytes)
+				.to((value)->properties.put(ProducerConfig.BATCH_SIZE_CONFIG, value));
+		propertyMapper.from(this::getBufferMemory).as(DataSize::toBytes)
+				.to((value)->properties.put(ProducerConfig.BUFFER_MEMORY_CONFIG, value));
+		propertyMapper.from(this::getCompressionType)
+				.to((value)->properties.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, value));
+		propertyMapper.from(this::getRetries).to((value)->properties.put(ProducerConfig.RETRIES_CONFIG, value));
+		propertyMapper.from(this::getSslConfiguration)
+				.to((value)->properties.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, value));
+		propertyMapper.from(StringSerializer.class.getName())
+				.to((value)->properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, value));
+		propertyMapper.from(JsonSerializer.class.getName())
+				.to((value)->properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, value));
+
+		if(getSslConfiguration() != null){
+			properties.putAll(getSslConfiguration().buildProperties());
+		}
+
+		if(getSecurityConfiguration() != null){
+			properties.putAll(getSecurityConfiguration().buildProperties());
+		}
+
+		if(Validate.isNotEmpty(getProperties())){
+			properties.putAll(getProperties());
+		}
+
+		return properties;
 	}
 
 }
