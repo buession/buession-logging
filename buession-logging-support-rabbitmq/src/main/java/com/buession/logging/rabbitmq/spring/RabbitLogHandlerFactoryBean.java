@@ -26,16 +26,10 @@ package com.buession.logging.rabbitmq.spring;
 
 import com.buession.core.converter.mapper.PropertyMapper;
 import com.buession.core.utils.Assert;
-import com.buession.logging.rabbitmq.core.Cache;
-import com.buession.logging.core.SslConfiguration;
-import com.buession.logging.rabbitmq.core.Template;
 import com.buession.logging.rabbitmq.handler.RabbitLogHandler;
 import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
-import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-
-import java.time.Duration;
 
 /**
  * RabbitMQ 日志处理器 {@link RabbitLogHandler} 工厂 Bean 基类

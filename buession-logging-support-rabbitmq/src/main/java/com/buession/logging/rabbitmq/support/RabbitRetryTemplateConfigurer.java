@@ -19,24 +19,23 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.rabbitmq.support;
 
 import com.buession.core.Configurer;
-import com.buession.core.Customizer;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.AbstractMessageListenerContainer;
 import org.springframework.retry.support.RetryTemplate;
 
 /**
- * {@link RetryTemplate} 定制器接口
+ * {@link RetryTemplate} 配置器接口
  *
  * @author Yong.Teng
  * @since 0.0.1
  */
-public interface RabbitRetryTemplateCustomizer extends Configurer<RabbitRetryTemplateCustomizer.Target, RetryTemplate> {
+public interface RabbitRetryTemplateConfigurer extends Configurer<RabbitRetryTemplateConfigurer.Target, RetryTemplate> {
 
 	enum Target {
 

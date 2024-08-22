@@ -22,65 +22,64 @@
  * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.file.spring.config;
+package com.buession.logging.rabbitmq.spring.config;
 
-import com.buession.logging.core.formatter.LogDataFormatter;
-import com.buession.logging.file.spring.FileLogHandlerFactoryBean;
+import com.buession.logging.rabbitmq.spring.RabbitLogHandlerFactoryBean;
 
 /**
- * Configures {@link FileLogHandlerFactoryBean} with sensible defaults.
+ * Configures {@link RabbitLogHandlerFactoryBean} with sensible defaults.
  *
  * @author Yong.Teng
  * @since 1.0.0
  */
-public class FileLogHandlerFactoryBeanConfigurer {
+public class RabbitLogHandlerFactoryBeanConfigurer {
 
 	/**
-	 * 日志文件路径
+	 * Exchange 名称
 	 */
-	private String path;
+	private String exchange;
 
 	/**
-	 * 日志格式化
+	 * Routing key 名称
 	 */
-	private LogDataFormatter<String> formatter;
+	private String routingKey;
 
 	/**
-	 * 返回日志文件路径
+	 * 返回 Exchange 名称
 	 *
-	 * @return 日志文件路径
+	 * @return Exchange 名称
 	 */
-	public String getPath() {
-		return path;
+	public String getExchange() {
+		return exchange;
 	}
 
 	/**
-	 * 设置日志文件路径
+	 * 设置 Exchange 名称
 	 *
-	 * @param path
-	 * 		日志文件路径
+	 * @param exchange
+	 * 		Exchange 名称
 	 */
-	public void setPath(String path) {
-		this.path = path;
+	public void setExchange(String exchange) {
+		this.exchange = exchange;
 	}
 
 	/**
-	 * 返回日志格式化
+	 * 返回 Routing key 名称
 	 *
-	 * @return 日志格式化
+	 * @return Routing key 名称
 	 */
-	public LogDataFormatter<String> getFormatter() {
-		return formatter;
+	public String getRoutingKey() {
+		return routingKey;
 	}
 
 	/**
-	 * 设置日志格式化
+	 * 设置 Routing key 名称
 	 *
-	 * @param formatter
-	 * 		日志格式化
+	 * @param routingKey
+	 * 		Routing key 名称
 	 */
-	public void setFormatter(LogDataFormatter<String> formatter) {
-		this.formatter = formatter;
+	public void setRoutingKey(String routingKey) {
+		this.routingKey = routingKey;
 	}
 
 }

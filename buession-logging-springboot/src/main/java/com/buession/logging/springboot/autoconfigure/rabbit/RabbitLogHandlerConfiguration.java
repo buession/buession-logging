@@ -25,21 +25,19 @@
 package com.buession.logging.springboot.autoconfigure.rabbit;
 
 import com.buession.logging.core.handler.LogHandler;
-import com.buession.logging.rabbitmq.spring.ConnectionFactoryBean;
 import com.buession.logging.rabbitmq.spring.RabbitLogHandlerFactoryBean;
-import com.buession.logging.rabbitmq.spring.RabbitTemplateFactoryBean;
-import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
+import com.buession.logging.rabbitmq.spring.config.AbstractRabbitLogHandlerConfiguration;
+import com.buession.logging.rabbitmq.spring.config.RabbitLogHandlerFactoryBeanConfigurer;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.RabbitProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * RabbitMQ 日志处理器自动配置类
@@ -47,59 +45,36 @@ import org.springframework.context.annotation.Configuration;
  * @author Yong.Teng
  * @since 0.0.1
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @EnableConfigurationProperties(LogProperties.class)
 @ConditionalOnMissingBean(LogHandler.class)
 @ConditionalOnClass({RabbitLogHandlerFactoryBean.class})
 @ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "rabbit.enabled", havingValue = "true")
-public class RabbitLogHandlerConfiguration extends AbstractLogHandlerConfiguration<RabbitProperties> {
+public class RabbitLogHandlerConfiguration extends AbstractRabbitLogHandlerConfiguration {
+
+	private final RabbitProperties properties;
 
 	public RabbitLogHandlerConfiguration(LogProperties logProperties) {
-		super(logProperties.getRabbit());
+		this.properties = logProperties.getRabbit();
 	}
 
-	@Bean(name = "logRabbitConnectionFactory")
-	public ConnectionFactoryBean connectionFactoryBean() {
-		final ConnectionFactoryBean connectionFactoryBean = new ConnectionFactoryBean();
+	@Bean(name = "loggingRabbitLogHandlerFactoryBeanConfigurer")
+	@ConditionalOnMissingBean(name = "loggingRabbitLogHandlerFactoryBeanConfigurer")
+	protected RabbitLogHandlerFactoryBeanConfigurer rabbitLogHandlerFactoryBeanConfigurer() {
+		final RabbitLogHandlerFactoryBeanConfigurer configurer = new RabbitLogHandlerFactoryBeanConfigurer();
 
-		connectionFactoryBean.setHost(properties.getHost());
-		
-		propertyMapper.from(properties::getPort).to(connectionFactoryBean::setPort);
-		propertyMapper.from(properties::getVirtualHost).to(connectionFactoryBean::setVirtualHost);
-		propertyMapper.from(properties::getUsername).to(connectionFactoryBean::setUsername);
-		propertyMapper.from(properties::getPassword).to(connectionFactoryBean::setPassword);
-		propertyMapper.from(properties::getRequestedHeartbeat).to(connectionFactoryBean::setRequestedHeartbeat);
-		propertyMapper.from(properties::getRequestedChannelMax).to(connectionFactoryBean::setRequestedChannelMax);
-		propertyMapper.from(properties::getPublisherConfirmType).to(connectionFactoryBean::setPublisherConfirmType);
-		propertyMapper.from(properties::getConnectionTimeout).to(connectionFactoryBean::setConnectionTimeout);
-		propertyMapper.from(properties::getSslConfiguration).to(connectionFactoryBean::setSslConfiguration);
-		propertyMapper.from(properties::getCache).to(connectionFactoryBean::setCache);
+		configurer.setExchange(properties.getExchange());
+		configurer.setRoutingKey(properties.getRoutingKey());
 
-		return connectionFactoryBean;
-	}
-
-	@Bean(name = "logRabbitRabbitTemplate")
-	public RabbitTemplateFactoryBean rabbitTemplateFactoryBean(
-			@Qualifier("logRabbitConnectionFactory") ObjectProvider<org.springframework.amqp.rabbit.connection.ConnectionFactory> connectionFactory) {
-		final RabbitTemplateFactoryBean rabbitTemplateFactoryBean = new RabbitTemplateFactoryBean();
-
-		connectionFactory.ifAvailable(rabbitTemplateFactoryBean::setConnectionFactory);
-		propertyMapper.from(properties::getTemplate).to(rabbitTemplateFactoryBean::setTemplate);
-		propertyMapper.from(properties::isPublisherReturns).to(rabbitTemplateFactoryBean::setPublisherReturns);
-
-		return rabbitTemplateFactoryBean;
+		return configurer;
 	}
 
 	@Bean
-	public RabbitLogHandlerFactoryBean logHandlerFactoryBean(@Qualifier("logRabbitRabbitTemplate")
-															 ObjectProvider<RabbitTemplate> rabbitTemplate) {
-		final RabbitLogHandlerFactoryBean logHandlerFactoryBean = new RabbitLogHandlerFactoryBean();
-
-		rabbitTemplate.ifAvailable(logHandlerFactoryBean::setRabbitTemplate);
-		logHandlerFactoryBean.setExchange(properties.getExchange());
-		logHandlerFactoryBean.setRoutingKey(properties.getRoutingKey());
-
-		return logHandlerFactoryBean;
+	@Override
+	public RabbitLogHandlerFactoryBean logHandlerFactoryBean(
+			@Qualifier("loggingRabbitLogHandlerFactoryBeanConfigurer") RabbitLogHandlerFactoryBeanConfigurer configurer,
+			@Qualifier("loggingRabbitRabbitTemplate") RabbitTemplate rabbitTemplate) {
+		return super.logHandlerFactoryBean(configurer, rabbitTemplate);
 	}
 
 }
