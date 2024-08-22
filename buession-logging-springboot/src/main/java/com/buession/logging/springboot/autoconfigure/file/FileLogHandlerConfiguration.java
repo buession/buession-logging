@@ -28,7 +28,6 @@ import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.file.spring.FileLogHandlerFactoryBean;
 import com.buession.logging.file.spring.config.AbstractFileLogHandlerConfiguration;
 import com.buession.logging.file.spring.config.FileLogHandlerFactoryBeanConfigurer;
-import com.buession.logging.springboot.Constants;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.FileProperties;
 import org.springframework.beans.BeanUtils;
