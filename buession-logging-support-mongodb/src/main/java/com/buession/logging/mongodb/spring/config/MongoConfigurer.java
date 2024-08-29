@@ -42,7 +42,7 @@ import java.time.Duration;
  * Configures {@link MongoTemplate} with sensible defaults.
  *
  * @author Yong.Teng
- * @since 3.0.0
+ * @since 1.0.0
  */
 public class MongoConfigurer {
 

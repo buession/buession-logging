@@ -80,7 +80,7 @@ public class KafkaConfiguration extends AbstractKafkaConfiguration {
 	@Override
 	public ProducerFactory<String, Object> producerFactory(
 			@Qualifier("loggingKafkaConfigurer") KafkaConfigurer configurer,
-			ObjectProvider<ProducerFactoryCustomizer> producerFactoryCustomizers) {
+			@Qualifier("loggingKafkaProducerFactoryCustomizer") ObjectProvider<ProducerFactoryCustomizer> producerFactoryCustomizers) {
 		return super.producerFactory(configurer, producerFactoryCustomizers);
 	}
 

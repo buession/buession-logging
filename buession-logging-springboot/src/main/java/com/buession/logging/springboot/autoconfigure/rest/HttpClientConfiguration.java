@@ -58,6 +58,12 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "rest.enabled", havingValue = "true")
 public class HttpClientConfiguration extends AbstractHttpClientConfiguration {
 
+	protected final static String LOGGING_HTTPCLIENT_CONNECTION_MANAGER = "loggingHttpClientConnectionManager";
+
+	protected final static String LOGGING_HTTPCLIENT_BEAN_NAME = "loggingHttpClient";
+
+	protected final static String LOGGING_ASYNC_HTTPCLIENT_BEAN_NAME = "loggingAsyncHttpClient";
+
 	private final RestProperties restProperties;
 
 	public HttpClientConfiguration(LogProperties logProperties) {
@@ -126,11 +132,11 @@ public class HttpClientConfiguration extends AbstractHttpClientConfiguration {
 	@AutoConfiguration
 	@ConditionalOnClass(name = {"org.apache.hc.client5.http.async.HttpAsyncClient",
 			"org.apache.http.nio.client.HttpAsyncClient"})
-	@ConditionalOnMissingBean(name = "loggingHttpClient")
+	@ConditionalOnMissingBean(name = LOGGING_ASYNC_HTTPCLIENT_BEAN_NAME)
 	static class AsyncApacheHttpClientConfiguration extends AbstractAsyncApacheHttpClientConfiguration {
 
-		@Bean(name = "loggingConnectionManager")
-		@ConditionalOnMissingBean(name = "loggingConnectionManager")
+		@Bean(name = LOGGING_HTTPCLIENT_CONNECTION_MANAGER)
+		@ConditionalOnMissingBean(name = LOGGING_HTTPCLIENT_CONNECTION_MANAGER)
 		@ConditionalOnClass(name = {"org.apache.hc.client5.http.async.HttpAsyncClient"})
 		@Override
 		public com.buession.httpclient.apache.ApacheNioClientConnectionManager apache5NioClientConnectionManager(
@@ -138,8 +144,8 @@ public class HttpClientConfiguration extends AbstractHttpClientConfiguration {
 			return super.apache5NioClientConnectionManager(httpClientConfigurer);
 		}
 
-		@Bean(name = "loggingConnectionManager")
-		@ConditionalOnMissingBean(name = "loggingConnectionManager")
+		@Bean(name = LOGGING_HTTPCLIENT_CONNECTION_MANAGER)
+		@ConditionalOnMissingBean(name = LOGGING_HTTPCLIENT_CONNECTION_MANAGER)
 		@ConditionalOnClass(name = {"org.apache.http.nio.client.HttpAsyncClient"})
 		@Override
 		public com.buession.httpclient.apache.ApacheNioClientConnectionManager apacheNioClientConnectionManager(
@@ -147,10 +153,11 @@ public class HttpClientConfiguration extends AbstractHttpClientConfiguration {
 			return super.apacheNioClientConnectionManager(httpClientConfigurer);
 		}
 
-		@Bean(name = "loggingHttpAsyncClient")
-		@ConditionalOnMissingBean(name = "loggingHttpAsyncClient")
+		@Bean(name = LOGGING_ASYNC_HTTPCLIENT_BEAN_NAME)
+		@ConditionalOnMissingBean(name = LOGGING_ASYNC_HTTPCLIENT_BEAN_NAME)
+		@Override
 		public ApacheHttpAsyncClient httpAsyncClient(
-				@Qualifier("loggingConnectionManager") ObjectProvider<com.buession.httpclient.apache.ApacheNioClientConnectionManager> clientConnectionManager) {
+				@Qualifier(LOGGING_HTTPCLIENT_CONNECTION_MANAGER) ObjectProvider<com.buession.httpclient.apache.ApacheNioClientConnectionManager> clientConnectionManager) {
 			return super.httpAsyncClient(clientConnectionManager);
 		}
 
@@ -158,11 +165,11 @@ public class HttpClientConfiguration extends AbstractHttpClientConfiguration {
 
 	@AutoConfiguration
 	@ConditionalOnClass(name = {"org.apache.hc.client5.http.classic.HttpClient", "org.apache.http.client.HttpClient"})
-	@ConditionalOnMissingBean(name = "loggingHttpClient")
+	@ConditionalOnMissingBean(name = LOGGING_HTTPCLIENT_BEAN_NAME)
 	static class ApacheHttpClientConfiguration extends AbstractApacheHttpClientConfiguration {
 
-		@Bean(name = "loggingConnectionManager")
-		@ConditionalOnMissingBean(name = "loggingConnectionManager")
+		@Bean(name = LOGGING_HTTPCLIENT_CONNECTION_MANAGER)
+		@ConditionalOnMissingBean(name = LOGGING_HTTPCLIENT_CONNECTION_MANAGER)
 		@ConditionalOnClass(name = {"org.apache.hc.client5.http.classic.HttpClient"})
 		@Override
 		public com.buession.httpclient.apache.ApacheClientConnectionManager apache5ClientConnectionManager(
@@ -170,8 +177,8 @@ public class HttpClientConfiguration extends AbstractHttpClientConfiguration {
 			return super.apache5ClientConnectionManager(httpClientConfigurer);
 		}
 
-		@Bean(name = "loggingConnectionManager")
-		@ConditionalOnMissingBean(name = "loggingConnectionManager")
+		@Bean(name = LOGGING_HTTPCLIENT_CONNECTION_MANAGER)
+		@ConditionalOnMissingBean(name = LOGGING_HTTPCLIENT_CONNECTION_MANAGER)
 		@ConditionalOnClass(name = {"org.apache.http.client.HttpClient"})
 		@Override
 		public com.buession.httpclient.apache.ApacheClientConnectionManager apacheClientConnectionManager(
@@ -179,11 +186,11 @@ public class HttpClientConfiguration extends AbstractHttpClientConfiguration {
 			return super.apacheClientConnectionManager(httpClientConfigurer);
 		}
 
-		@Bean(name = "loggingHttpClient")
-		@ConditionalOnMissingBean(name = "loggingHttpClient")
+		@Bean(name = LOGGING_HTTPCLIENT_BEAN_NAME)
+		@ConditionalOnMissingBean(name = LOGGING_HTTPCLIENT_BEAN_NAME)
 		@Override
 		public com.buession.httpclient.ApacheHttpClient httpClient(
-				@Qualifier("loggingConnectionManager") ObjectProvider<com.buession.httpclient.apache.ApacheClientConnectionManager> clientConnectionManager) {
+				@Qualifier(LOGGING_HTTPCLIENT_CONNECTION_MANAGER) ObjectProvider<com.buession.httpclient.apache.ApacheClientConnectionManager> clientConnectionManager) {
 			return super.httpClient(clientConnectionManager);
 		}
 
@@ -191,20 +198,22 @@ public class HttpClientConfiguration extends AbstractHttpClientConfiguration {
 
 	@AutoConfiguration
 	@ConditionalOnClass(name = {"okhttp3.OkHttpClient"})
-	@ConditionalOnMissingBean(name = "loggingHttpClient")
+	@ConditionalOnMissingBean(name = LOGGING_ASYNC_HTTPCLIENT_BEAN_NAME)
 	static class AsyncOkHttpClientConfiguration extends AbstractAsyncOkHttpClientConfiguration {
 
-		@Bean(name = "loggingConnectionManager")
-		@ConditionalOnMissingBean(name = "loggingConnectionManager")
+		@Bean(name = LOGGING_HTTPCLIENT_CONNECTION_MANAGER)
+		@ConditionalOnMissingBean(name = LOGGING_HTTPCLIENT_CONNECTION_MANAGER)
+		@Override
 		public OkHttpNioClientConnectionManager okHttpNioClientConnectionManager(
 				@Qualifier("loggingHttpClientConfigurer") HttpClientConfigurer httpClientConfigurer) {
 			return super.okHttpNioClientConnectionManager(httpClientConfigurer);
 		}
 
-		@Bean(name = "loggingHttpClient")
-		@ConditionalOnMissingBean(name = "loggingHttpClient")
+		@Bean(name = LOGGING_ASYNC_HTTPCLIENT_BEAN_NAME)
+		@ConditionalOnMissingBean(name = LOGGING_ASYNC_HTTPCLIENT_BEAN_NAME)
+		@Override
 		public OkHttpHttpAsyncClient httpClient(
-				@Qualifier("loggingConnectionManager") ObjectProvider<OkHttpNioClientConnectionManager> clientConnectionManager) {
+				@Qualifier(LOGGING_HTTPCLIENT_CONNECTION_MANAGER) ObjectProvider<OkHttpNioClientConnectionManager> clientConnectionManager) {
 			return super.httpClient(clientConnectionManager);
 		}
 
@@ -212,20 +221,22 @@ public class HttpClientConfiguration extends AbstractHttpClientConfiguration {
 
 	@AutoConfiguration
 	@ConditionalOnClass(name = {"okhttp3.OkHttpClient"})
-	@ConditionalOnMissingBean(name = "loggingHttpClient")
+	@ConditionalOnMissingBean(name = LOGGING_HTTPCLIENT_BEAN_NAME)
 	static class OkHttpClientConfiguration extends AbstractOkHttpClientConfiguration {
 
-		@Bean(name = "loggingConnectionManager")
-		@ConditionalOnMissingBean(name = "loggingConnectionManager")
+		@Bean(name = LOGGING_HTTPCLIENT_CONNECTION_MANAGER)
+		@ConditionalOnMissingBean(name = LOGGING_HTTPCLIENT_CONNECTION_MANAGER)
+		@Override
 		public OkHttpClientConnectionManager okHttpClientConnectionManager(
 				@Qualifier("loggingHttpClientConfigurer") HttpClientConfigurer httpClientConfigurer) {
 			return super.okHttpClientConnectionManager(httpClientConfigurer);
 		}
 
-		@Bean(name = "loggingHttpClient")
-		@ConditionalOnMissingBean(name = "loggingHttpClient")
+		@Bean(name = LOGGING_HTTPCLIENT_BEAN_NAME)
+		@ConditionalOnMissingBean(name = LOGGING_HTTPCLIENT_BEAN_NAME)
+		@Override
 		public OkHttpHttpClient httpClient(
-				@Qualifier("loggingConnectionManager") ObjectProvider<OkHttpClientConnectionManager> clientConnectionManager) {
+				@Qualifier(LOGGING_HTTPCLIENT_CONNECTION_MANAGER) ObjectProvider<OkHttpClientConnectionManager> clientConnectionManager) {
 			return super.httpClient(clientConnectionManager);
 		}
 

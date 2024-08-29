@@ -60,7 +60,7 @@ public class RabbitLogHandlerConfiguration extends AbstractRabbitLogHandlerConfi
 
 	@Bean(name = "loggingRabbitLogHandlerFactoryBeanConfigurer")
 	@ConditionalOnMissingBean(name = "loggingRabbitLogHandlerFactoryBeanConfigurer")
-	protected RabbitLogHandlerFactoryBeanConfigurer rabbitLogHandlerFactoryBeanConfigurer() {
+	public RabbitLogHandlerFactoryBeanConfigurer rabbitLogHandlerFactoryBeanConfigurer() {
 		final RabbitLogHandlerFactoryBeanConfigurer configurer = new RabbitLogHandlerFactoryBeanConfigurer();
 
 		configurer.setExchange(rabbitProperties.getExchange());

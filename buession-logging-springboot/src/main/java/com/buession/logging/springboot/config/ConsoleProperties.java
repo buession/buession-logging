@@ -45,7 +45,8 @@ public class ConsoleProperties implements AdapterProperties, Serializable {
 	/**
 	 * 日志模板
 	 */
-	private String template;
+	private String template = "${id} login success at: ${time}(IP: ${clientIp}), User-Agent: ${User-Agent}, OS: " +
+			"${os_name} ${os_version}, Device: ${device_type}, Browser: ${browser_name} ${browser_version}.";
 
 	/**
 	 * 日志格式化

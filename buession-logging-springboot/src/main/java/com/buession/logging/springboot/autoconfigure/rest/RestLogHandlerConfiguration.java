@@ -78,7 +78,8 @@ public class RestLogHandlerConfiguration extends AbstractRestLogHandlerConfigura
 	@Override
 	public RestLogHandlerFactoryBean logHandlerFactoryBean(
 			@Qualifier("loggingRestLogHandlerFactoryBeanConfigurer") RestLogHandlerFactoryBeanConfigurer configurer,
-			ObjectProvider<HttpClient> httpClient, ObjectProvider<HttpAsyncClient> httpAsyncClient) {
+			@Qualifier("loggingRestHttpClient") ObjectProvider<HttpClient> httpClient,
+			@Qualifier("loggingRestHttpAsyncClient") ObjectProvider<HttpAsyncClient> httpAsyncClient) {
 		return super.logHandlerFactoryBean(configurer, httpClient, httpAsyncClient);
 	}
 
