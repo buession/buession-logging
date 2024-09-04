@@ -25,6 +25,7 @@
 package com.buession.logging.jdbc.spring.config;
 
 import com.buession.core.id.IdGenerator;
+import com.buession.logging.core.formatter.GeoFormatter;
 import com.buession.logging.core.formatter.MapFormatter;
 import com.buession.logging.jdbc.converter.LogDataConverter;
 import com.buession.logging.jdbc.spring.JdbcLogHandlerFactoryBean;
@@ -56,6 +57,11 @@ public class JdbcLogHandlerFactoryBeanConfigurer {
 	 * 请求参数格式化为字符串
 	 */
 	private MapFormatter<Object> requestParametersFormatter;
+
+	/**
+	 * Geo 格式化
+	 */
+	private GeoFormatter geoFormatter;
 
 	/**
 	 * 附加参数格式化为字符串
@@ -141,6 +147,25 @@ public class JdbcLogHandlerFactoryBeanConfigurer {
 	 */
 	public void setRequestParametersFormatter(MapFormatter<Object> requestParametersFormatter) {
 		this.requestParametersFormatter = requestParametersFormatter;
+	}
+
+	/**
+	 * 返回 Geo 格式化
+	 *
+	 * @return Geo 格式化
+	 */
+	public GeoFormatter getGeoFormatter() {
+		return geoFormatter;
+	}
+
+	/**
+	 * 设置 Geo 格式化
+	 *
+	 * @param geoFormatter
+	 * 		Geo 格式化
+	 */
+	public void setGeoFormatter(GeoFormatter geoFormatter) {
+		this.geoFormatter = geoFormatter;
 	}
 
 	/**

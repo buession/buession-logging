@@ -51,6 +51,7 @@ public abstract class AbstractJdbcLogHandlerConfiguration extends AbstractLogHan
 		propertyMapper.from(configurer::getDateTimeFormat).to(logHandlerFactoryBean::setDateTimeFormat);
 		propertyMapper.from(configurer::getRequestParametersFormatter)
 				.to(logHandlerFactoryBean::setRequestParametersFormatter);
+		propertyMapper.from(configurer::getGeoFormatter).to(logHandlerFactoryBean::setGeoFormatter);
 		propertyMapper.from(configurer::getExtraFormatter).to(logHandlerFactoryBean::setExtraFormatter);
 		propertyMapper.from(configurer::getDataConverter).to(logHandlerFactoryBean::setLogDataConverter);
 
