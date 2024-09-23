@@ -180,16 +180,20 @@ public class RestLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<RestLog
 				"Property 'httpClient' or 'httpAsyncClient' is required");
 
 		if(logHandler == null){
-			if(getHttpAsyncClient() != null){
-				logHandler = getRequestMethod() == null ? new RestLogHandler(getHttpAsyncClient(), getUrl()) :
-						new RestLogHandler(getHttpAsyncClient(), getUrl(), getRequestMethod());
-			}else{
-				logHandler = getRequestMethod() == null ? new RestLogHandler(getHttpClient(), getUrl()) :
-						new RestLogHandler(getHttpClient(), getUrl(), getRequestMethod());
-			}
+			synchronized(this){
+				if(logHandler == null){
+					if(getHttpAsyncClient() != null){
+						logHandler = getRequestMethod() == null ? new RestLogHandler(getHttpAsyncClient(), getUrl()) :
+								new RestLogHandler(getHttpAsyncClient(), getUrl(), getRequestMethod());
+					}else{
+						logHandler = getRequestMethod() == null ? new RestLogHandler(getHttpClient(), getUrl()) :
+								new RestLogHandler(getHttpClient(), getUrl(), getRequestMethod());
+					}
 
-			if(getRequestBodyBuilder() != null){
-				logHandler.setRequestBodyBuilder(getRequestBodyBuilder());
+					if(getRequestBodyBuilder() != null){
+						logHandler.setRequestBodyBuilder(getRequestBodyBuilder());
+					}
+				}
 			}
 		}
 	}

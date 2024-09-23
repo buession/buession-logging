@@ -22,29 +22,59 @@
  * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.rabbitmq.spring.config;
+package com.buession.logging.mongodb.core;
 
-import com.buession.logging.rabbitmq.spring.RabbitLogHandlerFactoryBean;
-import com.buession.logging.support.config.AbstractLogHandlerConfiguration;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import com.buession.core.datetime.DateTimeUtils;
+import org.bson.BsonReader;
+import org.bson.BsonTimestamp;
+import org.bson.BsonWriter;
+import org.bson.codecs.Codec;
+import org.bson.codecs.DecoderContext;
+import org.bson.codecs.EncoderContext;
+import org.bson.codecs.configuration.CodecProvider;
+import org.bson.codecs.configuration.CodecRegistry;
+
+import java.time.ZonedDateTime;
+import java.util.Date;
 
 /**
- * RabbitMQ 日志处理器自动配置类
- *
  * @author Yong.Teng
- * @since 0.0.1
+ * @since 1.0.0
  */
-public abstract class AbstractRabbitLogHandlerConfiguration extends AbstractLogHandlerConfiguration {
+public class ZonedDateTimeCodecProvider implements CodecProvider {
 
-	public RabbitLogHandlerFactoryBean logHandlerFactoryBean(
-			RabbitLogHandlerFactoryBeanConfigurer configurer, RabbitTemplate rabbitTemplate) {
-		final RabbitLogHandlerFactoryBean logHandlerFactoryBean = new RabbitLogHandlerFactoryBean();
+	public ZonedDateTimeCodecProvider() {
+	}
 
-		logHandlerFactoryBean.setRabbitTemplate(rabbitTemplate);
-		logHandlerFactoryBean.setExchange(configurer.getExchange());
-		logHandlerFactoryBean.setRoutingKey(configurer.getRoutingKey());
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> Codec<T> get(final Class<T> clazz, final CodecRegistry codecRegistry) {
+		return ZonedDateTime.class.isAssignableFrom(clazz) ? (Codec<T>) new ZonedDateTimeCodec() : null;
+	}
 
-		return logHandlerFactoryBean;
+	private static class ZonedDateTimeCodec implements Codec<ZonedDateTime> {
+
+		private ZonedDateTimeCodec() {
+		}
+
+		@Override
+		public ZonedDateTime decode(final BsonReader reader, final DecoderContext decoderContext) {
+			BsonTimestamp timestamp = reader.readTimestamp();
+			Date date = new Date(timestamp.getTime());
+			return DateTimeUtils.zonedDateTimeOf(date);
+		}
+
+		@Override
+		public void encode(final BsonWriter writer, final ZonedDateTime zonedDateTime,
+						   final EncoderContext encoderContext) {
+			writer.writeTimestamp(new BsonTimestamp(DateTimeUtils.dateOf(zonedDateTime).getTime()));
+		}
+
+		@Override
+		public Class<ZonedDateTime> getEncoderClass() {
+			return ZonedDateTime.class;
+		}
+
 	}
 
 }

@@ -25,8 +25,6 @@
 package com.buession.logging.mongodb.spring.config;
 
 import com.buession.logging.mongodb.spring.MongoLogHandlerFactoryBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 /**
@@ -35,10 +33,8 @@ import org.springframework.data.mongodb.core.MongoTemplate;
  * @author Yong.Teng
  * @since 0.0.1
  */
-@Configuration(proxyBeanMethods = false)
 public abstract class AbstractMongoLogHandlerConfiguration {
 
-	@Bean
 	public MongoLogHandlerFactoryBean logHandlerFactoryBean(MongoTemplate mongoTemplate) {
 		final MongoLogHandlerFactoryBean logHandlerFactoryBean = new MongoLogHandlerFactoryBean();
 

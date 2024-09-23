@@ -26,17 +26,13 @@ package com.buession.logging.console.spring.config;
 
 import com.buession.logging.console.spring.ConsoleLogHandlerFactoryBean;
 import com.buession.logging.support.config.AbstractLogHandlerConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Yong.Teng
  * @since 1.0.0
  */
-@Configuration(proxyBeanMethods = false)
 public abstract class AbstractConsoleLogHandlerConfiguration extends AbstractLogHandlerConfiguration {
 
-	@Bean
 	public ConsoleLogHandlerFactoryBean logHandlerFactoryBean(ConsoleLogHandlerFactoryBeanConfigurer configurer) {
 		final ConsoleLogHandlerFactoryBean logHandlerFactoryBean = new ConsoleLogHandlerFactoryBean();
 

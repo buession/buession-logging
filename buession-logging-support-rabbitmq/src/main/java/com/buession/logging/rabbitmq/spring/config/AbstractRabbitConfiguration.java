@@ -25,7 +25,6 @@
 package com.buession.logging.rabbitmq.spring.config;
 
 import com.buession.core.converter.mapper.PropertyMapper;
-import com.buession.core.utils.Assert;
 import com.buession.core.utils.StringUtils;
 import com.buession.core.validator.Validate;
 import com.buession.logging.core.SslConfiguration;
@@ -37,8 +36,6 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.connection.RabbitConnectionFactoryBean;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
@@ -52,12 +49,10 @@ import java.util.List;
  * @author Yong.Teng
  * @since 0.0.1
  */
-@Configuration(proxyBeanMethods = false)
 public abstract class AbstractRabbitConfiguration {
 
 	protected final static PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 
-	@Bean
 	public ConnectionFactory rabbitConnectionFactory(RabbitConfigurer configurer) throws Exception {
 		final RabbitConnectionFactoryBean rabbitConnectionFactoryBean = createRabbitConnectionFactoryBean(configurer);
 
@@ -84,7 +79,6 @@ public abstract class AbstractRabbitConfiguration {
 		return connectionFactory;
 	}
 
-	@Bean
 	public RabbitTemplate rabbitTemplate(RabbitConfigurer configurer, ConnectionFactory connectionFactory) {
 		final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
 

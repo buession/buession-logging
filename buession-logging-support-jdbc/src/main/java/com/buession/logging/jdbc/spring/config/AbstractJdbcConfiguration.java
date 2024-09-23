@@ -31,8 +31,6 @@ import com.buession.jdbc.datasource.*;
 import com.buession.jdbc.datasource.pool.*;
 import org.springframework.beans.BeanInstantiationException;
 import org.springframework.beans.BeanUtils;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.ClassUtils;
 
@@ -45,7 +43,6 @@ import java.util.Map;
  * @author Yong.Teng
  * @since 1.0.0
  */
-@Configuration(proxyBeanMethods = false)
 public abstract class AbstractJdbcConfiguration {
 
 	protected final static PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
@@ -66,7 +63,6 @@ public abstract class AbstractJdbcConfiguration {
 				TomcatDataSource.class);
 	}
 
-	@Bean
 	public DataSource dataSource(JdbcConfigurer configurer) {
 		Assert.isBlank(configurer.getDriverClassName(), "Property 'driverClassName' is required");
 		Assert.isBlank(configurer.getUrl(), "Property 'url' is required");
@@ -136,7 +132,6 @@ public abstract class AbstractJdbcConfiguration {
 		}
 	}
 
-	@Bean
 	public JdbcTemplate jdbcTemplate(DataSource dataSource) {
 		return new JdbcTemplate(dataSource);
 	}

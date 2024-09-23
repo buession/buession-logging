@@ -91,7 +91,11 @@ public class KafkaLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<KafkaL
 		Assert.isBlank(getTopic(), "Property 'topic' is required");
 
 		if(logHandler == null){
-			logHandler = new KafkaLogHandler(getKafkaTemplate(), getTopic());
+			synchronized(this){
+				if(logHandler == null){
+					logHandler = new KafkaLogHandler(getKafkaTemplate(), getTopic());
+				}
+			}
 		}
 	}
 

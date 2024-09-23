@@ -38,8 +38,6 @@ import org.elasticsearch.client.Node;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchClients;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.config.ElasticsearchConfigurationSupport;
@@ -52,15 +50,12 @@ import java.net.URISyntaxException;
  * @author Yong.Teng
  * @since 1.0.0
  */
-@Configuration(proxyBeanMethods = false)
 public abstract class AbstractElasticsearchConfiguration extends ElasticsearchConfigurationSupport {
 
 	protected final static PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 
-	@Bean
 	public abstract RestClientBuilderCustomizer restClientBuilderCustomizer();
 
-	@Bean
 	public RestClient restClient(ElasticsearchConfigurer configurer,
 								 ObjectProvider<RestClientBuilderCustomizer> restClientBuilderCustomizer) {
 		Assert.isEmpty(configurer.getUrls(), "Property 'urls' is required");
@@ -69,7 +64,6 @@ public abstract class AbstractElasticsearchConfiguration extends ElasticsearchCo
 		return restClientBuilder.build();
 	}
 
-	@Bean
 	public ElasticsearchClient elasticsearchClient(ElasticsearchConfigurer configurer, RestClient restClient,
 												   ObjectProvider<TransportOptionsCustomizer> transportOptionsCustomizer) {
 		final HeaderMap headers = configurer.getHeaders() == null ? null : new HeaderMap(configurer.getHeaders());
@@ -81,7 +75,6 @@ public abstract class AbstractElasticsearchConfiguration extends ElasticsearchCo
 		return ElasticsearchClients.createImperative(restClient, transportOptions);
 	}
 
-	@Bean
 	public ElasticsearchTemplate elasticsearchTemplate(ElasticsearchConfigurer configurer,
 													   ElasticsearchClient elasticsearchClient,
 													   ObjectProvider<ElasticsearchConverter> elasticsearchConverter) {

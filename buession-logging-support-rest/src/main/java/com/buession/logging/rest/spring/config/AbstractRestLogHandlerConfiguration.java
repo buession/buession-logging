@@ -29,8 +29,6 @@ import com.buession.httpclient.HttpClient;
 import com.buession.logging.rest.spring.RestLogHandlerFactoryBean;
 import com.buession.logging.support.config.AbstractLogHandlerConfiguration;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * Rest 日志处理器自动配置类
@@ -38,10 +36,8 @@ import org.springframework.context.annotation.Configuration;
  * @author Yong.Teng
  * @since 0.0.1
  */
-@Configuration(proxyBeanMethods = false)
 public abstract class AbstractRestLogHandlerConfiguration extends AbstractLogHandlerConfiguration {
 
-	@Bean
 	public RestLogHandlerFactoryBean logHandlerFactoryBean(RestLogHandlerFactoryBeanConfigurer configurer,
 														   ObjectProvider<HttpClient> httpClient,
 														   ObjectProvider<HttpAsyncClient> httpAsyncClient) {

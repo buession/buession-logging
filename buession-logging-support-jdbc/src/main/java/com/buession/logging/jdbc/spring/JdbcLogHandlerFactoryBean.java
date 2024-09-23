@@ -256,17 +256,21 @@ public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLog
 		Assert.isBlank(getSql(), "Property 'sql' is required");
 
 		if(logHandler == null){
-			logHandler = new JdbcLogHandler(getJdbcTemplate(), getSql());
+			synchronized(this){
+				if(logHandler == null){
+					logHandler = new JdbcLogHandler(getJdbcTemplate(), getSql());
 
-			final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
+					final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 
-			propertyMapper.from(getIdGenerator()).to(logHandler::setIdGenerator);
-			propertyMapper.from(getDateTimeFormat()).whenHasText().as(DateTimeFormatter::new)
-					.to(logHandler::setDateTimeFormatter);
-			propertyMapper.from(getRequestParametersFormatter()).to(logHandler::setRequestParametersFormatter);
-			propertyMapper.from(getGeoFormatter()).to(logHandler::setGeoFormatter);
-			propertyMapper.from(getExtraFormatter()).to(logHandler::setExtraFormatter);
-			propertyMapper.from(getLogDataConverter()).to(logHandler::setLogDataConverter);
+					propertyMapper.from(getIdGenerator()).to(logHandler::setIdGenerator);
+					propertyMapper.from(getDateTimeFormat()).whenHasText().as(DateTimeFormatter::new)
+							.to(logHandler::setDateTimeFormatter);
+					propertyMapper.from(getRequestParametersFormatter()).to(logHandler::setRequestParametersFormatter);
+					propertyMapper.from(getGeoFormatter()).to(logHandler::setGeoFormatter);
+					propertyMapper.from(getExtraFormatter()).to(logHandler::setExtraFormatter);
+					propertyMapper.from(getLogDataConverter()).to(logHandler::setLogDataConverter);
+				}
+			}
 		}
 	}
 

@@ -91,9 +91,12 @@ public class ConsoleLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<Cons
 		Assert.isNull(getTemplate(), "Property 'template' is required");
 
 		if(logHandler == null){
-			logHandler =
-					getFormatter() == null ? new ConsoleLogHandler(getTemplate()) : new ConsoleLogHandler(getTemplate(),
-							getFormatter());
+			synchronized(this){
+				if(logHandler == null){
+					logHandler = getFormatter() == null ? new ConsoleLogHandler(getTemplate()) : new ConsoleLogHandler(
+							getTemplate(), getFormatter());
+				}
+			}
 		}
 	}
 

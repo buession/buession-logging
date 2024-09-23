@@ -40,7 +40,7 @@ public class LogManagerFactoryBean extends LogManagerFactory implements FactoryB
 	/**
 	 * 日志管理器
 	 */
-	private LogManager logManager;
+	private volatile LogManager logManager;
 
 	@Override
 	public LogManager getObject() throws Exception {
@@ -57,7 +57,11 @@ public class LogManagerFactoryBean extends LogManagerFactory implements FactoryB
 		Assert.isNull(getRequestContext(), "Property 'requestContext' is required");
 
 		if(logManager == null){
-			logManager = createLogManager();
+			synchronized(this){
+				if(logManager == null){
+					logManager = createLogManager();
+				}
+			}
 		}
 	}
 

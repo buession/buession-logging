@@ -22,29 +22,24 @@
  * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.rabbitmq.spring.config;
+package com.buession.logging.mongodb.core;
 
-import com.buession.logging.rabbitmq.spring.RabbitLogHandlerFactoryBean;
-import com.buession.logging.support.config.AbstractLogHandlerConfiguration;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.bson.Transformer;
+
+import java.time.ZonedDateTime;
 
 /**
- * RabbitMQ 日志处理器自动配置类
- *
  * @author Yong.Teng
- * @since 0.0.1
+ * @since 1.0.0
  */
-public abstract class AbstractRabbitLogHandlerConfiguration extends AbstractLogHandlerConfiguration {
+public class ZonedDateTimeTransformer implements Transformer {
 
-	public RabbitLogHandlerFactoryBean logHandlerFactoryBean(
-			RabbitLogHandlerFactoryBeanConfigurer configurer, RabbitTemplate rabbitTemplate) {
-		final RabbitLogHandlerFactoryBean logHandlerFactoryBean = new RabbitLogHandlerFactoryBean();
+	public ZonedDateTimeTransformer() {
+	}
 
-		logHandlerFactoryBean.setRabbitTemplate(rabbitTemplate);
-		logHandlerFactoryBean.setExchange(configurer.getExchange());
-		logHandlerFactoryBean.setRoutingKey(configurer.getRoutingKey());
-
-		return logHandlerFactoryBean;
+	public Object transform(final Object o) {
+		ZonedDateTime value = (ZonedDateTime) o;
+		return value.toString();
 	}
 
 }

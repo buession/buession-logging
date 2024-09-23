@@ -35,8 +35,6 @@ import com.buession.httpclient.conn.ApacheNioClientConnectionManager;
 import com.buession.httpclient.conn.OkHttpClientConnectionManager;
 import com.buession.httpclient.conn.OkHttpNioClientConnectionManager;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * Rest 日志处理器自动配置类
@@ -44,26 +42,22 @@ import org.springframework.context.annotation.Configuration;
  * @author Yong.Teng
  * @since 0.0.1
  */
-@Configuration(proxyBeanMethods = false)
 public abstract class AbstractHttpClientConfiguration {
 
 	protected final static PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 
 	protected abstract static class AbstractApacheHttpClientConfiguration extends AbstractHttpClientConfiguration {
 
-		@Bean
 		public com.buession.httpclient.apache.ApacheClientConnectionManager apache5ClientConnectionManager(
 				HttpClientConfigurer httpClientConfigurer) {
 			return new Apache5ClientConnectionManager(httpClientConfigurer);
 		}
 
-		@Bean
 		public com.buession.httpclient.apache.ApacheClientConnectionManager apacheClientConnectionManager(
 				HttpClientConfigurer httpClientConfigurer) {
 			return new ApacheClientConnectionManager(httpClientConfigurer);
 		}
 
-		@Bean
 		public com.buession.httpclient.ApacheHttpClient httpClient(
 				ObjectProvider<com.buession.httpclient.apache.ApacheClientConnectionManager> clientConnectionManager) {
 			final com.buession.httpclient.ApacheHttpClient apacheHttpClient = new com.buession.httpclient.ApacheHttpClient();
@@ -77,7 +71,6 @@ public abstract class AbstractHttpClientConfiguration {
 
 	protected abstract static class AbstractAsyncApacheHttpClientConfiguration extends AbstractHttpClientConfiguration {
 
-		@Bean
 		public com.buession.httpclient.apache.ApacheNioClientConnectionManager apache5NioClientConnectionManager(
 				HttpClientConfigurer httpClientConfigurer) {
 			final Apache5NioClientConnectionManager clientConnectionManager = new Apache5NioClientConnectionManager(
@@ -92,7 +85,6 @@ public abstract class AbstractHttpClientConfiguration {
 			return clientConnectionManager;
 		}
 
-		@Bean
 		public com.buession.httpclient.apache.ApacheNioClientConnectionManager apacheNioClientConnectionManager(
 				HttpClientConfigurer httpClientConfigurer) {
 			final ApacheNioClientConnectionManager clientConnectionManager = new ApacheNioClientConnectionManager(
@@ -107,7 +99,6 @@ public abstract class AbstractHttpClientConfiguration {
 			return clientConnectionManager;
 		}
 
-		@Bean
 		public ApacheHttpAsyncClient httpAsyncClient(
 				ObjectProvider<com.buession.httpclient.apache.ApacheNioClientConnectionManager> clientConnectionManager) {
 			final ApacheHttpAsyncClient apacheHttpAsyncClient = new ApacheHttpAsyncClient();
@@ -121,12 +112,10 @@ public abstract class AbstractHttpClientConfiguration {
 
 	protected abstract static class AbstractOkHttpClientConfiguration extends AbstractHttpClientConfiguration {
 
-		@Bean
 		public OkHttpClientConnectionManager okHttpClientConnectionManager(HttpClientConfigurer httpClientConfigurer) {
 			return new OkHttpClientConnectionManager(httpClientConfigurer);
 		}
 
-		@Bean
 		public OkHttpHttpClient httpClient(ObjectProvider<OkHttpClientConnectionManager> clientConnectionManager) {
 			final OkHttpHttpClient okHttpClient = new OkHttpHttpClient();
 
@@ -139,14 +128,12 @@ public abstract class AbstractHttpClientConfiguration {
 
 	protected static abstract class AbstractAsyncOkHttpClientConfiguration extends AbstractHttpClientConfiguration {
 
-		@Bean
 		public OkHttpNioClientConnectionManager okHttpNioClientConnectionManager(
 				HttpClientConfigurer httpClientConfigurer) {
 			return new OkHttpNioClientConnectionManager(httpClientConfigurer);
 		}
 
-		@Bean
-		public OkHttpHttpAsyncClient httpClient(
+		public OkHttpHttpAsyncClient httpAsyncClient(
 				ObjectProvider<OkHttpNioClientConnectionManager> clientConnectionManager) {
 			final OkHttpHttpAsyncClient okHttpHttpAsyncClient = new OkHttpHttpAsyncClient();
 

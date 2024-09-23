@@ -103,12 +103,16 @@ public class RabbitLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<Rabbi
 		Assert.isBlank(getRoutingKey(), "Property 'topic' is required");
 
 		if(logHandler == null){
-			logHandler = new RabbitLogHandler(getRabbitTemplate(), new Jackson2JsonMessageConverter());
+			synchronized(this){
+				if(logHandler == null){
+					logHandler = new RabbitLogHandler(getRabbitTemplate(), new Jackson2JsonMessageConverter());
 
-			final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenHasText();
+					final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenHasText();
 
-			propertyMapper.from(getExchange()).to(logHandler::setExchange);
-			propertyMapper.from(getRoutingKey()).to(logHandler::setRoutingKey);
+					propertyMapper.from(getExchange()).to(logHandler::setExchange);
+					propertyMapper.from(getRoutingKey()).to(logHandler::setRoutingKey);
+				}
+			}
 		}
 	}
 

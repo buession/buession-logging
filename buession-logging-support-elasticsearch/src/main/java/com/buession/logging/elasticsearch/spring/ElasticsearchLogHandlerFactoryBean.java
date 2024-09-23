@@ -132,9 +132,13 @@ public class ElasticsearchLogHandlerFactoryBean extends BaseLogHandlerFactoryBea
 		Assert.isBlank(getIndexName(), "Property 'indexName' is required");
 
 		if(logHandler == null){
-			logHandler = new ElasticsearchLogHandler(getElasticsearchTemplate(), getIndexName());
-			if(autoCreateIndex){
-				logHandler.setAutoCreateIndex(autoCreateIndex);
+			synchronized(this){
+				if(logHandler == null){
+					logHandler = new ElasticsearchLogHandler(getElasticsearchTemplate(), getIndexName());
+					if(autoCreateIndex){
+						logHandler.setAutoCreateIndex(autoCreateIndex);
+					}
+				}
 			}
 		}
 	}

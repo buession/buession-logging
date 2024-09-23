@@ -26,8 +26,6 @@ package com.buession.logging.elasticsearch.spring.config;
 
 import com.buession.logging.elasticsearch.spring.ElasticsearchLogHandlerFactoryBean;
 import com.buession.logging.support.config.AbstractLogHandlerConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 
 /**
@@ -36,10 +34,8 @@ import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
  * @author Yong.Teng
  * @since 0.0.1
  */
-@Configuration(proxyBeanMethods = false)
 public abstract class AbstractElasticsearchLogHandlerConfiguration extends AbstractLogHandlerConfiguration {
 
-	@Bean
 	public ElasticsearchLogHandlerFactoryBean logHandlerFactoryBean(ElasticsearchTemplate elasticsearchTemplate,
 																	ElasticsearchLogHandlerFactoryBeanConfigurer configurer) {
 		final ElasticsearchLogHandlerFactoryBean logHandlerFactoryBean = new ElasticsearchLogHandlerFactoryBean();

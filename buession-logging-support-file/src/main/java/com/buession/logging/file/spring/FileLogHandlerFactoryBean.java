@@ -94,7 +94,11 @@ public class FileLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<FileLog
 		Assert.isTrue(getFile().isDirectory(), getFile() + " is a directory.");
 
 		if(logHandler == null){
-			logHandler = new FileLogHandler(getFile(), getFormatter());
+			synchronized(this){
+				if(logHandler == null){
+					logHandler = new FileLogHandler(getFile(), getFormatter());
+				}
+			}
 		}
 	}
 

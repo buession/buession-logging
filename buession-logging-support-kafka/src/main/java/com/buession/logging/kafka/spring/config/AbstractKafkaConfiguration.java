@@ -28,8 +28,6 @@ import com.buession.core.converter.mapper.PropertyMapper;
 import com.buession.core.utils.Assert;
 import com.buession.logging.kafka.ProducerFactoryCustomizer;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
@@ -43,12 +41,10 @@ import org.springframework.kafka.support.converter.JsonMessageConverter;
  * @author Yong.Teng
  * @since 0.0.1
  */
-@Configuration(proxyBeanMethods = false)
 public abstract class AbstractKafkaConfiguration {
 
 	protected final static PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 
-	@Bean
 	public ProducerFactory<String, Object> producerFactory(KafkaConfigurer configurer,
 														   ObjectProvider<ProducerFactoryCustomizer> producerFactoryCustomizers) {
 		Assert.isNull(configurer.getBootstrapServers(), "Property 'bootstrapServers' is required");
@@ -63,12 +59,10 @@ public abstract class AbstractKafkaConfiguration {
 		return producerFactory;
 	}
 
-	@Bean
 	public LoggingProducerListener<String, Object> kafkaProducerListener() {
 		return new LoggingProducerListener<>();
 	}
 
-	@Bean
 	public KafkaTemplate<String, Object> kafkaTemplate(KafkaConfigurer configurer,
 													   ProducerFactory<String, Object> producerFactory,
 													   ProducerListener<String, Object> kafkaProducerListener) {

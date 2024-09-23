@@ -26,8 +26,6 @@ package com.buession.logging.jdbc.spring.config;
 
 import com.buession.logging.jdbc.spring.JdbcLogHandlerFactoryBean;
 import com.buession.logging.support.config.AbstractLogHandlerConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
@@ -36,10 +34,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * @author Yong.Teng
  * @since 0.0.1
  */
-@Configuration(proxyBeanMethods = false)
 public abstract class AbstractJdbcLogHandlerConfiguration extends AbstractLogHandlerConfiguration {
 
-	@Bean
 	public JdbcLogHandlerFactoryBean logHandlerFactoryBean(JdbcLogHandlerFactoryBeanConfigurer configurer,
 														   JdbcTemplate jdbcTemplate) {
 		final JdbcLogHandlerFactoryBean logHandlerFactoryBean = new JdbcLogHandlerFactoryBean();

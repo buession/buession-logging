@@ -212,9 +212,9 @@ public class HttpClientConfiguration extends AbstractHttpClientConfiguration {
 		@Bean(name = LOGGING_ASYNC_HTTPCLIENT_BEAN_NAME)
 		@ConditionalOnMissingBean(name = LOGGING_ASYNC_HTTPCLIENT_BEAN_NAME)
 		@Override
-		public OkHttpHttpAsyncClient httpClient(
+		public OkHttpHttpAsyncClient httpAsyncClient(
 				@Qualifier(LOGGING_HTTPCLIENT_CONNECTION_MANAGER) ObjectProvider<OkHttpNioClientConnectionManager> clientConnectionManager) {
-			return super.httpClient(clientConnectionManager);
+			return super.httpAsyncClient(clientConnectionManager);
 		}
 
 	}

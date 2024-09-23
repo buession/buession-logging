@@ -43,7 +43,7 @@ public abstract class BaseLogHandlerFactoryBean<T extends LogHandler> extends Lo
 	/**
 	 * 日志处理器
 	 */
-	protected T logHandler;
+	protected volatile T logHandler;
 
 	@Override
 	public T getObject() throws Exception {
@@ -54,5 +54,5 @@ public abstract class BaseLogHandlerFactoryBean<T extends LogHandler> extends Lo
 	public Class<? extends LogHandler> getObjectType() {
 		return logHandler.getClass();
 	}
-	
+
 }

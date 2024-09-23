@@ -26,8 +26,6 @@ package com.buession.logging.kafka.spring.config;
 
 import com.buession.logging.kafka.spring.KafkaLogHandlerFactoryBean;
 import com.buession.logging.support.config.AbstractLogHandlerConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.KafkaTemplate;
 
 /**
@@ -36,10 +34,8 @@ import org.springframework.kafka.core.KafkaTemplate;
  * @author Yong.Teng
  * @since 0.0.1
  */
-@Configuration(proxyBeanMethods = false)
 public abstract class AbstractKafkaLogHandlerConfiguration extends AbstractLogHandlerConfiguration {
 
-	@Bean
 	public KafkaLogHandlerFactoryBean logHandlerFactoryBean(KafkaTemplate<String, Object> kafkaTemplate) {
 		final KafkaLogHandlerFactoryBean logHandlerFactoryBean = new KafkaLogHandlerFactoryBean();
 

@@ -26,8 +26,6 @@ package com.buession.logging.file.spring.config;
 
 import com.buession.logging.file.spring.FileLogHandlerFactoryBean;
 import com.buession.logging.support.config.AbstractLogHandlerConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import java.io.File;
 
@@ -35,10 +33,8 @@ import java.io.File;
  * @author Yong.Teng
  * @since 1.0.0
  */
-@Configuration(proxyBeanMethods = false)
 public abstract class AbstractFileLogHandlerConfiguration extends AbstractLogHandlerConfiguration {
 
-	@Bean
 	public FileLogHandlerFactoryBean logHandlerFactoryBean(FileLogHandlerFactoryBeanConfigurer configurer) {
 		final FileLogHandlerFactoryBean logHandlerFactoryBean = new FileLogHandlerFactoryBean();
 
