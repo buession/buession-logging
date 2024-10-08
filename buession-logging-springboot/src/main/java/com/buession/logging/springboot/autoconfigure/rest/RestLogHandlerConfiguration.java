@@ -28,8 +28,8 @@ import com.buession.httpclient.HttpAsyncClient;
 import com.buession.httpclient.HttpClient;
 import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.rest.spring.RestLogHandlerFactoryBean;
-import com.buession.logging.rest.spring.config.AbstractRestLogHandlerConfiguration;
 import com.buession.logging.rest.spring.config.RestLogHandlerFactoryBeanConfigurer;
+import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.RestProperties;
 import org.springframework.beans.BeanUtils;
@@ -53,34 +53,29 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnMissingBean(LogHandler.class)
 @ConditionalOnClass({RestLogHandlerFactoryBean.class})
 @ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "rest.enabled", havingValue = "true")
-public class RestLogHandlerConfiguration extends AbstractRestLogHandlerConfiguration {
-
-	private final RestProperties restProperties;
+public class RestLogHandlerConfiguration extends AbstractLogHandlerConfiguration<RestProperties> {
 
 	public RestLogHandlerConfiguration(LogProperties logProperties) {
-		this.restProperties = logProperties.getRest();
-	}
-
-	@Bean(name = "loggingRestLogHandlerFactoryBeanConfigurer")
-	@ConditionalOnMissingBean(name = "loggingRestLogHandlerFactoryBeanConfigurer")
-	public RestLogHandlerFactoryBeanConfigurer restLogHandlerFactoryBeanConfigurer() {
-		final RestLogHandlerFactoryBeanConfigurer configurer = new RestLogHandlerFactoryBeanConfigurer();
-
-		configurer.setUrl(restProperties.getUrl());
-		configurer.setRequestMethod(restProperties.getRequestMethod());
-		propertyMapper.from(restProperties::getRequestBodyBuilder).as(BeanUtils::instantiateClass)
-				.to(configurer::setRequestBodyBuilder);
-
-		return configurer;
+		super(logProperties.getRest());
 	}
 
 	@Bean
-	@Override
 	public RestLogHandlerFactoryBean logHandlerFactoryBean(
-			@Qualifier("loggingRestLogHandlerFactoryBeanConfigurer") RestLogHandlerFactoryBeanConfigurer configurer,
 			@Qualifier("loggingRestHttpClient") ObjectProvider<HttpClient> httpClient,
 			@Qualifier("loggingRestHttpAsyncClient") ObjectProvider<HttpAsyncClient> httpAsyncClient) {
-		return super.logHandlerFactoryBean(configurer, httpClient, httpAsyncClient);
+		final RestLogHandlerFactoryBeanConfigurer configurer = new RestLogHandlerFactoryBeanConfigurer();
+
+		configurer.setUrl(properties.getUrl());
+		configurer.setRequestMethod(properties.getRequestMethod());
+		propertyMapper.from(properties::getRequestBodyBuilder).as(BeanUtils::instantiateClass)
+				.to(configurer::setRequestBodyBuilder);
+
+		final RestLogHandlerFactoryBean factoryBean = new RestLogHandlerFactoryBean(configurer);
+
+		httpClient.ifAvailable(factoryBean::setHttpClient);
+		httpAsyncClient.ifAvailable(factoryBean::setHttpAsyncClient);
+
+		return factoryBean;
 	}
 
 }

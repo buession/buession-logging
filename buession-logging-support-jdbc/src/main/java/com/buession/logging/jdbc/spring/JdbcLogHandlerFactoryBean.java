@@ -35,6 +35,7 @@ import com.buession.logging.core.formatter.GeoFormatter;
 import com.buession.logging.jdbc.formatter.JsonMapFormatter;
 import com.buession.logging.core.formatter.MapFormatter;
 import com.buession.logging.jdbc.handler.JdbcLogHandler;
+import com.buession.logging.jdbc.spring.config.JdbcLogHandlerFactoryBeanConfigurer;
 import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -93,6 +94,30 @@ public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLog
 	 * @since 2.3.3
 	 */
 	private LogDataConverter logDataConverter = new DefaultLogDataConverter();
+
+	/**
+	 * 构造函数
+	 */
+	public JdbcLogHandlerFactoryBean() {
+	}
+
+	/**
+	 * 构造函数
+	 *
+	 * @param configurer
+	 *        {@link JdbcLogHandlerFactoryBeanConfigurer}
+	 */
+	public JdbcLogHandlerFactoryBean(final JdbcLogHandlerFactoryBeanConfigurer configurer) {
+		setJdbcTemplate(jdbcTemplate);
+		setSql(configurer.getSql());
+
+		propertyMapper.from(configurer::getIdGenerator).to(this::setIdGenerator);
+		propertyMapper.from(configurer::getDateTimeFormat).to(this::setDateTimeFormat);
+		propertyMapper.from(configurer::getRequestParametersFormatter).to(this::setRequestParametersFormatter);
+		propertyMapper.from(configurer::getGeoFormatter).to(this::setGeoFormatter);
+		propertyMapper.from(configurer::getExtraFormatter).to(this::setExtraFormatter);
+		propertyMapper.from(configurer::getDataConverter).to(this::setLogDataConverter);
+	}
 
 	/**
 	 * 返回 {@link JdbcTemplate}

@@ -31,6 +31,7 @@ import com.buession.logging.core.RequestMethod;
 import com.buession.logging.rest.core.JsonRequestBodyBuilder;
 import com.buession.logging.rest.core.RequestBodyBuilder;
 import com.buession.logging.rest.handler.RestLogHandler;
+import com.buession.logging.rest.spring.config.RestLogHandlerFactoryBeanConfigurer;
 import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
 
 /**
@@ -69,6 +70,24 @@ public class RestLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<RestLog
 	 * 请求体构建器
 	 */
 	private RequestBodyBuilder requestBodyBuilder = new JsonRequestBodyBuilder();
+
+	/**
+	 * 构造函数
+	 */
+	public RestLogHandlerFactoryBean() {
+	}
+
+	/**
+	 * 构造函数
+	 *
+	 * @param configurer
+	 *        {@link RestLogHandlerFactoryBeanConfigurer}
+	 */
+	public RestLogHandlerFactoryBean(final RestLogHandlerFactoryBeanConfigurer configurer) {
+		setUrl(configurer.getUrl());
+		setRequestMethod(configurer.getRequestMethod());
+		setRequestBodyBuilder(configurer.getRequestBodyBuilder());
+	}
 
 	/**
 	 * 访问 {@link HttpClient}

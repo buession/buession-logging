@@ -26,6 +26,7 @@ package com.buession.logging.elasticsearch.spring;
 
 import com.buession.core.utils.Assert;
 import com.buession.logging.elasticsearch.handler.ElasticsearchLogHandler;
+import com.buession.logging.elasticsearch.spring.config.ElasticsearchLogHandlerFactoryBeanConfigurer;
 import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 
@@ -53,6 +54,23 @@ public class ElasticsearchLogHandlerFactoryBean extends BaseLogHandlerFactoryBea
 	 * @since 1.0.0
 	 */
 	private Boolean autoCreateIndex = true;
+
+	/**
+	 * 构造函数
+	 */
+	public ElasticsearchLogHandlerFactoryBean() {
+	}
+
+	/**
+	 * 构造函数
+	 *
+	 * @param configurer
+	 *        {@link  ElasticsearchLogHandlerFactoryBeanConfigurer}
+	 */
+	public ElasticsearchLogHandlerFactoryBean(final ElasticsearchLogHandlerFactoryBeanConfigurer configurer) {
+		propertyMapper.from(configurer.getIndexName()).to(this::setIndexName);
+		propertyMapper.from(configurer.getAutoCreateIndex()).to(this::setAutoCreateIndex);
+	}
 
 	/**
 	 * 返回 {@link ElasticsearchTemplate}

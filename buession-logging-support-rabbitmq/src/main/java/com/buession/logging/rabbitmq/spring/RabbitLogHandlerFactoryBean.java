@@ -27,6 +27,7 @@ package com.buession.logging.rabbitmq.spring;
 import com.buession.core.converter.mapper.PropertyMapper;
 import com.buession.core.utils.Assert;
 import com.buession.logging.rabbitmq.handler.RabbitLogHandler;
+import com.buession.logging.rabbitmq.spring.config.RabbitLogHandlerFactoryBeanConfigurer;
 import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -50,6 +51,24 @@ public class RabbitLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<Rabbi
 	 * Routing key 名称
 	 */
 	private String routingKey;
+
+	/**
+	 * 构造函数
+	 */
+	public RabbitLogHandlerFactoryBean() {
+
+	}
+
+	/**
+	 * 构造函数
+	 *
+	 * @param configurer
+	 *        {@link RabbitLogHandlerFactoryBeanConfigurer}
+	 */
+	public RabbitLogHandlerFactoryBean(final RabbitLogHandlerFactoryBeanConfigurer configurer) {
+		setExchange(configurer.getExchange());
+		setRoutingKey(configurer.getRoutingKey());
+	}
 
 	public RabbitTemplate getRabbitTemplate() {
 		return rabbitTemplate;
@@ -107,10 +126,8 @@ public class RabbitLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<Rabbi
 				if(logHandler == null){
 					logHandler = new RabbitLogHandler(getRabbitTemplate(), new Jackson2JsonMessageConverter());
 
-					final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenHasText();
-
-					propertyMapper.from(getExchange()).to(logHandler::setExchange);
-					propertyMapper.from(getRoutingKey()).to(logHandler::setRoutingKey);
+					propertyMapper.alwaysApplyingWhenHasText().from(getExchange()).to(logHandler::setExchange);
+					propertyMapper.alwaysApplyingWhenHasText().from(getRoutingKey()).to(logHandler::setRoutingKey);
 				}
 			}
 		}

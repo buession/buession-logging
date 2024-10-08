@@ -48,6 +48,12 @@ public class KafkaLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<KafkaL
 	private String topic;
 
 	/**
+	 * 构造函数
+	 */
+	public KafkaLogHandlerFactoryBean() {
+	}
+
+	/**
 	 * 返回 {@link KafkaTemplate}
 	 *
 	 * @return {@link KafkaTemplate}

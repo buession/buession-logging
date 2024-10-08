@@ -26,7 +26,7 @@ package com.buession.logging.springboot.autoconfigure.mongo;
 
 import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.mongodb.spring.MongoLogHandlerFactoryBean;
-import com.buession.logging.mongodb.spring.config.AbstractMongoLogHandlerConfiguration;
+import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.MongoProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -49,24 +49,21 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 @ConditionalOnMissingBean(LogHandler.class)
 @ConditionalOnClass({MongoLogHandlerFactoryBean.class})
 @ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "mongo.enabled", havingValue = "true")
-public class MongoLogHandlerConfiguration extends AbstractMongoLogHandlerConfiguration {
-
-	private final MongoProperties mongoProperties;
+public class MongoLogHandlerConfiguration extends AbstractLogHandlerConfiguration<MongoProperties> {
 
 	public MongoLogHandlerConfiguration(LogProperties logProperties) {
-		this.mongoProperties = logProperties.getMongo();
+		super(logProperties.getMongo());
 	}
 
 	@Bean
-	@Override
 	public MongoLogHandlerFactoryBean logHandlerFactoryBean(
 			@Qualifier("loggingMongoTemplate") MongoTemplate mongoTemplate) {
-		return super.logHandlerFactoryBean(mongoTemplate);
-	}
+		final MongoLogHandlerFactoryBean factoryBean = new MongoLogHandlerFactoryBean();
 
-	@Override
-	protected String getCollectionName() {
-		return mongoProperties.getCollectionName();
+		factoryBean.setMongoTemplate(mongoTemplate);
+		factoryBean.setCollectionName(properties.getCollectionName());
+
+		return factoryBean;
 	}
 
 }

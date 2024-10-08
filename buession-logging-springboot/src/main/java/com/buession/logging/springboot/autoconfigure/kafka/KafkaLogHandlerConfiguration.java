@@ -26,7 +26,7 @@ package com.buession.logging.springboot.autoconfigure.kafka;
 
 import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.kafka.spring.KafkaLogHandlerFactoryBean;
-import com.buession.logging.kafka.spring.config.AbstractKafkaLogHandlerConfiguration;
+import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.KafkaProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -49,24 +49,21 @@ import org.springframework.kafka.core.KafkaTemplate;
 @ConditionalOnMissingBean(LogHandler.class)
 @ConditionalOnClass({KafkaLogHandlerFactoryBean.class})
 @ConditionalOnProperty(prefix = KafkaProperties.PREFIX, name = "enabled", havingValue = "true")
-public class KafkaLogHandlerConfiguration extends AbstractKafkaLogHandlerConfiguration {
-
-	private final KafkaProperties kafkaProperties;
+public class KafkaLogHandlerConfiguration extends AbstractLogHandlerConfiguration<KafkaProperties> {
 
 	public KafkaLogHandlerConfiguration(LogProperties logProperties) {
-		this.kafkaProperties = logProperties.getKafka();
+		super(logProperties.getKafka());
 	}
 
 	@Bean
-	@Override
 	public KafkaLogHandlerFactoryBean logHandlerFactoryBean(
 			@Qualifier("loggingKafkaTemplate") KafkaTemplate<String, Object> kafkaTemplate) {
-		return super.logHandlerFactoryBean(kafkaTemplate);
-	}
+		final KafkaLogHandlerFactoryBean factoryBean = new KafkaLogHandlerFactoryBean();
 
-	@Override
-	protected String getTopic() {
-		return kafkaProperties.getTopic();
+		factoryBean.setKafkaTemplate(kafkaTemplate);
+		factoryBean.setTopic(properties.getTopic());
+
+		return factoryBean;
 	}
 
 }

@@ -27,8 +27,6 @@ package com.buession.logging.jdbc.spring.config;
 import com.buession.jdbc.config.Config;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 /**

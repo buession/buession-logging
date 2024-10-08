@@ -26,12 +26,11 @@ package com.buession.logging.springboot.autoconfigure.file;
 
 import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.file.spring.FileLogHandlerFactoryBean;
-import com.buession.logging.file.spring.config.AbstractFileLogHandlerConfiguration;
 import com.buession.logging.file.spring.config.FileLogHandlerFactoryBeanConfigurer;
+import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.FileProperties;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -50,30 +49,20 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnMissingBean(LogHandler.class)
 @ConditionalOnClass({FileLogHandlerFactoryBean.class})
 @ConditionalOnProperty(prefix = FileProperties.PREFIX, name = "enabled", havingValue = "true")
-public class FileLogHandlerConfiguration extends AbstractFileLogHandlerConfiguration {
-
-	private final FileProperties fileProperties;
+public class FileLogHandlerConfiguration extends AbstractLogHandlerConfiguration<FileProperties> {
 
 	public FileLogHandlerConfiguration(LogProperties logProperties) {
-		this.fileProperties = logProperties.getFile();
-	}
-
-	@Bean(name = "loggingFileLogHandlerFactoryBeanConfigurer")
-	@ConditionalOnMissingBean(name = "loggingFileLogHandlerFactoryBeanConfigurer")
-	public FileLogHandlerFactoryBeanConfigurer fileLogHandlerFactoryBeanConfigurer() {
-		final FileLogHandlerFactoryBeanConfigurer configurer = new FileLogHandlerFactoryBeanConfigurer();
-
-		configurer.setPath(fileProperties.getPath());
-		propertyMapper.from(fileProperties::getFormatter).as(BeanUtils::instantiateClass).to(configurer::setFormatter);
-
-		return configurer;
+		super(logProperties.getFile());
 	}
 
 	@Bean
-	@Override
-	public FileLogHandlerFactoryBean logHandlerFactoryBean(
-			@Qualifier("loggingFileLogHandlerFactoryBeanConfigurer") FileLogHandlerFactoryBeanConfigurer configurer) {
-		return super.logHandlerFactoryBean(configurer);
+	public FileLogHandlerFactoryBean logHandlerFactoryBean() {
+		final FileLogHandlerFactoryBeanConfigurer configurer = new FileLogHandlerFactoryBeanConfigurer();
+
+		configurer.setPath(properties.getPath());
+		propertyMapper.from(properties::getFormatter).as(BeanUtils::instantiateClass).to(configurer::setFormatter);
+
+		return new FileLogHandlerFactoryBean(configurer);
 	}
 
 }

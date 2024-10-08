@@ -26,8 +26,8 @@ package com.buession.logging.springboot.autoconfigure.rabbit;
 
 import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.rabbitmq.spring.RabbitLogHandlerFactoryBean;
-import com.buession.logging.rabbitmq.spring.config.AbstractRabbitLogHandlerConfiguration;
 import com.buession.logging.rabbitmq.spring.config.RabbitLogHandlerFactoryBeanConfigurer;
+import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.RabbitProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -50,31 +50,25 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnMissingBean(LogHandler.class)
 @ConditionalOnClass({RabbitLogHandlerFactoryBean.class})
 @ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "rabbit.enabled", havingValue = "true")
-public class RabbitLogHandlerConfiguration extends AbstractRabbitLogHandlerConfiguration {
-
-	private final RabbitProperties rabbitProperties;
+public class RabbitLogHandlerConfiguration extends AbstractLogHandlerConfiguration<RabbitProperties> {
 
 	public RabbitLogHandlerConfiguration(LogProperties logProperties) {
-		this.rabbitProperties = logProperties.getRabbit();
-	}
-
-	@Bean(name = "loggingRabbitLogHandlerFactoryBeanConfigurer")
-	@ConditionalOnMissingBean(name = "loggingRabbitLogHandlerFactoryBeanConfigurer")
-	public RabbitLogHandlerFactoryBeanConfigurer rabbitLogHandlerFactoryBeanConfigurer() {
-		final RabbitLogHandlerFactoryBeanConfigurer configurer = new RabbitLogHandlerFactoryBeanConfigurer();
-
-		configurer.setExchange(rabbitProperties.getExchange());
-		configurer.setRoutingKey(rabbitProperties.getRoutingKey());
-
-		return configurer;
+		super(logProperties.getRabbit());
 	}
 
 	@Bean
-	@Override
 	public RabbitLogHandlerFactoryBean logHandlerFactoryBean(
-			@Qualifier("loggingRabbitLogHandlerFactoryBeanConfigurer") RabbitLogHandlerFactoryBeanConfigurer configurer,
 			@Qualifier("loggingRabbitRabbitTemplate") RabbitTemplate rabbitTemplate) {
-		return super.logHandlerFactoryBean(configurer, rabbitTemplate);
+		final RabbitLogHandlerFactoryBeanConfigurer configurer = new RabbitLogHandlerFactoryBeanConfigurer();
+
+		configurer.setExchange(properties.getExchange());
+		configurer.setRoutingKey(properties.getRoutingKey());
+
+		final RabbitLogHandlerFactoryBean factoryBean = new RabbitLogHandlerFactoryBean(configurer);
+
+		factoryBean.setRabbitTemplate(rabbitTemplate);
+
+		return factoryBean;
 	}
 
 }
