@@ -46,12 +46,7 @@ public class KafkaConfigurer {
 	/**
 	 * 配置
 	 */
-	private Map<String, Object> configs;
-
-	/**
-	 * 事务 ID 前缀
-	 */
-	private String transactionIdPrefix;
+	private Map<String, Object> properties;
 
 	/**
 	 * Return Comma-delimited list of host:port pairs to use for establishing the initial
@@ -81,8 +76,8 @@ public class KafkaConfigurer {
 	 *
 	 * @return 配置
 	 */
-	public Map<String, Object> getConfigs() {
-		return configs;
+	public Map<String, Object> getProperties() {
+		return properties;
 	}
 
 	/**
@@ -91,27 +86,8 @@ public class KafkaConfigurer {
 	 * @param configs
 	 * 		配置
 	 */
-	public void setConfigs(Map<String, Object> configs) {
-		this.configs = configs;
-	}
-
-	/**
-	 * 返回事务 ID 前缀
-	 *
-	 * @return 事务 ID 前缀
-	 */
-	public String getTransactionIdPrefix() {
-		return transactionIdPrefix;
-	}
-
-	/**
-	 * 设置事务 ID 前缀
-	 *
-	 * @param transactionIdPrefix
-	 * 		事务 ID 前缀
-	 */
-	public void setTransactionIdPrefix(String transactionIdPrefix) {
-		this.transactionIdPrefix = transactionIdPrefix;
+	public void setProperties(Map<String, Object> configs) {
+		this.properties = configs;
 	}
 
 }

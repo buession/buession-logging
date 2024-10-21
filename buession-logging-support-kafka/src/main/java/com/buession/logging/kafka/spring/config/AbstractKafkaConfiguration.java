@@ -33,7 +33,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.LoggingProducerListener;
 import org.springframework.kafka.support.ProducerListener;
-import org.springframework.kafka.support.converter.JsonMessageConverter;
 
 /**
  * Kafka 日志处理器自动配置类
@@ -50,9 +49,7 @@ public abstract class AbstractKafkaConfiguration {
 		Assert.isNull(configurer.getBootstrapServers(), "Property 'bootstrapServers' is required");
 
 		final DefaultKafkaProducerFactory<String, Object> producerFactory = new DefaultKafkaProducerFactory<>(
-				configurer.getConfigs());
-
-		producerFactory.setTransactionIdPrefix(configurer.getTransactionIdPrefix());
+				configurer.getProperties());
 
 		producerFactoryCustomizers.orderedStream().forEach((customizer)->customizer.customize(producerFactory));
 
@@ -69,8 +66,6 @@ public abstract class AbstractKafkaConfiguration {
 		final KafkaTemplate<String, Object> kafkaTemplate = new KafkaTemplate<>(producerFactory);
 
 		kafkaTemplate.setProducerListener(kafkaProducerListener);
-		kafkaTemplate.setMessageConverter(new JsonMessageConverter());
-		kafkaTemplate.setTransactionIdPrefix(configurer.getTransactionIdPrefix());
 
 		return kafkaTemplate;
 	}
