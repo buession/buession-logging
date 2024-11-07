@@ -7,13 +7,13 @@
 		<groupId>com.buession</groupId>
 		<artifactId>parent</artifactId>
 		<relativePath/>
-		<version>2.3.3</version>
+		<version>3.0.0</version>
 	</parent>
 	<groupId>com.buession.logging</groupId>
 	<artifactId>buession-logging-parent</artifactId>
 	<url>https://logging.buession.com/</url>
 	<description>Buession Logging Framework Parent</description>
-	<version>0.0.4</version>
+	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
 	<organization>
@@ -71,8 +71,8 @@
 	</modules>
 
 	<properties>
-		<buession.version>2.3.3</buession.version>
-		<buession.springboot.version>2.3.3</buession.springboot.version>
+		<buession.version>3.0.0</buession.version>
+		<buession.springboot.version>3.0.0</buession.springboot.version>
 	</properties>
 
 	<dependencyManagement>
@@ -86,11 +86,27 @@
 				<groupId>com.buession</groupId>
 				<artifactId>buession-geoip</artifactId>
 				<version>${buession.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>com.fasterxml.jackson.core</groupId>
+						<artifactId>*</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.buession</groupId>
 				<artifactId>buession-web</artifactId>
 				<version>${buession.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>jakarta.servlet</groupId>
+						<artifactId>jakarta.servlet-api</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.aspectj</groupId>
+						<artifactId>*</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -127,20 +143,9 @@
 				<artifactId>maven-gpg-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<groupId>org.sonatype.central</groupId>
+				<artifactId>central-publishing-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>
-
-	<distributionManagement>
-		<snapshotRepository>
-			<id>sonatype-nexus-snapshots</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>sonatype-nexus-staging</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
 </project>

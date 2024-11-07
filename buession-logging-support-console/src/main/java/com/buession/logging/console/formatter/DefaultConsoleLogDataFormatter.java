@@ -38,7 +38,7 @@ import java.util.Map;
  * @author Yong.Teng
  * @since 0.0.4
  */
-public class DefaultConsoleLogDataFormatter implements ConsoleLogDataFormatter<String> {
+public class DefaultConsoleLogDataFormatter implements ConsoleLogDataFormatter {
 
 	@Override
 	public String format(final LogData logData) {

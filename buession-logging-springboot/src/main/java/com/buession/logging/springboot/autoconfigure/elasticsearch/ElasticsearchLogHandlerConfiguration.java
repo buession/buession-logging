@@ -26,21 +26,18 @@ package com.buession.logging.springboot.autoconfigure.elasticsearch;
 
 import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.elasticsearch.spring.ElasticsearchLogHandlerFactoryBean;
-import com.buession.logging.elasticsearch.spring.ElasticsearchRestTemplateFactoryBean;
-import com.buession.logging.elasticsearch.spring.RestHighLevelClientFactoryBean;
+import com.buession.logging.elasticsearch.spring.config.ElasticsearchLogHandlerFactoryBeanConfigurer;
 import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.ElasticsearchProperties;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 
 /**
  * Elasticsearch 日志处理器自动配置类
@@ -48,53 +45,30 @@ import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
  * @author Yong.Teng
  * @since 0.0.1
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @EnableConfigurationProperties(LogProperties.class)
 @ConditionalOnMissingBean(LogHandler.class)
 @ConditionalOnClass({ElasticsearchLogHandlerFactoryBean.class})
-@ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "elasticsearch.enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = ElasticsearchProperties.PREFIX, name = "enabled", havingValue = "true")
 public class ElasticsearchLogHandlerConfiguration extends AbstractLogHandlerConfiguration<ElasticsearchProperties> {
 
 	public ElasticsearchLogHandlerConfiguration(LogProperties logProperties) {
 		super(logProperties.getElasticsearch());
 	}
 
-	@Bean(name = "loggingElasticsearchRestHighLevelClient")
-	public RestHighLevelClientFactoryBean restHighLevelClientFactoryBean() {
-		final RestHighLevelClientFactoryBean restHighLevelClientFactoryBean = new RestHighLevelClientFactoryBean();
-
-		propertyMapper.from(handlerProperties::getUrls).to(restHighLevelClientFactoryBean::setUrls);
-		propertyMapper.from(handlerProperties::getHost).to(restHighLevelClientFactoryBean::setHost);
-		propertyMapper.from(handlerProperties::getPort).to(restHighLevelClientFactoryBean::setPort);
-		propertyMapper.from(handlerProperties::getUsername).to(restHighLevelClientFactoryBean::setUsername);
-		propertyMapper.from(handlerProperties::getPassword).to(restHighLevelClientFactoryBean::setPassword);
-		propertyMapper.from(handlerProperties::getConnectionTimeout)
-				.to(restHighLevelClientFactoryBean::setConnectionTimeout);
-		propertyMapper.from(handlerProperties::getReadTimeout).to(restHighLevelClientFactoryBean::setReadTimeout);
-
-		return restHighLevelClientFactoryBean;
-	}
-
-	@Bean(name = "loggingElasticsearchElasticsearchRestTemplate")
-	public ElasticsearchRestTemplateFactoryBean elasticsearchRestTemplateFactoryBean(
-			@Qualifier("loggingElasticsearchRestHighLevelClient") ObjectProvider<RestHighLevelClient> restHighLevelClient) {
-		final ElasticsearchRestTemplateFactoryBean elasticsearchRestTemplateFactoryBean =
-				new ElasticsearchRestTemplateFactoryBean();
-
-		restHighLevelClient.ifAvailable(elasticsearchRestTemplateFactoryBean::setClient);
-
-		return elasticsearchRestTemplateFactoryBean;
-	}
-
 	@Bean
 	public ElasticsearchLogHandlerFactoryBean logHandlerFactoryBean(
-			@Qualifier("loggingElasticsearchElasticsearchRestTemplate") ObjectProvider<ElasticsearchRestTemplate> restTemplateFactory) {
-		final ElasticsearchLogHandlerFactoryBean logHandlerFactoryBean = new ElasticsearchLogHandlerFactoryBean();
+			@Qualifier("loggingElasticsearchTemplate") ElasticsearchTemplate elasticsearchTemplate) {
+		final ElasticsearchLogHandlerFactoryBeanConfigurer configurer = new ElasticsearchLogHandlerFactoryBeanConfigurer();
 
-		restTemplateFactory.ifAvailable(logHandlerFactoryBean::setRestTemplate);
-		propertyMapper.from(handlerProperties::getIndexName).to(logHandlerFactoryBean::setIndexName);
+		configurer.setIndexName(properties.getIndexName());
+		configurer.setAutoCreateIndex(properties.getAutoCreateIndex());
 
-		return logHandlerFactoryBean;
+		final ElasticsearchLogHandlerFactoryBean factoryBean = new ElasticsearchLogHandlerFactoryBean(configurer);
+
+		factoryBean.setElasticsearchTemplate(elasticsearchTemplate);
+
+		return factoryBean;
 	}
 
 }

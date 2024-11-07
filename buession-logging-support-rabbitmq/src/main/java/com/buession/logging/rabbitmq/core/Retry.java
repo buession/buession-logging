@@ -24,6 +24,11 @@
  */
 package com.buession.logging.rabbitmq.core;
 
+import com.buession.logging.rabbitmq.support.RabbitRetryTemplateConfigurer;
+import org.springframework.retry.support.RetryTemplate;
+
+import java.util.List;
+
 /**
  * 重试配置
  *
@@ -40,11 +45,18 @@ public class Retry extends com.buession.lang.Retry {
 	private boolean enabled;
 
 	/**
+	 * {@link RetryTemplate} 配置器
+	 *
+	 * @since 1.0.0
+	 */
+	private List<RabbitRetryTemplateConfigurer> retryConfigurers;
+
+	/**
 	 * 返回是否启用重试
 	 *
 	 * @return 是否启用重试
 	 */
-	public boolean isEnabled(){
+	public boolean isEnabled() {
 		return this.enabled;
 	}
 
@@ -54,8 +66,31 @@ public class Retry extends com.buession.lang.Retry {
 	 * @param enabled
 	 * 		是否启用重试
 	 */
-	public void setEnabled(boolean enabled){
+	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
+	}
+
+	/**
+	 * 返回 {@link RetryTemplate} 配置器
+	 *
+	 * @return {@link RetryTemplate} 配置器
+	 *
+	 * @since 1.0.0
+	 */
+	public List<RabbitRetryTemplateConfigurer> getRetryCustomizers() {
+		return retryConfigurers;
+	}
+
+	/**
+	 * 设置 {@link RetryTemplate} 配置器
+	 *
+	 * @param retryConfigurers
+	 *        {@link RetryTemplate} 配置器
+	 *
+	 * @since 1.0.0
+	 */
+	public void setRetryCustomizers(List<RabbitRetryTemplateConfigurer> retryConfigurers) {
+		this.retryConfigurers = retryConfigurers;
 	}
 
 }

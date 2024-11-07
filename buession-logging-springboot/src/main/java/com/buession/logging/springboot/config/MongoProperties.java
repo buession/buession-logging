@@ -19,7 +19,7 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.springboot.config;
@@ -28,11 +28,15 @@ import com.buession.dao.mongodb.core.ReadConcern;
 import com.buession.dao.mongodb.core.ReadPreference;
 import com.buession.dao.mongodb.core.WriteConcern;
 import com.buession.logging.mongodb.core.PoolConfiguration;
-import com.buession.logging.mongodb.spring.MongoClientFactory;
-import com.buession.logging.mongodb.spring.MongoMappingContextFactory;
-import com.buession.logging.support.config.HandlerProperties;
+import com.buession.logging.support.config.AdapterProperties;
+import com.mongodb.connection.ClusterConnectionMode;
+import com.mongodb.connection.ClusterType;
+import com.mongodb.connection.ServerMonitoringMode;
+import com.mongodb.selector.ServerSelector;
 import org.bson.UuidRepresentation;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.data.mapping.model.FieldNamingStrategy;
+import org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -43,7 +47,7 @@ import java.time.Duration;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class MongoProperties implements HandlerProperties, Serializable {
+public class MongoProperties implements AdapterProperties, Serializable {
 
 	private final static long serialVersionUID = -8119695487949928232L;
 
@@ -55,7 +59,7 @@ public class MongoProperties implements HandlerProperties, Serializable {
 	/**
 	 * MongoDB 端口
 	 */
-	private int port = MongoClientFactory.DEFAULT_PORT;
+	private int port = 27017;
 
 	/**
 	 * 用户名
@@ -70,7 +74,7 @@ public class MongoProperties implements HandlerProperties, Serializable {
 	/**
 	 * Mongo database URI.
 	 */
-	private String url = MongoClientFactory.DEFAULT_URL;
+	private String url = "mongodb://localhost/test";
 
 	/**
 	 * 副本集名称
@@ -95,17 +99,17 @@ public class MongoProperties implements HandlerProperties, Serializable {
 	/**
 	 * 连接超时
 	 */
-	private Duration connectionTimeout = MongoClientFactory.DEFAULT_CONNECTION_TIMEOUT;
+	private Duration connectionTimeout = Duration.ofSeconds(1);
 
 	/**
 	 * 读取超时
 	 */
-	private Duration readTimeout = MongoClientFactory.DEFAULT_READ_TIMEOUT;
+	private Duration readTimeout = Duration.ofSeconds(3);
 
 	/**
 	 * Representation to use when converting a UUID to a BSON binary value.
 	 */
-	private UuidRepresentation uuidRepresentation = MongoClientFactory.DEFAULT_UUID_REPRESENTATION;
+	private UuidRepresentation uuidRepresentation = UuidRepresentation.JAVA_LEGACY;
 
 	/**
 	 * Whether to enable auto-index creation.
@@ -115,7 +119,7 @@ public class MongoProperties implements HandlerProperties, Serializable {
 	/**
 	 * Fully qualified name of the FieldNamingStrategy to use.
 	 */
-	private Class<? extends FieldNamingStrategy> fieldNamingStrategy = MongoMappingContextFactory.DEFAULT_FIELD_NAMING_STRATEGY;
+	private Class<? extends FieldNamingStrategy> fieldNamingStrategy = SnakeCaseFieldNamingStrategy.class;
 
 	/**
 	 * {@link ReadPreference}
@@ -133,8 +137,24 @@ public class MongoProperties implements HandlerProperties, Serializable {
 	private WriteConcern writeConcern = WriteConcern.ACKNOWLEDGED;
 
 	/**
+	 * 集群配置
+	 *
+	 * @since 1.0.0
+	 */
+	@NestedConfigurationProperty
+	private Cluster cluster;
+
+	/**
+	 * 服务端配置
+	 *
+	 * @since 1.0.0
+	 */
+	private Server server;
+
+	/**
 	 * 连接池配置
 	 */
+	@NestedConfigurationProperty
 	private PoolConfiguration pool = new PoolConfiguration();
 
 	/**
@@ -399,8 +419,7 @@ public class MongoProperties implements HandlerProperties, Serializable {
 	 * @param fieldNamingStrategy
 	 * 		Fully qualified name of the FieldNamingStrategy to use.
 	 */
-	public void setFieldNamingStrategy(
-			Class<? extends FieldNamingStrategy> fieldNamingStrategy) {
+	public void setFieldNamingStrategy(Class<? extends FieldNamingStrategy> fieldNamingStrategy) {
 		this.fieldNamingStrategy = fieldNamingStrategy;
 	}
 
@@ -462,6 +481,48 @@ public class MongoProperties implements HandlerProperties, Serializable {
 	}
 
 	/**
+	 * 返回集群配置
+	 *
+	 * @return 集群配置
+	 *
+	 * @since 1.0.0
+	 */
+	public Cluster getCluster() {
+		return cluster;
+	}
+
+	/**
+	 * 设置集群配置
+	 *
+	 * @param cluster
+	 * 		集群配置
+	 *
+	 * @since 1.0.0
+	 */
+	public void setCluster(Cluster cluster) {
+		this.cluster = cluster;
+	}
+
+	/**
+	 * 返回服务端配置
+	 *
+	 * @return 服务端配置
+	 */
+	public Server getServer() {
+		return server;
+	}
+
+	/**
+	 * 设置服务端配置
+	 *
+	 * @param server
+	 * 		服务端配置
+	 */
+	public void setServer(Server server) {
+		this.server = server;
+	}
+
+	/**
 	 * 返回连接池配置
 	 *
 	 * @return 连接池配置
@@ -478,6 +539,216 @@ public class MongoProperties implements HandlerProperties, Serializable {
 	 */
 	public void setPool(PoolConfiguration pool) {
 		this.pool = pool;
+	}
+
+	/**
+	 * 集群配置
+	 *
+	 * @since 1.0.0
+	 */
+	public final static class Cluster {
+
+		/**
+		 * 集群连接模式
+		 */
+		private ClusterConnectionMode connectionMode;
+
+		/**
+		 * 集群类型
+		 */
+		private ClusterType clusterType;
+
+		/**
+		 * Server 选择器
+		 */
+		private Class<? extends ServerSelector> serverSelector;
+
+		/**
+		 * Server 选择超时
+		 */
+		private Duration serverSelectionTimeout;
+
+		/**
+		 * 客户端在选择合适的服务器（节点）时的本地阈值
+		 */
+		private Duration localThreshold;
+
+		/**
+		 * 返回集群连接模式
+		 *
+		 * @return 集群连接模式
+		 */
+		public ClusterConnectionMode getConnectionMode() {
+			return connectionMode;
+		}
+
+		/**
+		 * 设置集群连接模式
+		 *
+		 * @param connectionMode
+		 * 		集群连接模式
+		 */
+		public void setConnectionMode(ClusterConnectionMode connectionMode) {
+			this.connectionMode = connectionMode;
+		}
+
+		/**
+		 * 返回集群类型
+		 *
+		 * @return 集群类型
+		 */
+		public ClusterType getClusterType() {
+			return clusterType;
+		}
+
+		/**
+		 * 设置集群类型
+		 *
+		 * @param clusterType
+		 * 		集群类型
+		 */
+		public void setClusterType(ClusterType clusterType) {
+			this.clusterType = clusterType;
+		}
+
+		/**
+		 * 返回 Server 选择器
+		 *
+		 * @return Server 选择器
+		 */
+		public Class<? extends ServerSelector> getServerSelector() {
+			return serverSelector;
+		}
+
+		/**
+		 * 设置 Server 选择器
+		 *
+		 * @param serverSelector
+		 * 		Server 选择器
+		 */
+		public void setServerSelector(Class<? extends ServerSelector> serverSelector) {
+			this.serverSelector = serverSelector;
+		}
+
+		/**
+		 * 返回 Server 选择超时
+		 *
+		 * @return Server 选择超时
+		 */
+		public Duration getServerSelectionTimeout() {
+			return serverSelectionTimeout;
+		}
+
+		/**
+		 * 设置 Server 选择超时
+		 *
+		 * @param serverSelectionTimeout
+		 * 		Server 选择超时
+		 */
+		public void setServerSelectionTimeout(Duration serverSelectionTimeout) {
+			this.serverSelectionTimeout = serverSelectionTimeout;
+		}
+
+		/**
+		 * 返回客户端在选择合适的服务器（节点）时的本地阈值
+		 *
+		 * @return 客户端在选择合适的服务器（节点）时的本地阈值
+		 */
+		public Duration getLocalThreshold() {
+			return localThreshold;
+		}
+
+		/**
+		 * 设置客户端在选择合适的服务器（节点）时的本地阈值
+		 *
+		 * @param localThreshold
+		 * 		客户端在选择合适的服务器（节点）时的本地阈值
+		 */
+		public void setLocalThreshold(Duration localThreshold) {
+			this.localThreshold = localThreshold;
+		}
+
+	}
+
+	/**
+	 * 服务端配置
+	 *
+	 * @since 1.0.0
+	 */
+	public final static class Server {
+
+		/**
+		 * 节点之间的心跳检查频率
+		 */
+		private Duration heartbeatFrequency;
+
+		/**
+		 * 客户端发送心跳请求的最小频率
+		 */
+		private Duration minHeartbeatFrequency;
+
+		/**
+		 * 服务端监控模式
+		 */
+		private ServerMonitoringMode serverMonitoringMode;
+
+		/**
+		 * 返回节点之间的心跳检查频率
+		 *
+		 * @return 节点之间的心跳检查频率
+		 */
+		public Duration getHeartbeatFrequency() {
+			return heartbeatFrequency;
+		}
+
+		/**
+		 * 设置节点之间的心跳检查频率
+		 *
+		 * @param heartbeatFrequency
+		 * 		节点之间的心跳检查频率
+		 */
+		public void setHeartbeatFrequency(Duration heartbeatFrequency) {
+			this.heartbeatFrequency = heartbeatFrequency;
+		}
+
+		/**
+		 * 返回客户端发送心跳请求的最小频率
+		 *
+		 * @return 客户端发送心跳请求的最小频率
+		 */
+		public Duration getMinHeartbeatFrequency() {
+			return minHeartbeatFrequency;
+		}
+
+		/**
+		 * 设置客户端发送心跳请求的最小频率
+		 *
+		 * @param minHeartbeatFrequency
+		 * 		客户端发送心跳请求的最小频率
+		 */
+		public void setMinHeartbeatFrequency(Duration minHeartbeatFrequency) {
+			this.minHeartbeatFrequency = minHeartbeatFrequency;
+		}
+
+		/**
+		 * 返回服务端监控模式
+		 *
+		 * @return 服务端监控模式
+		 */
+		public ServerMonitoringMode getServerMonitoringMode() {
+			return serverMonitoringMode;
+		}
+
+		/**
+		 * 设置服务端监控模式
+		 *
+		 * @param serverMonitoringMode
+		 * 		服务端监控模式
+		 */
+		public void setServerMonitoringMode(ServerMonitoringMode serverMonitoringMode) {
+			this.serverMonitoringMode = serverMonitoringMode;
+		}
+
 	}
 
 }

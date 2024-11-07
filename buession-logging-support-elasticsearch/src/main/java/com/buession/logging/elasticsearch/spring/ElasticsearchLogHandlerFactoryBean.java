@@ -19,15 +19,16 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.elasticsearch.spring;
 
 import com.buession.core.utils.Assert;
 import com.buession.logging.elasticsearch.handler.ElasticsearchLogHandler;
+import com.buession.logging.elasticsearch.spring.config.ElasticsearchLogHandlerFactoryBeanConfigurer;
 import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 
 /**
  * Elasticsearch 日志处理器 {@link ElasticsearchLogHandler} 工厂 Bean 基类
@@ -37,19 +38,57 @@ import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
  */
 public class ElasticsearchLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<ElasticsearchLogHandler> {
 
-	private ElasticsearchRestTemplate restTemplate;
+	/**
+	 * {@link ElasticsearchTemplate}
+	 */
+	private ElasticsearchTemplate elasticsearchTemplate;
 
 	/**
 	 * 索引名称
 	 */
 	private String indexName;
 
-	public ElasticsearchRestTemplate getRestTemplate() {
-		return restTemplate;
+	/**
+	 * 是否自动创建索引
+	 *
+	 * @since 1.0.0
+	 */
+	private Boolean autoCreateIndex = true;
+
+	/**
+	 * 构造函数
+	 */
+	public ElasticsearchLogHandlerFactoryBean() {
 	}
 
-	public void setRestTemplate(ElasticsearchRestTemplate restTemplate) {
-		this.restTemplate = restTemplate;
+	/**
+	 * 构造函数
+	 *
+	 * @param configurer
+	 *        {@link  ElasticsearchLogHandlerFactoryBeanConfigurer}
+	 */
+	public ElasticsearchLogHandlerFactoryBean(final ElasticsearchLogHandlerFactoryBeanConfigurer configurer) {
+		propertyMapper.from(configurer.getIndexName()).to(this::setIndexName);
+		propertyMapper.from(configurer.getAutoCreateIndex()).to(this::setAutoCreateIndex);
+	}
+
+	/**
+	 * 返回 {@link ElasticsearchTemplate}
+	 *
+	 * @return {@link ElasticsearchTemplate}
+	 */
+	public ElasticsearchTemplate getElasticsearchTemplate() {
+		return elasticsearchTemplate;
+	}
+
+	/**
+	 * 设置 {@link ElasticsearchTemplate}
+	 *
+	 * @param elasticsearchTemplate
+	 *        {@link ElasticsearchTemplate}
+	 */
+	public void setElasticsearchTemplate(ElasticsearchTemplate elasticsearchTemplate) {
+		this.elasticsearchTemplate = elasticsearchTemplate;
 	}
 
 	/**
@@ -71,13 +110,54 @@ public class ElasticsearchLogHandlerFactoryBean extends BaseLogHandlerFactoryBea
 		this.indexName = indexName;
 	}
 
+	/**
+	 * 返回是否自动创建索引
+	 *
+	 * @return 是否自动创建索引
+	 *
+	 * @since 1.0.0
+	 */
+	public Boolean isAutoCreateIndex() {
+		return getAutoCreateIndex();
+	}
+
+	/**
+	 * 返回是否自动创建索引
+	 *
+	 * @return 是否自动创建索引
+	 *
+	 * @since 1.0.0
+	 */
+	public Boolean getAutoCreateIndex() {
+		return autoCreateIndex;
+	}
+
+	/**
+	 * 设置是否自动创建索引
+	 *
+	 * @param autoCreateIndex
+	 * 		是否自动创建索引
+	 *
+	 * @since 1.0.0
+	 */
+	public void setAutoCreateIndex(Boolean autoCreateIndex) {
+		this.autoCreateIndex = autoCreateIndex;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isNull(getRestTemplate(), "Property 'restTemplate' is required");
+		Assert.isNull(getElasticsearchTemplate(), "Property 'elasticsearchTemplate' is required");
 		Assert.isBlank(getIndexName(), "Property 'indexName' is required");
 
 		if(logHandler == null){
-			logHandler = new ElasticsearchLogHandler(getRestTemplate(), getIndexName());
+			synchronized(this){
+				if(logHandler == null){
+					logHandler = new ElasticsearchLogHandler(getElasticsearchTemplate(), getIndexName());
+					if(autoCreateIndex){
+						logHandler.setAutoCreateIndex(autoCreateIndex);
+					}
+				}
+			}
 		}
 	}
 

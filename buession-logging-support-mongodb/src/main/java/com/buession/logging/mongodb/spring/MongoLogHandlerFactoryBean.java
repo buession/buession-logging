@@ -94,9 +94,13 @@ public class MongoLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<MongoL
 		Assert.isNull(getMongoTemplate(), "Property 'mongoTemplate' is required");
 
 		if(logHandler == null){
-			createCollection();
+			synchronized(this){
+				if(logHandler == null){
+					createCollection();
 
-			logHandler = new MongoLogHandler(getMongoTemplate(), getCollectionName());
+					logHandler = new MongoLogHandler(getMongoTemplate(), getCollectionName());
+				}
+			}
 		}
 	}
 

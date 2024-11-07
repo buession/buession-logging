@@ -26,19 +26,16 @@ package com.buession.logging.springboot.autoconfigure.kafka;
 
 import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.kafka.spring.KafkaLogHandlerFactoryBean;
-import com.buession.logging.kafka.spring.KafkaTemplateFactoryBean;
-import com.buession.logging.kafka.spring.ProducerFactoryBean;
 import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.KafkaProperties;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.KafkaTemplate;
 
 /**
@@ -47,59 +44,26 @@ import org.springframework.kafka.core.KafkaTemplate;
  * @author Yong.Teng
  * @since 0.0.1
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @EnableConfigurationProperties(LogProperties.class)
 @ConditionalOnMissingBean(LogHandler.class)
 @ConditionalOnClass({KafkaLogHandlerFactoryBean.class})
-@ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "kafka.enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = KafkaProperties.PREFIX, name = "enabled", havingValue = "true")
 public class KafkaLogHandlerConfiguration extends AbstractLogHandlerConfiguration<KafkaProperties> {
 
 	public KafkaLogHandlerConfiguration(LogProperties logProperties) {
 		super(logProperties.getKafka());
 	}
 
-	@Bean(name = "loggingKafkaProducerFactory")
-	public ProducerFactoryBean producerFactoryBean() {
-		final ProducerFactoryBean producerFactoryBean = new ProducerFactoryBean();
-
-		propertyMapper.from(handlerProperties::getBootstrapServers).to(producerFactoryBean::setBootstrapServers);
-		propertyMapper.from(handlerProperties::getClientId).to(producerFactoryBean::setClientId);
-		propertyMapper.from(handlerProperties::getTransactionIdPrefix)
-				.to(producerFactoryBean::setTransactionIdPrefix);
-		propertyMapper.from(handlerProperties::getAcks).to(producerFactoryBean::setAcks);
-		propertyMapper.from(handlerProperties::getBatchSize).to(producerFactoryBean::setBatchSize);
-		propertyMapper.from(handlerProperties::getBufferMemory).to(producerFactoryBean::setBufferMemory);
-		propertyMapper.from(handlerProperties::getCompressionType).to(producerFactoryBean::setCompressionType);
-		propertyMapper.from(handlerProperties::getRetries).to(producerFactoryBean::setRetries);
-		propertyMapper.from(handlerProperties::getSslConfiguration).to(producerFactoryBean::setSslConfiguration);
-		propertyMapper.from(handlerProperties::getSecurityConfiguration)
-				.to(producerFactoryBean::setSecurityConfiguration);
-		propertyMapper.from(handlerProperties::getTransactionIdPrefix).to(producerFactoryBean::setTransactionIdPrefix);
-		propertyMapper.from(handlerProperties::getProperties).to(producerFactoryBean::setProperties);
-
-		return producerFactoryBean;
-	}
-
-	@Bean(name = "loggingKafkaKafkaTemplate")
-	public KafkaTemplateFactoryBean<String, Object> kafkaTemplateFactoryBean(@Qualifier("loggingKafkaProducerFactory")
-																					 ObjectProvider<org.springframework.kafka.core.ProducerFactory<String, Object>> producerFactory) {
-		final KafkaTemplateFactoryBean<String, Object> kafkaTemplateFactoryBean = new KafkaTemplateFactoryBean<>();
-
-		producerFactory.ifAvailable(kafkaTemplateFactoryBean::setProducerFactory);
-
-		return kafkaTemplateFactoryBean;
-	}
-
 	@Bean
 	public KafkaLogHandlerFactoryBean logHandlerFactoryBean(
-			@Qualifier("loggingKafkaKafkaTemplate") ObjectProvider<KafkaTemplate<String, Object>> kafkaTemplate) {
-		final KafkaLogHandlerFactoryBean logHandlerFactoryBean = new KafkaLogHandlerFactoryBean();
+			@Qualifier("loggingKafkaTemplate") KafkaTemplate<String, Object> kafkaTemplate) {
+		final KafkaLogHandlerFactoryBean factoryBean = new KafkaLogHandlerFactoryBean();
 
-		kafkaTemplate.ifAvailable(logHandlerFactoryBean::setKafkaTemplate);
+		factoryBean.setKafkaTemplate(kafkaTemplate);
+		factoryBean.setTopic(properties.getTopic());
 
-		propertyMapper.from(handlerProperties::getTopic).to(logHandlerFactoryBean::setTopic);
-
-		return logHandlerFactoryBean;
+		return factoryBean;
 	}
 
 }

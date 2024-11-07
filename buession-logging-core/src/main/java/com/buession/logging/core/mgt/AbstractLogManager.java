@@ -19,13 +19,14 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.core.mgt;
 
 import com.buession.geoip.Resolver;
 import com.buession.geoip.model.Location;
+import com.buession.lang.Constants;
 import com.buession.lang.Geo;
 import com.buession.lang.Status;
 import com.buession.logging.core.Browser;
@@ -41,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.Optional;
 
 /**
  * 日志管理器抽象类
@@ -116,20 +118,13 @@ public abstract class AbstractLogManager implements LogManager {
 	public Status save(final LogData logData) {
 		final Request request = requestContext.createRequest();
 
-		//logData.setPrincipal(null);
 		logData.setDateTime(new Date());
-		//logData.setBusinessType(null);
-		//logData.setEvent(null);
-		//logData.setDescription("");
 		logData.setUrl(request.getUrl());
 		logData.setRequestMethod(request.getRequestMethod());
-		//logData.setRequestBody(null);
 		logData.setRequestParameters(logData.getRequestParameters());
 		logData.setClientIp(request.getClientIp());
 		logData.setRemoteAddr(request.getRemoteAddr());
 		logData.setUserAgent(request.getUserAgent());
-		//logData.setStatus(null);
-		//logData.setExtra(null);
 
 		if(getGeoResolver() != null){
 			parseLocation(logData);
@@ -156,14 +151,16 @@ public abstract class AbstractLogManager implements LogManager {
 			}
 
 			final GeoLocation.Country country = new GeoLocation.Country();
-			country.setCode(location.getCountry().getCode());
-			country.setName(location.getCountry().getName());
-			country.setFullName(location.getCountry().getFullName());
+			country.setCode(Optional.ofNullable(location.getCountry().getCode()).orElse(Constants.EMPTY_STRING));
+			country.setName(Optional.ofNullable(location.getCountry().getName()).orElse(Constants.EMPTY_STRING));
+			country.setFullName(
+					Optional.ofNullable(location.getCountry().getFullName()).orElse(Constants.EMPTY_STRING));
 			geoLocation.setCountry(country);
 
 			final GeoLocation.District district = new GeoLocation.District();
-			district.setName(location.getDistrict().getName());
-			district.setFullName(location.getDistrict().getFullName());
+			district.setName(Optional.ofNullable(location.getDistrict().getName()).orElse(Constants.EMPTY_STRING));
+			district.setFullName(
+					Optional.ofNullable(location.getDistrict().getFullName()).orElse(Constants.EMPTY_STRING));
 			geoLocation.setDistrict(district);
 
 			logData.setLocation(geoLocation);
@@ -180,16 +177,18 @@ public abstract class AbstractLogManager implements LogManager {
 		final UserAgent userAgent = new UserAgent(logData.getUserAgent());
 
 		final OperatingSystem operatingSystem = new OperatingSystem();
-		operatingSystem.setName(userAgent.getOperatingSystem().name());
-		operatingSystem.setVersion(userAgent.getOperatingSystem().getVersion());
+		operatingSystem.setName(
+				Optional.ofNullable(userAgent.getOperatingSystem().name()).orElse(Constants.EMPTY_STRING));
+		operatingSystem.setVersion(
+				Optional.ofNullable(userAgent.getOperatingSystem().getVersion()).orElse(Constants.EMPTY_STRING));
 		logData.setOperatingSystem(operatingSystem);
 
 		logData.setDeviceType(userAgent.getOperatingSystem().getDeviceType());
 
 		final Browser browser = new Browser();
-		browser.setName(userAgent.getBrowser().name());
+		browser.setName(Optional.ofNullable(userAgent.getBrowser().name()).orElse(Constants.EMPTY_STRING));
 		browser.setType(userAgent.getBrowser().getBrowserType());
-		browser.setVersion(userAgent.getBrowser().getVersion());
+		browser.setVersion(Optional.ofNullable(userAgent.getBrowser().getVersion()).orElse(Constants.EMPTY_STRING));
 		logData.setBrowser(browser);
 	}
 

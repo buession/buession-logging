@@ -34,17 +34,17 @@ import com.buession.logging.core.request.RequestContext;
 import com.buession.logging.core.request.ServletRequestContext;
 import com.buession.logging.spring.LogManagerFactoryBean;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Yong.Teng
  * @since 0.0.1
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @EnableConfigurationProperties(LogProperties.class)
 public class LogConfiguration {
 
@@ -55,37 +55,30 @@ public class LogConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnMissingBean({RequestContext.class})
-	public RequestContext requestContext() {
-		return new ServletRequestContext();
-	}
-
-	@Bean
 	@ConditionalOnMissingBean({PrincipalHandler.class})
 	public PrincipalHandler<?> principalHandler() {
 		return new DefaultPrincipalHandler();
 	}
 
 	@Bean
-	public LogManagerFactoryBean logManagerFactoryBean(ObjectProvider<RequestContext> requestContext,
-													   ObjectProvider<PrincipalHandler<?>> principalHandler,
-													   ObjectProvider<LogHandler> logHandler,
+	public LogManagerFactoryBean logManagerFactoryBean(RequestContext requestContext,
+													   PrincipalHandler<?> principalHandler, LogHandler logHandler,
 													   ObjectProvider<Resolver> geoResolver) {
 		final LogManagerFactoryBean logManagerFactoryBean = new LogManagerFactoryBean();
-		
-		requestContext.ifAvailable(logManagerFactoryBean::setRequestContext);
-		geoResolver.ifAvailable(logManagerFactoryBean::setGeoResolver);
-		principalHandler.ifAvailable(logManagerFactoryBean::setPrincipalHandler);
-		logHandler.ifAvailable(logManagerFactoryBean::setLogHandler);
 
-		if(Validate.isNotBlank(logProperties.getClientIpHeaderName())){
+		logManagerFactoryBean.setRequestContext(requestContext);
+		logManagerFactoryBean.setPrincipalHandler(principalHandler);
+		logManagerFactoryBean.setLogHandler(logHandler);
+		geoResolver.ifAvailable(logManagerFactoryBean::setGeoResolver);
+
+		if(Validate.hasText(logProperties.getClientIpHeaderName())){
 			logManagerFactoryBean.setClientIpHeaderName(logProperties.getClientIpHeaderName());
 		}
 
 		return logManagerFactoryBean;
 	}
 
-	@Configuration(proxyBeanMethods = false)
+	@AutoConfiguration
 	@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 	static class Servlet {
 
@@ -96,7 +89,7 @@ public class LogConfiguration {
 
 	}
 
-	@Configuration(proxyBeanMethods = false)
+	@AutoConfiguration
 	@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
 	static class Reactive {
 

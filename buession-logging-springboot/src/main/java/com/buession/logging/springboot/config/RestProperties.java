@@ -19,17 +19,21 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.springboot.config;
 
+import com.buession.httpclient.conn.nio.IOReactorConfig;
+import com.buession.httpclient.core.Configuration;
+import com.buession.logging.core.RequestMethod;
 import com.buession.logging.rest.core.JsonRequestBodyBuilder;
 import com.buession.logging.rest.core.RequestBodyBuilder;
-import com.buession.logging.rest.core.RequestMethod;
-import com.buession.logging.support.config.HandlerProperties;
+import com.buession.logging.support.config.AdapterProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 import java.io.Serializable;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * Rest 日志配置
@@ -37,7 +41,7 @@ import java.io.Serializable;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class RestProperties implements HandlerProperties, Serializable {
+public class RestProperties implements AdapterProperties, Serializable {
 
 	private final static long serialVersionUID = -158997473471475854L;
 
@@ -55,6 +59,14 @@ public class RestProperties implements HandlerProperties, Serializable {
 	 * 请求体构建器
 	 */
 	private Class<? extends RequestBodyBuilder> requestBodyBuilder = JsonRequestBodyBuilder.class;
+
+	/**
+	 * {@link com.buession.httpclient.HttpClient} 配置
+	 *
+	 * @since 1.0.0
+	 */
+	@NestedConfigurationProperty
+	private HttpClientProperties httpClient = new HttpClientProperties();
 
 	/**
 	 * 返回 Rest Url
@@ -111,6 +123,86 @@ public class RestProperties implements HandlerProperties, Serializable {
 	 */
 	public void setRequestBodyBuilder(Class<? extends RequestBodyBuilder> requestBodyBuilder) {
 		this.requestBodyBuilder = requestBodyBuilder;
+	}
+
+	/**
+	 * 返回 {@link com.buession.httpclient.HttpClient} 配置
+	 *
+	 * @return {@link com.buession.httpclient.HttpClient} 配置
+	 *
+	 * @since 1.0.0
+	 */
+	public HttpClientProperties getHttpClient() {
+		return httpClient;
+	}
+
+	/**
+	 * 设置 {@link com.buession.httpclient.HttpClient} 配置
+	 *
+	 * @param httpClient
+	 *        {@link com.buession.httpclient.HttpClient} 配置
+	 *
+	 * @since 1.0.0
+	 */
+	public void setHttpClient(HttpClientProperties httpClient) {
+		this.httpClient = httpClient;
+	}
+
+	/**
+	 * {@link com.buession.httpclient.HttpClient} 配置
+	 */
+	public final static class HttpClientProperties extends Configuration {
+
+		@NestedConfigurationProperty
+		private ApacheClient apacheClient;
+
+		@NestedConfigurationProperty
+		private OkHttp okHttp;
+
+		public ApacheClient getApacheClient() {
+			return apacheClient;
+		}
+
+		public void setApacheClient(ApacheClient apacheClient) {
+			this.apacheClient = apacheClient;
+		}
+
+		public OkHttp getOkHttp() {
+			return okHttp;
+		}
+
+		public void setOkHttp(OkHttp okHttp) {
+			this.okHttp = okHttp;
+		}
+
+		public final static class ApacheClient {
+
+			private IOReactorConfig ioReactor;
+
+			private Class<? extends ThreadFactory> threadFactory;
+
+			public IOReactorConfig getIoReactor() {
+				return ioReactor;
+			}
+
+			public void setIoReactor(IOReactorConfig ioReactor) {
+				this.ioReactor = ioReactor;
+			}
+
+			public Class<? extends ThreadFactory> getThreadFactory() {
+				return threadFactory;
+			}
+
+			public void setThreadFactory(Class<? extends ThreadFactory> threadFactory) {
+				this.threadFactory = threadFactory;
+			}
+
+		}
+
+		public final static class OkHttp {
+
+		}
+
 	}
 
 }

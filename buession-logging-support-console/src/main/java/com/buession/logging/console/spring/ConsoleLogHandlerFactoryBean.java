@@ -28,7 +28,10 @@ import com.buession.core.utils.Assert;
 import com.buession.logging.console.formatter.ConsoleLogDataFormatter;
 import com.buession.logging.console.formatter.DefaultConsoleLogDataFormatter;
 import com.buession.logging.console.handler.ConsoleLogHandler;
+import com.buession.logging.console.spring.config.ConsoleLogHandlerFactoryBeanConfigurer;
 import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
+
+import java.util.Optional;
 
 /**
  * 控制台日志处理器 {@link ConsoleLogHandler} 工厂 Bean 基类
@@ -46,7 +49,24 @@ public class ConsoleLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<Cons
 	/**
 	 * 日志格式化
 	 */
-	private ConsoleLogDataFormatter<String> formatter = new DefaultConsoleLogDataFormatter();
+	private ConsoleLogDataFormatter formatter = new DefaultConsoleLogDataFormatter();
+
+	/**
+	 * 构造函数
+	 */
+	public ConsoleLogHandlerFactoryBean() {
+	}
+
+	/**
+	 * 构造函数
+	 *
+	 * @param configurer
+	 *        {@link  ConsoleLogHandlerFactoryBeanConfigurer}
+	 */
+	public ConsoleLogHandlerFactoryBean(final ConsoleLogHandlerFactoryBeanConfigurer configurer) {
+		setTemplate(configurer.getTemplate());
+		Optional.ofNullable(configurer.getFormatter()).ifPresent(this::setFormatter);
+	}
 
 	/**
 	 * 返回日志模板
@@ -72,7 +92,7 @@ public class ConsoleLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<Cons
 	 *
 	 * @return 日志格式化
 	 */
-	public ConsoleLogDataFormatter<String> getFormatter() {
+	public ConsoleLogDataFormatter getFormatter() {
 		return formatter;
 	}
 
@@ -82,7 +102,7 @@ public class ConsoleLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<Cons
 	 * @param formatter
 	 * 		日志格式化
 	 */
-	public void setFormatter(ConsoleLogDataFormatter<String> formatter) {
+	public void setFormatter(ConsoleLogDataFormatter formatter) {
 		this.formatter = formatter;
 	}
 
@@ -91,9 +111,12 @@ public class ConsoleLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<Cons
 		Assert.isNull(getTemplate(), "Property 'template' is required");
 
 		if(logHandler == null){
-			logHandler =
-					getFormatter() == null ? new ConsoleLogHandler(getTemplate()) : new ConsoleLogHandler(getTemplate(),
-							getFormatter());
+			synchronized(this){
+				if(logHandler == null){
+					logHandler = getFormatter() == null ? new ConsoleLogHandler(getTemplate()) : new ConsoleLogHandler(
+							getTemplate(), getFormatter());
+				}
+			}
 		}
 	}
 

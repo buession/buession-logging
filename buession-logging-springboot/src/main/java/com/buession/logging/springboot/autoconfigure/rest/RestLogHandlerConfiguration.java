@@ -19,23 +19,28 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.springboot.autoconfigure.rest;
 
+import com.buession.httpclient.HttpAsyncClient;
+import com.buession.httpclient.HttpClient;
 import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.rest.spring.RestLogHandlerFactoryBean;
+import com.buession.logging.rest.spring.config.RestLogHandlerFactoryBeanConfigurer;
 import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.RestProperties;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * Rest 日志处理器自动配置类
@@ -43,7 +48,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Yong.Teng
  * @since 0.0.1
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @EnableConfigurationProperties(LogProperties.class)
 @ConditionalOnMissingBean(LogHandler.class)
 @ConditionalOnClass({RestLogHandlerFactoryBean.class})
@@ -55,15 +60,22 @@ public class RestLogHandlerConfiguration extends AbstractLogHandlerConfiguration
 	}
 
 	@Bean
-	public RestLogHandlerFactoryBean logHandlerFactoryBean() {
-		final RestLogHandlerFactoryBean logHandlerFactoryBean = new RestLogHandlerFactoryBean();
+	public RestLogHandlerFactoryBean logHandlerFactoryBean(
+			@Qualifier("loggingRestHttpClient") ObjectProvider<HttpClient> httpClient,
+			@Qualifier("loggingRestHttpAsyncClient") ObjectProvider<HttpAsyncClient> httpAsyncClient) {
+		final RestLogHandlerFactoryBeanConfigurer configurer = new RestLogHandlerFactoryBeanConfigurer();
 
-		propertyMapper.from(handlerProperties::getUrl).to(logHandlerFactoryBean::setUrl);
-		propertyMapper.from(handlerProperties::getRequestMethod).to(logHandlerFactoryBean::setRequestMethod);
-		propertyMapper.from(handlerProperties::getRequestBodyBuilder).as(BeanUtils::instantiateClass)
-				.to(logHandlerFactoryBean::setRequestBodyBuilder);
+		configurer.setUrl(properties.getUrl());
+		configurer.setRequestMethod(properties.getRequestMethod());
+		propertyMapper.from(properties::getRequestBodyBuilder).as(BeanUtils::instantiateClass)
+				.to(configurer::setRequestBodyBuilder);
 
-		return logHandlerFactoryBean;
+		final RestLogHandlerFactoryBean factoryBean = new RestLogHandlerFactoryBean(configurer);
+
+		httpClient.ifAvailable(factoryBean::setHttpClient);
+		httpAsyncClient.ifAvailable(factoryBean::setHttpAsyncClient);
+
+		return factoryBean;
 	}
 
 }

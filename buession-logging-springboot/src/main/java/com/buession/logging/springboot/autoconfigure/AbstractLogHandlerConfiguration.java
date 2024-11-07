@@ -19,31 +19,40 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.springboot.autoconfigure;
 
 import com.buession.core.converter.mapper.PropertyMapper;
-import com.buession.logging.support.config.HandlerProperties;
+import com.buession.logging.support.config.AdapterProperties;
 
 /**
  * 日志处理器自动配置类抽象类
  *
- * @param <P>
- * 		Handler 配置
+ * @param <PROPS>
+ * 		日志适配器配置类型
  *
  * @author Yong.Teng
  * @since 0.0.1
  */
-public abstract class AbstractLogHandlerConfiguration<P extends HandlerProperties> {
+public abstract class AbstractLogHandlerConfiguration<PROPS extends AdapterProperties> {
 
-	protected final P handlerProperties;
+	/**
+	 * 日志适配器配置
+	 */
+	protected final PROPS properties;
 
 	protected final PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 
-	public AbstractLogHandlerConfiguration(final P handlerProperties) {
-		this.handlerProperties = handlerProperties;
+	/**
+	 * 构造函数
+	 *
+	 * @param properties
+	 * 		日志适配器配置
+	 */
+	public AbstractLogHandlerConfiguration(final PROPS properties) {
+		this.properties = properties;
 	}
 
 }

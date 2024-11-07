@@ -24,6 +24,7 @@
  */
 package com.buession.logging.support.spring;
 
+import com.buession.core.converter.mapper.PropertyMapper;
 import com.buession.logging.core.handler.LogHandler;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -37,13 +38,15 @@ import org.springframework.beans.factory.InitializingBean;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public abstract class BaseLogHandlerFactoryBean<T extends LogHandler> extends LogHandlerFactory
-		implements FactoryBean<T>, InitializingBean {
+public abstract class BaseLogHandlerFactoryBean<T extends LogHandler>
+		implements LogHandlerFactory, FactoryBean<T>, InitializingBean {
+
+	protected final static PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 
 	/**
 	 * 日志处理器
 	 */
-	protected T logHandler;
+	protected volatile T logHandler;
 
 	@Override
 	public T getObject() throws Exception {
@@ -54,5 +57,5 @@ public abstract class BaseLogHandlerFactoryBean<T extends LogHandler> extends Lo
 	public Class<? extends LogHandler> getObjectType() {
 		return logHandler.getClass();
 	}
-	
+
 }

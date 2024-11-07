@@ -32,6 +32,6 @@ import com.buession.logging.core.handler.LogHandler;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class LogHandlerFactory {
+public interface LogHandlerFactory {
 
 }

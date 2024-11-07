@@ -19,20 +19,29 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.springboot.config;
 
 import com.buession.core.id.IdGenerator;
-import com.buession.jdbc.datasource.config.PoolConfiguration;
+import com.buession.jdbc.config.Dbcp2Config;
+import com.buession.jdbc.config.DruidConfig;
+import com.buession.jdbc.config.GenericConfig;
+import com.buession.jdbc.config.HikariConfig;
+import com.buession.jdbc.config.OracleConfig;
+import com.buession.jdbc.config.TomcatConfig;
+import com.buession.logging.jdbc.converter.DefaultLogDataConverter;
+import com.buession.logging.jdbc.converter.LogDataConverter;
 import com.buession.logging.jdbc.formatter.DefaultGeoFormatter;
 import com.buession.logging.core.formatter.GeoFormatter;
 import com.buession.logging.jdbc.formatter.JsonMapFormatter;
 import com.buession.logging.core.formatter.MapFormatter;
-import com.buession.logging.support.config.HandlerProperties;
+import com.buession.logging.springboot.autoconfigure.LogProperties;
+import com.buession.logging.support.config.AdapterProperties;
 
 import java.io.Serializable;
+import java.util.Properties;
 
 /**
  * JDBC 日志配置
@@ -40,9 +49,11 @@ import java.io.Serializable;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class JdbcProperties implements HandlerProperties, Serializable {
+public class JdbcProperties implements AdapterProperties, Serializable {
 
 	private final static long serialVersionUID = -8823778313817319882L;
+
+	public final static String PREFIX = LogProperties.PREFIX + ".jdbc";
 
 	/**
 	 * 数据库驱动类名
@@ -65,9 +76,60 @@ public class JdbcProperties implements HandlerProperties, Serializable {
 	private String password;
 
 	/**
-	 * 连接池配置
+	 * 设置一个SQL语句，在将每个新连接创建后，将其添加到池中之前执行该语句
+	 *
+	 * @since 1.0.0
 	 */
-	private PoolConfiguration pool;
+	private String initSQL;
+
+	/**
+	 * 连接属性
+	 *
+	 * @since 1.0.0
+	 */
+	private Properties connectionProperties;
+
+	/**
+	 * DBCP2 数据源配置
+	 *
+	 * @since 1.0.0
+	 */
+	private Dbcp2Config dbcp2;
+
+	/**
+	 * Druid 数据源配置
+	 *
+	 * @since 1.0.0
+	 */
+	private DruidConfig druid;
+
+	/**
+	 * Hikari 数据源配置
+	 *
+	 * @since 1.0.0
+	 */
+	private HikariConfig hikari;
+
+	/**
+	 * Oracle 数据源配置
+	 *
+	 * @since 1.0.0
+	 */
+	private OracleConfig oracle;
+
+	/**
+	 * Tomcat 数据源配置
+	 *
+	 * @since 1.0.0
+	 */
+	private TomcatConfig tomcat;
+
+	/**
+	 * Generic 数据源配置
+	 *
+	 * @since 1.0.0
+	 */
+	private GenericConfig generic;
 
 	/**
 	 * SQL
@@ -98,6 +160,13 @@ public class JdbcProperties implements HandlerProperties, Serializable {
 	 * 附加参数格式化为字符串
 	 */
 	private Class<? extends MapFormatter<Object>> extraFormatter = JsonMapFormatter.class;
+
+	/**
+	 * 数据转换器
+	 *
+	 * @since 1.0.0
+	 */
+	private Class<? extends LogDataConverter> dataConverter = DefaultLogDataConverter.class;
 
 	/**
 	 * 返回数据库驱动类名
@@ -176,22 +245,187 @@ public class JdbcProperties implements HandlerProperties, Serializable {
 	}
 
 	/**
-	 * 返回连接池配置
+	 * 返回在将每个新连接创建后，将其添加到池中之前执行的SQL语句
 	 *
-	 * @return 连接池配置
+	 * @return 每个新连接创建后，将其添加到池中之前执行的SQL语句
+	 *
+	 * @since 1.0.0
 	 */
-	public PoolConfiguration getPool() {
-		return pool;
+	public String getInitSQL() {
+		return initSQL;
 	}
 
 	/**
-	 * 设置连接池配置
+	 * 设置每个新连接创建后，将其添加到池中之前执行的SQL语句
 	 *
-	 * @param pool
-	 * 		连接池配置
+	 * @param initSQL
+	 * 		每个新连接创建后，将其添加到池中之前执行的SQL语句
+	 *
+	 * @since 1.0.0
 	 */
-	public void setPool(PoolConfiguration pool) {
-		this.pool = pool;
+	public void setInitSQL(String initSQL) {
+		this.initSQL = initSQL;
+	}
+
+	/**
+	 * 返回连接属性
+	 *
+	 * @return 连接属性
+	 *
+	 * @since 1.0.0
+	 */
+	public Properties getConnectionProperties() {
+		return connectionProperties;
+	}
+
+	/**
+	 * 设置连接属性
+	 *
+	 * @param connectionProperties
+	 * 		连接属性
+	 *
+	 * @since 1.0.0
+	 */
+	public void setConnectionProperties(Properties connectionProperties) {
+		this.connectionProperties = connectionProperties;
+	}
+
+	/**
+	 * 返回 Dbcp2 数据源配置
+	 *
+	 * @return Dbcp2 数据源配置
+	 *
+	 * @since 1.0.0
+	 */
+	public Dbcp2Config getDbcp2() {
+		return dbcp2;
+	}
+
+	/**
+	 * 设置 Dbcp2 数据源配置
+	 *
+	 * @param dbcp2
+	 * 		Dbcp2 数据源配置
+	 *
+	 * @since 1.0.0
+	 */
+	public void setDbcp2(Dbcp2Config dbcp2) {
+		this.dbcp2 = dbcp2;
+	}
+
+	/**
+	 * 返回 Druid 数据源配置
+	 *
+	 * @return Druid 数据源配置
+	 *
+	 * @since 1.0.0
+	 */
+	public DruidConfig getDruid() {
+		return druid;
+	}
+
+	/**
+	 * 设置 Druid 数据源配置
+	 *
+	 * @param druid
+	 * 		Druid 数据源配置
+	 *
+	 * @since 1.0.0
+	 */
+	public void setDruid(DruidConfig druid) {
+		this.druid = druid;
+	}
+
+	/**
+	 * 返回 Hikari 数据源配置
+	 *
+	 * @return Hikari 数据源配置
+	 *
+	 * @since 1.0.0
+	 */
+	public HikariConfig getHikari() {
+		return hikari;
+	}
+
+	/**
+	 * 设置 Hikari 数据源配置
+	 *
+	 * @param hikari
+	 * 		Hikari 数据源配置
+	 *
+	 * @since 1.0.0
+	 */
+	public void setHikari(HikariConfig hikari) {
+		this.hikari = hikari;
+	}
+
+	/**
+	 * 返回 Oracle 数据源配置
+	 *
+	 * @return Oracle 数据源配置
+	 *
+	 * @since 1.0.0
+	 */
+	public OracleConfig getOracle() {
+		return oracle;
+	}
+
+	/**
+	 * 设置 Oracle 数据源配置
+	 *
+	 * @param oracle
+	 * 		Oracle 数据源配置
+	 *
+	 * @since 1.0.0
+	 */
+	public void setOracle(OracleConfig oracle) {
+		this.oracle = oracle;
+	}
+
+	/**
+	 * 返回 Tomcat 数据源配置
+	 *
+	 * @return Tomcat 数据源配置
+	 *
+	 * @since 1.0.0
+	 */
+	public TomcatConfig getTomcat() {
+		return tomcat;
+	}
+
+	/**
+	 * 设置 Tomcat 数据源配置
+	 *
+	 * @param tomcat
+	 * 		Tomcat 数据源配置
+	 *
+	 * @since 1.0.0
+	 */
+	public void setTomcat(TomcatConfig tomcat) {
+		this.tomcat = tomcat;
+	}
+
+	/**
+	 * 返回 Generic 数据源配置
+	 *
+	 * @return Generic 数据源配置
+	 *
+	 * @since 1.0.0
+	 */
+	public GenericConfig getGeneric() {
+		return generic;
+	}
+
+	/**
+	 * 设置 Generic 数据源配置
+	 *
+	 * @param generic
+	 * 		Generic 数据源配置
+	 *
+	 * @since 1.0.0
+	 */
+	public void setGeneric(GenericConfig generic) {
+		this.generic = generic;
 	}
 
 	/**
@@ -306,6 +540,29 @@ public class JdbcProperties implements HandlerProperties, Serializable {
 	 */
 	public void setExtraFormatter(Class<? extends MapFormatter<Object>> extraFormatter) {
 		this.extraFormatter = extraFormatter;
+	}
+
+	/**
+	 * 返回数据转换器
+	 *
+	 * @return 数据转换器
+	 *
+	 * @since 1.0.0
+	 */
+	public Class<? extends LogDataConverter> getDataConverter() {
+		return dataConverter;
+	}
+
+	/**
+	 * 设置数据转换器
+	 *
+	 * @param dataConverter
+	 * 		数据转换器
+	 *
+	 * @since 1.0.0
+	 */
+	public void setDataConverter(Class<? extends LogDataConverter> dataConverter) {
+		this.dataConverter = dataConverter;
 	}
 
 }

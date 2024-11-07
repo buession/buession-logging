@@ -19,7 +19,7 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2024 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.springboot.autoconfigure;
@@ -27,43 +27,38 @@ package com.buession.logging.springboot.autoconfigure;
 import com.buession.logging.aspectj.reactive.aopalliance.ReactiveLogAttributeSourcePointcutAdvisor;
 import com.buession.logging.aspectj.servlet.aopalliance.ServletLogAttributeSourcePointcutAdvisor;
 import com.buession.logging.core.mgt.LogManager;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Yong.Teng
  * @since 0.0.1
  */
-@Configuration(proxyBeanMethods = false)
-@AutoConfigureAfter({LogConfiguration.class})
+@AutoConfiguration(after = {LogConfiguration.class})
 public class AnnotationProcessorConfiguration {
 
-	@Configuration(proxyBeanMethods = false)
+	@AutoConfiguration
 	@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 	static class Servlet {
 
 		@Bean
 		@ConditionalOnBean(LogManager.class)
-		public ServletLogAttributeSourcePointcutAdvisor logAttributeSourcePointcutAdvisor(
-				ObjectProvider<LogManager> logManager) {
-			return new ServletLogAttributeSourcePointcutAdvisor(logManager.getIfAvailable());
+		public ServletLogAttributeSourcePointcutAdvisor logAttributeSourcePointcutAdvisor(LogManager logManager) {
+			return new ServletLogAttributeSourcePointcutAdvisor(logManager);
 		}
 
 	}
 
-	@Configuration(proxyBeanMethods = false)
+	@AutoConfiguration
 	@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
 	static class Reactive {
 
 		@Bean
 		@ConditionalOnBean(LogManager.class)
-		public ReactiveLogAttributeSourcePointcutAdvisor logAttributeSourcePointcutAdvisor(
-				ObjectProvider<LogManager> logManager) {
-			return new ReactiveLogAttributeSourcePointcutAdvisor(logManager.getIfAvailable());
+		public ReactiveLogAttributeSourcePointcutAdvisor logAttributeSourcePointcutAdvisor(LogManager logManager) {
+			return new ReactiveLogAttributeSourcePointcutAdvisor(logManager);
 		}
 
 	}

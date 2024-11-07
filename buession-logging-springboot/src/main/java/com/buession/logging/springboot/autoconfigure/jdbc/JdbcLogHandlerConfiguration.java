@@ -25,22 +25,19 @@
 package com.buession.logging.springboot.autoconfigure.jdbc;
 
 import com.buession.logging.core.handler.LogHandler;
-import com.buession.logging.jdbc.converter.DefaultLogDataConverter;
-import com.buession.logging.jdbc.converter.LogDataConverter;
 import com.buession.logging.jdbc.spring.JdbcLogHandlerFactoryBean;
-import com.buession.logging.jdbc.spring.JdbcTemplateFactoryBean;
+import com.buession.logging.jdbc.spring.config.JdbcLogHandlerFactoryBeanConfigurer;
 import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.springboot.config.JdbcProperties;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
@@ -49,52 +46,38 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * @author Yong.Teng
  * @since 0.0.1
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @EnableConfigurationProperties(LogProperties.class)
 @ConditionalOnMissingBean(LogHandler.class)
 @ConditionalOnClass({JdbcLogHandlerFactoryBean.class})
-@ConditionalOnProperty(prefix = LogProperties.PREFIX, name = "jdbc.enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = JdbcProperties.PREFIX, name = "enabled", havingValue = "true")
 public class JdbcLogHandlerConfiguration extends AbstractLogHandlerConfiguration<JdbcProperties> {
 
 	public JdbcLogHandlerConfiguration(LogProperties logProperties) {
 		super(logProperties.getJdbc());
 	}
 
-	@Bean(name = "loggingJdbcJdbcTemplate")
-	public JdbcTemplateFactoryBean jdbcTemplateFactoryBean() {
-		final JdbcTemplateFactoryBean jdbcTemplateFactoryBean = new JdbcTemplateFactoryBean();
-
-		propertyMapper.from(handlerProperties::getDriverClassName).to(jdbcTemplateFactoryBean::setDriverClassName);
-		propertyMapper.from(handlerProperties::getUrl).to(jdbcTemplateFactoryBean::setUrl);
-		propertyMapper.from(handlerProperties::getUsername).to(jdbcTemplateFactoryBean::setUsername);
-		propertyMapper.from(handlerProperties::getPassword).to(jdbcTemplateFactoryBean::setPassword);
-		propertyMapper.from(handlerProperties::getPool).to(jdbcTemplateFactoryBean::setPoolConfiguration);
-
-		return jdbcTemplateFactoryBean;
-	}
-
-	@Bean(name = "loggingJdbcDataConverter")
-	public LogDataConverter logDataConverter() {
-		return new DefaultLogDataConverter();
-	}
-
 	@Bean
 	public JdbcLogHandlerFactoryBean logHandlerFactoryBean(
-			@Qualifier("loggingJdbcJdbcTemplate") ObjectProvider<JdbcTemplate> jdbcTemplate) {
-		final JdbcLogHandlerFactoryBean logHandlerFactoryBean = new JdbcLogHandlerFactoryBean();
+			@Qualifier("loggingJdbcTemplate") JdbcTemplate jdbcTemplate) {
+		final JdbcLogHandlerFactoryBeanConfigurer configurer = new JdbcLogHandlerFactoryBeanConfigurer();
 
-		jdbcTemplate.ifUnique(logHandlerFactoryBean::setJdbcTemplate);
+		configurer.setSql(properties.getSql());
+		propertyMapper.from(properties::getIdGenerator).as(BeanUtils::instantiateClass)
+				.to(configurer::setIdGenerator);
+		configurer.setDateTimeFormat(properties.getDateTimeFormat());
+		propertyMapper.from(properties::getRequestParametersFormatter).as(BeanUtils::instantiateClass)
+				.to(configurer::setRequestParametersFormatter);
+		propertyMapper.from(properties::getExtraFormatter).as(BeanUtils::instantiateClass)
+				.to(configurer::setExtraFormatter);
+		propertyMapper.from(properties.getDataConverter()).as(BeanUtils::instantiateClass)
+				.to(configurer::setDataConverter);
 
-		propertyMapper.from(handlerProperties::getSql).to(logHandlerFactoryBean::setSql);
-		propertyMapper.from(handlerProperties::getIdGenerator).as(BeanUtils::instantiateClass)
-				.to(logHandlerFactoryBean::setIdGenerator);
-		propertyMapper.from(handlerProperties::getDateTimeFormat).to(logHandlerFactoryBean::setDateTimeFormat);
-		propertyMapper.from(handlerProperties::getRequestParametersFormatter).as(BeanUtils::instantiateClass)
-				.to(logHandlerFactoryBean::setRequestParametersFormatter);
-		propertyMapper.from(handlerProperties::getExtraFormatter).as(BeanUtils::instantiateClass)
-				.to(logHandlerFactoryBean::setExtraFormatter);
+		final JdbcLogHandlerFactoryBean factoryBean = new JdbcLogHandlerFactoryBean(configurer);
 
-		return logHandlerFactoryBean;
+		factoryBean.setJdbcTemplate(jdbcTemplate);
+
+		return factoryBean;
 	}
 
 }

@@ -40,9 +40,9 @@ public class PoolConfiguration implements Serializable {
 
 	private final static long serialVersionUID = 6352817004600241253L;
 
-	private int minSize;
+	private Integer minSize;
 
-	private int maxSize;
+	private Integer maxSize;
 
 	private Duration maxWaitTime;
 
@@ -54,23 +54,23 @@ public class PoolConfiguration implements Serializable {
 
 	private Duration maintenanceFrequency;
 
-	private int maxConnecting;
+	private Integer maxConnecting;
 
 	private List<ConnectionPoolListener> connectionPoolListeners;
 
-	public int getMinSize() {
+	public Integer getMinSize() {
 		return minSize;
 	}
 
-	public void setMinSize(int minSize) {
+	public void setMinSize(Integer minSize) {
 		this.minSize = minSize;
 	}
 
-	public int getMaxSize() {
+	public Integer getMaxSize() {
 		return maxSize;
 	}
 
-	public void setMaxSize(int maxSize) {
+	public void setMaxSize(Integer maxSize) {
 		this.maxSize = maxSize;
 	}
 
@@ -114,11 +114,11 @@ public class PoolConfiguration implements Serializable {
 		this.maintenanceFrequency = maintenanceFrequency;
 	}
 
-	public int getMaxConnecting() {
+	public Integer getMaxConnecting() {
 		return maxConnecting;
 	}
 
-	public void setMaxConnecting(int maxConnecting) {
+	public void setMaxConnecting(Integer maxConnecting) {
 		this.maxConnecting = maxConnecting;
 	}
 
@@ -129,4 +129,5 @@ public class PoolConfiguration implements Serializable {
 	public void setConnectionPoolListeners(List<ConnectionPoolListener> connectionPoolListeners) {
 		this.connectionPoolListeners = connectionPoolListeners;
 	}
+
 }
