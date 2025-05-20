@@ -1,0 +1,13 @@
+{
+  "title": "Buession Logging",
+  "keywords": "buession logging 用户行为 日志",
+  "description": "一款用于记录用户操作行为的日志框架",
+  "author": "buession",
+  "theme": "demo",
+  "root": "src",
+  "pluginsConfig": {
+    "import-asset": {
+      "js": ["/js/stat.js"]
+    }
+  }
+}
