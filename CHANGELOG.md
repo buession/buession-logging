@@ -2,6 +2,16 @@
 ===========================
 
 
+## [1.0.1](https://github.com/buession/buession-logging/releases/tag/v1.0.1) (2025-05-20)
+
+### 🔨依赖升级
+
+- [依赖库版本升级和安全漏洞修复](https://github.com/buession/buession-parent/releases/tag/v3.0.1)
+
+
+---
+
+
 ## [1.0.0](https://github.com/buession/buession-logging/releases/tag/v1.0.0) (2024-11-07)
 
 ### 🔨依赖升级
