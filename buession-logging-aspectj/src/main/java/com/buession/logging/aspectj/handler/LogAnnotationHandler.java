@@ -19,7 +19,7 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2025 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.aspectj.handler;
@@ -28,8 +28,6 @@ import com.buession.aop.MethodInvocation;
 import com.buession.aop.handler.AbstractAnnotationHandler;
 import com.buession.core.utils.Assert;
 import com.buession.logging.annotation.Log;
-import com.buession.logging.core.BusinessType;
-import com.buession.logging.core.Event;
 import com.buession.logging.core.LogData;
 import com.buession.logging.core.mgt.LogManager;
 
@@ -42,7 +40,7 @@ public class LogAnnotationHandler extends AbstractAnnotationHandler<Log> {
 	private LogManager logManager;
 
 	public LogAnnotationHandler() {
-		super(Log.class);
+		super(Log.class, null);
 	}
 
 	public LogAnnotationHandler(LogManager logManager) {

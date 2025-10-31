@@ -19,12 +19,11 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2024 Buession.com Inc.														       |
+ * | Copyright @ 2013-2025 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.mongodb.spring.config;
 
-import com.buession.core.Customizer;
 import com.buession.core.converter.mapper.PropertyMapper;
 import com.buession.core.validator.Validate;
 import com.buession.dao.mongodb.core.ReadConcern;
@@ -42,7 +41,6 @@ import com.mongodb.connection.ConnectionPoolSettings;
 import com.mongodb.connection.ServerSettings;
 import com.mongodb.connection.SocketSettings;
 import org.bson.codecs.configuration.CodecRegistries;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.JodaTimeConverters;
 import org.springframework.data.convert.Jsr310Converters;
@@ -80,8 +78,31 @@ public abstract class AbstractMongoConfiguration extends AbstractMongoClientConf
 		this.mongoConfigurer = mongoConfigurer;
 	}
 
-	public MongoCustomConversions mongoCustomConversions(
-			ObjectProvider<Customizer<List<Converter<?, ?>>>> convertersCustomizer) {
+	@Override
+	public MongoTemplate mongoTemplate(MongoDatabaseFactory databaseFactory, MappingMongoConverter converter) {
+		return super.mongoTemplate(databaseFactory, converter);
+	}
+
+	@Override
+	public MongoDatabaseFactory mongoDbFactory() {
+		return super.mongoDbFactory();
+	}
+
+	@Override
+	public MappingMongoConverter mappingMongoConverter(MongoDatabaseFactory databaseFactory,
+													   MongoCustomConversions customConversions,
+													   MongoMappingContext mappingContext) {
+		final MappingMongoConverter mappingMongoConverter = super.mappingMongoConverter(databaseFactory,
+				customConversions, mappingContext);
+
+		mappingMongoConverter.setTypeMapper(new DefaultMongoTypeMapper(null, mappingContext));
+
+		return mappingMongoConverter;
+	}
+
+	@Override
+	protected void configureConverters(
+			MongoCustomConversions.MongoConverterConfigurationAdapter converterConfigurationAdapter) {
 		final Collection<Converter<?, ?>> jodaTimeConverters = JodaTimeConverters.getConvertersToRegister();
 		final Collection<Converter<?, ?>> jsr310Converters = Jsr310Converters.getConvertersToRegister();
 		final List<Converter<?, ?>> converters =
@@ -108,31 +129,7 @@ public abstract class AbstractMongoConfiguration extends AbstractMongoClientConf
 		converters.addAll(jodaTimeConverters);
 		converters.addAll(jsr310Converters);
 
-		convertersCustomizer.ifAvailable((customizer)->customizer.customize(converters));
-
-		return new MongoCustomConversions(converters);
-	}
-
-	@Override
-	public MongoTemplate mongoTemplate(MongoDatabaseFactory databaseFactory, MappingMongoConverter converter) {
-		return super.mongoTemplate(databaseFactory, converter);
-	}
-
-	@Override
-	public MongoDatabaseFactory mongoDbFactory() {
-		return super.mongoDbFactory();
-	}
-
-	@Override
-	public MappingMongoConverter mappingMongoConverter(MongoDatabaseFactory databaseFactory,
-													   MongoCustomConversions customConversions,
-													   MongoMappingContext mappingContext) {
-		final MappingMongoConverter mappingMongoConverter = super.mappingMongoConverter(databaseFactory,
-				customConversions, mappingContext);
-
-		mappingMongoConverter.setTypeMapper(new DefaultMongoTypeMapper(null, mappingContext));
-
-		return mappingMongoConverter;
+		converterConfigurationAdapter.registerConverters(converters);
 	}
 
 	@Override
