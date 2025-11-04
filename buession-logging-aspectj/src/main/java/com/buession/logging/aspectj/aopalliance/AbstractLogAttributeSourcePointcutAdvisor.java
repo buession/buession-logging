@@ -19,7 +19,7 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2025 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.aspectj.aopalliance;
@@ -34,6 +34,8 @@ import com.buession.logging.annotation.Log;
  * @since 0.0.1
  */
 public abstract class AbstractLogAttributeSourcePointcutAdvisor extends AbstractAttributeSourceAdvisor {
+
+	private final static long serialVersionUID = -6278786314426264338L;
 
 	@SuppressWarnings({"unchecked"})
 	public AbstractLogAttributeSourcePointcutAdvisor(final AnnotationsMethodInterceptor annotationsMethodInterceptor) {

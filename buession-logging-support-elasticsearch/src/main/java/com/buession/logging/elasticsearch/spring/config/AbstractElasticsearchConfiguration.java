@@ -19,12 +19,13 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2024 Buession.com Inc.														       |
+ * | Copyright @ 2013-2025 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.elasticsearch.spring.config;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.DefaultTransportOptions;
 import co.elastic.clients.transport.TransportOptions;
 import co.elastic.clients.transport.http.HeaderMap;
@@ -72,7 +73,7 @@ public abstract class AbstractElasticsearchConfiguration extends ElasticsearchCo
 
 		transportOptionsCustomizer.orderedStream().forEach((customizer)->customizer.customize(transportOptions));
 
-		return ElasticsearchClients.createImperative(restClient, transportOptions);
+		return ElasticsearchClients.createImperative(restClient, transportOptions, new JacksonJsonpMapper());
 	}
 
 	public ElasticsearchTemplate elasticsearchTemplate(ElasticsearchConfigurer configurer,
