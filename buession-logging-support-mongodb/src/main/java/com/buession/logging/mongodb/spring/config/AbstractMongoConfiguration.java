@@ -29,7 +29,6 @@ import com.buession.core.validator.Validate;
 import com.buession.dao.mongodb.core.ReadConcern;
 import com.buession.dao.mongodb.core.ReadPreference;
 import com.buession.dao.mongodb.core.WriteConcern;
-import com.buession.logging.mongodb.core.Converters;
 import com.buession.logging.mongodb.core.PoolConfiguration;
 import com.buession.logging.mongodb.core.ZonedDateTimeCodecProvider;
 import com.mongodb.ConnectionString;
@@ -41,8 +40,6 @@ import com.mongodb.connection.ConnectionPoolSettings;
 import com.mongodb.connection.ServerSettings;
 import com.mongodb.connection.SocketSettings;
 import org.bson.codecs.configuration.CodecRegistries;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.data.convert.JodaTimeConverters;
 import org.springframework.data.convert.Jsr310Converters;
 import org.springframework.data.mapping.model.FieldNamingStrategy;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
@@ -54,10 +51,7 @@ import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.lang.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -103,33 +97,7 @@ public abstract class AbstractMongoConfiguration extends AbstractMongoClientConf
 	@Override
 	protected void configureConverters(
 			MongoCustomConversions.MongoConverterConfigurationAdapter converterConfigurationAdapter) {
-		final Collection<Converter<?, ?>> jodaTimeConverters = JodaTimeConverters.getConvertersToRegister();
-		final Collection<Converter<?, ?>> jsr310Converters = Jsr310Converters.getConvertersToRegister();
-		final List<Converter<?, ?>> converters =
-				new ArrayList<>(18 + jodaTimeConverters.size() + jsr310Converters.size());
-
-		converters.add(new Converters.LoggerConverter());
-		converters.add(new Converters.ClassConverter());
-		converters.add(new Converters.CommonsLogConverter());
-		converters.add(new Converters.CacheLoaderConverter());
-		converters.add(new Converters.RunnableConverter());
-		converters.add(new Converters.ReferenceQueueConverter());
-		converters.add(new Converters.ThreadLocalConverter());
-		converters.add(new Converters.CertPathConverter());
-		converters.add(new Converters.CacheConverter());
-		converters.add(new Converters.PatternToStringConverter());
-		converters.add(new Converters.StringToPatternConverter());
-		converters.add(new Converters.ObjectIdToLongConverter());
-		converters.add(new Converters.BsonTimestampToStringConverter());
-		converters.add(new Converters.ZonedDateTimeToDateConverter());
-		converters.add(new Converters.DateToZonedDateTimeConverter());
-		converters.add(new Converters.BsonTimestampToDateConverter());
-		converters.add(new Converters.ZonedDateTimeToStringConverter());
-		converters.add(new Converters.StringToZonedDateTimeConverter());
-		converters.addAll(jodaTimeConverters);
-		converters.addAll(jsr310Converters);
-
-		converterConfigurationAdapter.registerConverters(converters);
+		converterConfigurationAdapter.registerConverters(Jsr310Converters.getConvertersToRegister());
 	}
 
 	@Override

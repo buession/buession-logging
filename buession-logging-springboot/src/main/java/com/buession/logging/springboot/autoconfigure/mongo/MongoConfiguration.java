@@ -19,7 +19,7 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2024 Buession.com Inc.														       |
+ * | Copyright @ 2013-2025Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.springboot.autoconfigure.mongo;
@@ -40,6 +40,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
+import org.springframework.data.mongodb.MongoManagedTypes;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
@@ -135,9 +136,16 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
 	@ConditionalOnMissingBean(name = "loggingMongoMappingContext")
 	@Override
 	public MongoMappingContext mongoMappingContext(
-			@Qualifier("loggingMongoCustomConversions") MongoCustomConversions customConversions)
-			throws ClassNotFoundException {
-		return super.mongoMappingContext(customConversions);
+			@Qualifier("loggingMongoCustomConversions") MongoCustomConversions customConversions,
+			@Qualifier("loggingMongoManagedTypes") MongoManagedTypes mongoManagedTypes) {
+		return super.mongoMappingContext(customConversions, mongoManagedTypes);
+	}
+
+	@Bean(name = "loggingMongoManagedTypes")
+	@ConditionalOnMissingBean(name = "loggingMongoManagedTypes")
+	@Override
+	public MongoManagedTypes mongoManagedTypes() throws ClassNotFoundException {
+		return MongoManagedTypes.fromIterable(getInitialEntitySet());
 	}
 
 	@Bean(name = "loggingMongoDatabaseFactory")
