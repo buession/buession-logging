@@ -78,7 +78,7 @@ public class RocketMQConfiguration extends AbstractRocketMQConfiguration {
 				(int) rocketMQProperties.getCompressMessageBodyThreshold().toBytes());
 		configurer.setRetryNextServer(rocketMQProperties.isRetryNextServer());
 		configurer.setRetryTimesWhenSendFailed(rocketMQProperties.getRetryTimesWhenSendFailed());
-		configurer.setRetryTimesWhenSendAsyncFailed(rocketMQConfigurer().getRetryTimesWhenSendAsyncFailed());
+		configurer.setRetryTimesWhenSendAsyncFailed(rocketMQProperties.getRetryTimesWhenSendAsyncFailed());
 		configurer.setEnableMsgTrace(rocketMQProperties.isEnableMsgTrace());
 		configurer.setCustomizedTraceTopic(rocketMQProperties.getCustomizedTraceTopic());
 		configurer.setTlsEnable(rocketMQProperties.isTlsEnable());

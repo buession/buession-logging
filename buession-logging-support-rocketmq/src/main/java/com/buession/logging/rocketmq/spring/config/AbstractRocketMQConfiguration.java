@@ -26,10 +26,20 @@ package com.buession.logging.rocketmq.spring.config;
 
 import com.buession.core.converter.mapper.PropertyMapper;
 import com.buession.core.validator.Validate;
+import org.apache.rocketmq.acl.common.AclClientRPCHook;
+import org.apache.rocketmq.acl.common.SessionCredentials;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
+import org.apache.rocketmq.client.producer.TransactionMQProducer;
+import org.apache.rocketmq.client.trace.AsyncTraceDispatcher;
+import org.apache.rocketmq.client.trace.TraceDispatcher;
+import org.apache.rocketmq.client.trace.hook.SendMessageTraceHookImpl;
 import org.apache.rocketmq.spring.core.RocketTemplate;
 import org.apache.rocketmq.spring.support.RocketMQMessageConverter;
-import org.apache.rocketmq.spring.support.RocketMQUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
+
+import java.lang.reflect.Field;
 
 /**
  * RocketMQ 日志处理器自动配置类
@@ -41,10 +51,11 @@ public abstract class AbstractRocketMQConfiguration {
 
 	protected final static PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 
+	private final static Logger logger = LoggerFactory.getLogger(AbstractRocketMQConfiguration.class);
+
 	public DefaultMQProducer defaultMQProducer(RocketMQConfigurer configurer) {
-		DefaultMQProducer producer = RocketMQUtil.createDefaultMQProducer(configurer.getGroup(),
-				configurer.getAccessKey(), configurer.getSecretKey(), configurer.isEnableMsgTrace(),
-				configurer.getCustomizedTraceTopic());
+		DefaultMQProducer producer = createDefaultMQProducer(configurer.getGroup(), configurer.getAccessKey(),
+				configurer.getSecretKey(), configurer.isEnableMsgTrace(), configurer.getCustomizedTraceTopic());
 
 		producer.setNamesrvAddr(configurer.getNameServer());
 		if(Validate.hasText(configurer.getNamespace())){
@@ -76,6 +87,38 @@ public abstract class AbstractRocketMQConfiguration {
 		rocketTemplate.setMessageConverter(new RocketMQMessageConverter().getMessageConverter());
 
 		return rocketTemplate;
+	}
+
+	public static DefaultMQProducer createDefaultMQProducer(String groupName, String ak, String sk,
+	                                                        boolean isEnableMsgTrace, String customizedTraceTopic) {
+
+		boolean isEnableAcl = StringUtils.hasLength(ak) && StringUtils.hasLength(sk);
+		DefaultMQProducer producer;
+
+		if(isEnableAcl){
+			producer = new TransactionMQProducer(groupName, new AclClientRPCHook(new SessionCredentials(ak, sk)));
+			producer.setVipChannelEnabled(false);
+		}else{
+			producer = new TransactionMQProducer(groupName);
+		}
+
+		if(isEnableMsgTrace){
+			try{
+				AsyncTraceDispatcher dispatcher = new AsyncTraceDispatcher(groupName, TraceDispatcher.Type.PRODUCE, 10,
+						customizedTraceTopic,
+						isEnableAcl ? new AclClientRPCHook(new SessionCredentials(ak, sk)) : null);
+				dispatcher.setHostProducer(producer.getDefaultMQProducerImpl());
+				Field field = DefaultMQProducer.class.getDeclaredField("traceDispatcher");
+				field.setAccessible(true);
+				field.set(producer, dispatcher);
+				producer.getDefaultMQProducerImpl().registerSendMessageHook(
+						new SendMessageTraceHookImpl(dispatcher));
+			}catch(Throwable e){
+				logger.error("system trace hook init failed ,maybe can't send msg trace data");
+			}
+		}
+
+		return producer;
 	}
 
 }
