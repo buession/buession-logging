@@ -19,10 +19,10 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2024 Buession.com Inc.														       |
+ * | Copyright @ 2013-2026 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.springboot.config;
+package com.buession.logging.springboot.autoconfigure.kafka;
 
 import com.buession.core.builder.ListBuilder;
 import com.buession.core.converter.mapper.PropertyMapper;
@@ -34,13 +34,11 @@ import com.buession.logging.kafka.config.SslConfiguration;
 import com.buession.logging.kafka.core.Constants;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.support.config.AdapterProperties;
-import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.util.unit.DataSize;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,9 +49,7 @@ import java.util.Map;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class KafkaProperties implements AdapterProperties, KafkaConfiguration, Serializable {
-
-	private final static long serialVersionUID = 922408714153127145L;
+public class KafkaProperties implements AdapterProperties, KafkaConfiguration {
 
 	public final static String PREFIX = LogProperties.PREFIX + ".kafka";
 

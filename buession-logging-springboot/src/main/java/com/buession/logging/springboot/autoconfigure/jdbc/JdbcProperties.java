@@ -19,10 +19,10 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2024 Buession.com Inc.														       |
+ * | Copyright @ 2013-2026 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.springboot.config;
+package com.buession.logging.springboot.autoconfigure.jdbc;
 
 import com.buession.core.id.IdGenerator;
 import com.buession.jdbc.config.Dbcp2Config;
@@ -40,7 +40,6 @@ import com.buession.logging.core.formatter.MapFormatter;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.support.config.AdapterProperties;
 
-import java.io.Serializable;
 import java.util.Properties;
 
 /**
@@ -49,9 +48,7 @@ import java.util.Properties;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class JdbcProperties implements AdapterProperties, Serializable {
-
-	private final static long serialVersionUID = -8823778313817319882L;
+public class JdbcProperties implements AdapterProperties {
 
 	public final static String PREFIX = LogProperties.PREFIX + ".jdbc";
 

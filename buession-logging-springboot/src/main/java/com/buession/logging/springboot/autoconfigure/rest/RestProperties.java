@@ -19,10 +19,10 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2024 Buession.com Inc.														       |
+ * | Copyright @ 2013-2026 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.springboot.config;
+package com.buession.logging.springboot.autoconfigure.rest;
 
 import com.buession.httpclient.conn.nio.IOReactorConfig;
 import com.buession.httpclient.core.Configuration;
@@ -32,7 +32,6 @@ import com.buession.logging.rest.core.RequestBodyBuilder;
 import com.buession.logging.support.config.AdapterProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
-import java.io.Serializable;
 import java.util.concurrent.ThreadFactory;
 
 /**
@@ -41,9 +40,7 @@ import java.util.concurrent.ThreadFactory;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class RestProperties implements AdapterProperties, Serializable {
-
-	private final static long serialVersionUID = -158997473471475854L;
+public class RestProperties implements AdapterProperties {
 
 	/**
 	 * Rest Url

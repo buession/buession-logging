@@ -19,57 +19,52 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2024 Buession.com Inc.														       |
+ * | Copyright @ 2013-2026 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.springboot.config;
+package com.buession.logging.springboot.autoconfigure.file;
 
-import com.buession.logging.console.formatter.ConsoleLogDataFormatter;
+import com.buession.logging.core.formatter.LogDataFormatter;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.support.config.AdapterProperties;
 
-import java.io.Serializable;
-
 /**
- * 控制台日志配置
+ * 文件日志配置
  *
  * @author Yong.Teng
- * @since 0.0.4
+ * @since 0.0.1
  */
-public class ConsoleProperties implements AdapterProperties, Serializable {
+public class FileProperties implements AdapterProperties {
 
-	private final static long serialVersionUID = -8119695487949928232L;
-
-	public final static String PREFIX = LogProperties.PREFIX + ".console";
+	public final static String PREFIX = LogProperties.PREFIX + ".file";
 
 	/**
-	 * 日志模板
+	 * 日志文件路径
 	 */
-	private String template = "${id} login success at: ${time}(IP: ${clientIp}), User-Agent: ${User-Agent}, OS: " +
-			"${os_name} ${os_version}, Device: ${device_type}, Browser: ${browser_name} ${browser_version}.";
+	private String path;
 
 	/**
 	 * 日志格式化
 	 */
-	private Class<? extends ConsoleLogDataFormatter> formatter;
+	private Class<? extends LogDataFormatter<String>> formatter;
 
 	/**
-	 * 返回日志模板
+	 * 返回日志文件路径
 	 *
-	 * @return 日志模板
+	 * @return 日志文件路径
 	 */
-	public String getTemplate() {
-		return template;
+	public String getPath() {
+		return path;
 	}
 
 	/**
-	 * 设置日志模板
+	 * 设置日志文件路径
 	 *
-	 * @param template
-	 * 		日志模板
+	 * @param path
+	 * 		日志文件路径
 	 */
-	public void setTemplate(String template) {
-		this.template = template;
+	public void setPath(String path) {
+		this.path = path;
 	}
 
 	/**
@@ -77,7 +72,7 @@ public class ConsoleProperties implements AdapterProperties, Serializable {
 	 *
 	 * @return 日志格式化
 	 */
-	public Class<? extends ConsoleLogDataFormatter> getFormatter() {
+	public Class<? extends LogDataFormatter<String>> getFormatter() {
 		return formatter;
 	}
 
@@ -87,7 +82,7 @@ public class ConsoleProperties implements AdapterProperties, Serializable {
 	 * @param formatter
 	 * 		日志格式化
 	 */
-	public void setFormatter(Class<? extends ConsoleLogDataFormatter> formatter) {
+	public void setFormatter(Class<? extends LogDataFormatter<String>> formatter) {
 		this.formatter = formatter;
 	}
 

@@ -29,7 +29,6 @@ import com.buession.logging.mongodb.spring.MongoLogHandlerFactoryBean;
 import com.buession.logging.mongodb.spring.config.AbstractMongoConfiguration;
 import com.buession.logging.mongodb.spring.config.MongoConfigurer;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
-import com.buession.logging.springboot.config.MongoProperties;
 import com.mongodb.client.MongoClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -173,7 +172,7 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
 	@Bean(name = "loggingMongoTemplate")
 	@ConditionalOnMissingBean(name = "loggingMongoTemplate")
 	public MongoTemplate mongoTemplate(@Qualifier("loggingMongoDatabaseFactory") MongoDatabaseFactory databaseFactory,
-									   @Qualifier("loggingMappingMongoConverter") MappingMongoConverter converter) {
+	                                   @Qualifier("loggingMappingMongoConverter") MappingMongoConverter converter) {
 		return super.mongoTemplate(databaseFactory, converter);
 	}
 

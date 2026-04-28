@@ -19,10 +19,10 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2024 Buession.com Inc.														       |
+ * | Copyright @ 2013-2026 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.springboot.config;
+package com.buession.logging.springboot.autoconfigure.mongo;
 
 import com.buession.dao.mongodb.core.ReadConcern;
 import com.buession.dao.mongodb.core.ReadPreference;
@@ -38,7 +38,6 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.data.mapping.model.FieldNamingStrategy;
 import org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy;
 
-import java.io.Serializable;
 import java.time.Duration;
 
 /**
@@ -47,9 +46,7 @@ import java.time.Duration;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class MongoProperties implements AdapterProperties, Serializable {
-
-	private final static long serialVersionUID = -8119695487949928232L;
+public class MongoProperties implements AdapterProperties {
 
 	/**
 	 * MongoDB 主机地址

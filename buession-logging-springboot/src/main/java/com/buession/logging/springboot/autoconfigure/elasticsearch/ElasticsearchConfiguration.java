@@ -35,7 +35,6 @@ import com.buession.logging.elasticsearch.spring.ElasticsearchLogHandlerFactoryB
 import com.buession.logging.elasticsearch.spring.config.AbstractElasticsearchConfiguration;
 import com.buession.logging.elasticsearch.spring.config.ElasticsearchConfigurer;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
-import com.buession.logging.springboot.config.ElasticsearchProperties;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -131,7 +130,7 @@ public class ElasticsearchConfiguration extends AbstractElasticsearchConfigurati
 	@ConditionalOnMissingBean(name = "loggingElasticsearchRestClient")
 	@Override
 	public RestClient restClient(@Qualifier("loggingElasticsearchConfigurer") ElasticsearchConfigurer configurer,
-								 @Qualifier("loggingElasticsearchRestClientBuilderCustomizer") ObjectProvider<RestClientBuilderCustomizer> restClientBuilderCustomizer) {
+	                             @Qualifier("loggingElasticsearchRestClientBuilderCustomizer") ObjectProvider<RestClientBuilderCustomizer> restClientBuilderCustomizer) {
 		return super.restClient(configurer, restClientBuilderCustomizer);
 	}
 

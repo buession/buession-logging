@@ -29,7 +29,6 @@ import com.buession.logging.console.spring.config.ConsoleLogHandlerFactoryBeanCo
 import com.buession.logging.core.handler.LogHandler;
 import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
-import com.buession.logging.springboot.config.ConsoleProperties;
 import org.springframework.beans.BeanUtils;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;

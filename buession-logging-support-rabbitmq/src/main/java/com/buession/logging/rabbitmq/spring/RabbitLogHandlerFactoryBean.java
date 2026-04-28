@@ -31,6 +31,7 @@ import com.buession.logging.rabbitmq.spring.config.RabbitLogHandlerFactoryBeanCo
 import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 
 /**
  * RabbitMQ 日志处理器 {@link RabbitLogHandler} 工厂 Bean 基类
@@ -52,6 +53,8 @@ public class RabbitLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<Rabbi
 	 */
 	private String routingKey;
 
+	private MessageConverter messageConverter = new Jackson2JsonMessageConverter();
+
 	/**
 	 * 构造函数
 	 */
@@ -66,8 +69,10 @@ public class RabbitLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<Rabbi
 	 *        {@link RabbitLogHandlerFactoryBeanConfigurer}
 	 */
 	public RabbitLogHandlerFactoryBean(final RabbitLogHandlerFactoryBeanConfigurer configurer) {
-		setExchange(configurer.getExchange());
-		setRoutingKey(configurer.getRoutingKey());
+		if(configurer != null){
+			setExchange(configurer.getExchange());
+			setRoutingKey(configurer.getRoutingKey());
+		}
 	}
 
 	public RabbitTemplate getRabbitTemplate() {
@@ -116,6 +121,14 @@ public class RabbitLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<Rabbi
 		this.routingKey = routingKey;
 	}
 
+	public MessageConverter getMessageConverter() {
+		return messageConverter;
+	}
+
+	public void setMessageConverter(MessageConverter messageConverter) {
+		this.messageConverter = messageConverter;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.isNull(getRabbitTemplate(), "Property 'rabbitTemplate' is required");
@@ -124,10 +137,8 @@ public class RabbitLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<Rabbi
 		if(logHandler == null){
 			synchronized(this){
 				if(logHandler == null){
-					logHandler = new RabbitLogHandler(getRabbitTemplate(), new Jackson2JsonMessageConverter());
-
-					propertyMapper.alwaysApplyingWhenHasText().from(getExchange()).to(logHandler::setExchange);
-					propertyMapper.alwaysApplyingWhenHasText().from(getRoutingKey()).to(logHandler::setRoutingKey);
+					logHandler = new RabbitLogHandler(getRabbitTemplate(), getExchange(), getRoutingKey(),
+							getMessageConverter());
 				}
 			}
 		}

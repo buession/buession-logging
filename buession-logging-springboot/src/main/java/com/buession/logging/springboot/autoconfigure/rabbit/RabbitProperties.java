@@ -19,10 +19,10 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2024 Buession.com Inc.														       |
+ * | Copyright @ 2013-2026 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
-package com.buession.logging.springboot.config;
+package com.buession.logging.springboot.autoconfigure.rabbit;
 
 import com.buession.logging.core.SslConfiguration;
 import com.buession.logging.rabbitmq.core.Cache;
@@ -31,7 +31,6 @@ import com.buession.logging.support.config.AdapterProperties;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.support.converter.MessageConverter;
 
-import java.io.Serializable;
 import java.time.Duration;
 
 /**
@@ -40,9 +39,7 @@ import java.time.Duration;
  * @author Yong.Teng
  * @since 0.0.1
  */
-public class RabbitProperties implements AdapterProperties, Serializable {
-
-	private final static long serialVersionUID = -8119695487949928232L;
+public class RabbitProperties implements AdapterProperties {
 
 	/**
 	 * RabbitMQ 地址

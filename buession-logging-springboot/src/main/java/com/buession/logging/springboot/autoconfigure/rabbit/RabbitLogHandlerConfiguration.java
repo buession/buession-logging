@@ -29,7 +29,6 @@ import com.buession.logging.rabbitmq.spring.RabbitLogHandlerFactoryBean;
 import com.buession.logging.rabbitmq.spring.config.RabbitLogHandlerFactoryBeanConfigurer;
 import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
-import com.buession.logging.springboot.config.RabbitProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -58,7 +57,7 @@ public class RabbitLogHandlerConfiguration extends AbstractLogHandlerConfigurati
 
 	@Bean
 	public RabbitLogHandlerFactoryBean logHandlerFactoryBean(
-			@Qualifier("loggingRabbitRabbitTemplate") RabbitTemplate rabbitTemplate) {
+			@Qualifier("loggingRabbitTemplate") RabbitTemplate rabbitTemplate) {
 		final RabbitLogHandlerFactoryBeanConfigurer configurer = new RabbitLogHandlerFactoryBeanConfigurer();
 
 		configurer.setExchange(properties.getExchange());

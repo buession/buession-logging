@@ -19,13 +19,14 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2026 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.kafka.spring;
 
 import com.buession.core.utils.Assert;
 import com.buession.logging.kafka.handler.KafkaLogHandler;
+import com.buession.logging.kafka.spring.config.KafkaLogHandlerFactoryBeanConfigurer;
 import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
 import org.springframework.kafka.core.KafkaTemplate;
 
@@ -51,6 +52,18 @@ public class KafkaLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<KafkaL
 	 * 构造函数
 	 */
 	public KafkaLogHandlerFactoryBean() {
+	}
+
+	/**
+	 * 构造函数
+	 *
+	 * @param configurer
+	 *        {@link KafkaLogHandlerFactoryBeanConfigurer}
+	 */
+	public KafkaLogHandlerFactoryBean(final KafkaLogHandlerFactoryBeanConfigurer configurer) {
+		if(configurer != null){
+			setTopic(configurer.getTopic());
+		}
 	}
 
 	/**

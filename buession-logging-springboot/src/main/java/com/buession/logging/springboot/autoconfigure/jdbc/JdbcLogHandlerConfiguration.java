@@ -29,7 +29,6 @@ import com.buession.logging.jdbc.spring.JdbcLogHandlerFactoryBean;
 import com.buession.logging.jdbc.spring.config.JdbcLogHandlerFactoryBeanConfigurer;
 import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
-import com.buession.logging.springboot.config.JdbcProperties;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;

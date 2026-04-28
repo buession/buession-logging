@@ -26,6 +26,8 @@ package com.buession.logging.mongodb.spring;
 
 import com.buession.core.utils.Assert;
 import com.buession.logging.mongodb.handler.MongoLogHandler;
+import com.buession.logging.mongodb.spring.config.MongoConfigurer;
+import com.buession.logging.mongodb.spring.config.MongoLogHandlerFactoryBeanConfigurer;
 import com.buession.logging.support.spring.BaseLogHandlerFactoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +52,24 @@ public class MongoLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<MongoL
 	private String collectionName;
 
 	private final static Logger logger = LoggerFactory.getLogger(MongoLogHandlerFactoryBean.class);
+
+	/**
+	 * 构造函数
+	 */
+	public MongoLogHandlerFactoryBean() {
+	}
+
+	/**
+	 * 构造函数
+	 *
+	 * @param configurer
+	 *        {@link MongoConfigurer}
+	 */
+	public MongoLogHandlerFactoryBean(final MongoLogHandlerFactoryBeanConfigurer configurer) {
+		if(configurer != null){
+			setCollectionName(configurer.getCollectionName());
+		}
+	}
 
 	/**
 	 * 返回 {@link MongoTemplate}
