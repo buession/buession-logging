@@ -71,6 +71,8 @@ public class RocketMQLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<Roc
 	public RocketMQLogHandlerFactoryBean(final RocketMQLogHandlerFactoryBeanConfigurer configurer) {
 		if(configurer != null){
 			setTopic(configurer.getTopic());
+			setCharset(configurer.getCharset());
+			setSync(configurer.isSync());
 		}
 	}
 

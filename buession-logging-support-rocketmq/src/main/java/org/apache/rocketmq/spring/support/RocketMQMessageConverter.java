@@ -27,6 +27,7 @@ import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.converter.StringMessageConverter;
 import org.springframework.util.ClassUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,8 +71,9 @@ public class RocketMQMessageConverter {
 				messageConverters.add(
 						(MessageConverter) ClassUtils.forName(
 								"com.alibaba.fastjson.support.spring.messaging.MappingFastJsonMessageConverter",
-								ClassUtils.getDefaultClassLoader()).newInstance());
-			}catch(ClassNotFoundException | IllegalAccessException | InstantiationException ignored){
+								ClassUtils.getDefaultClassLoader()).getConstructor().newInstance());
+			}catch(ClassNotFoundException | IllegalAccessException | InstantiationException |
+			       InvocationTargetException | NoSuchMethodException ignored){
 				//ignore this exception
 			}
 		}
