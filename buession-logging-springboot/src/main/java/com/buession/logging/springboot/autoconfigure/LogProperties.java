@@ -24,14 +24,15 @@
  */
 package com.buession.logging.springboot.autoconfigure;
 
-import com.buession.logging.springboot.config.ConsoleProperties;
-import com.buession.logging.springboot.config.ElasticsearchProperties;
-import com.buession.logging.springboot.config.FileProperties;
-import com.buession.logging.springboot.config.JdbcProperties;
-import com.buession.logging.springboot.config.KafkaProperties;
-import com.buession.logging.springboot.config.MongoProperties;
-import com.buession.logging.springboot.config.RabbitProperties;
-import com.buession.logging.springboot.config.RestProperties;
+import com.buession.logging.springboot.autoconfigure.console.ConsoleProperties;
+import com.buession.logging.springboot.autoconfigure.elasticsearch.ElasticsearchProperties;
+import com.buession.logging.springboot.autoconfigure.file.FileProperties;
+import com.buession.logging.springboot.autoconfigure.jdbc.JdbcProperties;
+import com.buession.logging.springboot.autoconfigure.kafka.KafkaProperties;
+import com.buession.logging.springboot.autoconfigure.mongo.MongoProperties;
+import com.buession.logging.springboot.autoconfigure.rabbit.RabbitProperties;
+import com.buession.logging.springboot.autoconfigure.rest.RestProperties;
+import com.buession.logging.springboot.autoconfigure.rocketmq.RocketMQProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -84,6 +85,11 @@ public class LogProperties {
 	 * RabbitMQ 日志配置
 	 */
 	private RabbitProperties rabbit;
+
+	/**
+	 * RocketMQ 日志配置
+	 */
+	private RocketMQProperties rocketmq;
 
 	/**
 	 * Rest 日志配置
@@ -240,6 +246,25 @@ public class LogProperties {
 	 */
 	public void setRabbit(RabbitProperties rabbit) {
 		this.rabbit = rabbit;
+	}
+
+	/**
+	 * 获取 RocketMQ 日志配置
+	 *
+	 * @return RocketMQ 日志配置
+	 */
+	public RocketMQProperties getRocketmq() {
+		return rocketmq;
+	}
+
+	/**
+	 * 设置 RocketMQ 日志配置
+	 *
+	 * @param rocketmq
+	 * 		RocketMQ 日志配置
+	 */
+	public void setRocketmq(RocketMQProperties rocketmq) {
+		this.rocketmq = rocketmq;
 	}
 
 	/**

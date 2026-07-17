@@ -19,7 +19,7 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2025 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.aspectj.reactive.aopalliance;
@@ -33,6 +33,8 @@ import com.buession.logging.core.mgt.LogManager;
  * @since 0.0.1
  */
 public class ReactiveLogAttributeSourcePointcutAdvisor extends AbstractLogAttributeSourcePointcutAdvisor {
+
+	private final static long serialVersionUID = 1727124794832949812L;
 
 	public ReactiveLogAttributeSourcePointcutAdvisor(LogManager logManager) {
 		super(new ReactiveLogAopAllianceAnnotationsMethodInterceptor(logManager));

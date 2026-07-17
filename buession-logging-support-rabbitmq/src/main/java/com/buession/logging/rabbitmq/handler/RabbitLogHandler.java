@@ -19,7 +19,7 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2026 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.rabbitmq.handler;
@@ -33,6 +33,7 @@ import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConversionException;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.amqp.support.converter.SimpleMessageConverter;
 
 /**
  * RabbitMQ 日志处理器
@@ -55,64 +56,49 @@ public class RabbitLogHandler extends AbstractLogHandler {
 	/**
 	 * Exchange 名称
 	 */
-	private String exchange;
+	private final String exchange;
 
 	/**
 	 * Routing key 名称
 	 */
-	private String routingKey;
+	private final String routingKey;
 
 	/**
 	 * 构造函数
 	 *
 	 * @param rabbitTemplate
 	 *        {@link RabbitTemplate}
-	 * @param messageConverter
-	 *        {@link MessageConverter}
-	 */
-	public RabbitLogHandler(final RabbitTemplate rabbitTemplate, final MessageConverter messageConverter) {
-		Assert.isNull(rabbitTemplate, "RabbitTemplate is null.");
-		Assert.isNull(messageConverter, "MessageConverter is null.");
-		this.rabbitTemplate = rabbitTemplate;
-		this.messageConverter = messageConverter;
-	}
-
-	/**
-	 * 返回 Exchange 名称
-	 *
-	 * @return Exchange 名称
-	 */
-	public String getExchange() {
-		return exchange;
-	}
-
-	/**
-	 * 设置 Exchange 名称
-	 *
 	 * @param exchange
 	 * 		Exchange 名称
-	 */
-	public void setExchange(String exchange) {
-		this.exchange = exchange;
-	}
-
-	/**
-	 * 返回 Routing key 名称
-	 *
-	 * @return Routing key 名称
-	 */
-	public String getRoutingKey() {
-		return routingKey;
-	}
-
-	/**
-	 * 设置 Routing key 名称
-	 *
 	 * @param routingKey
 	 * 		Routing key 名称
 	 */
-	public void setRoutingKey(String routingKey) {
+	public RabbitLogHandler(final RabbitTemplate rabbitTemplate, final String exchange, final String routingKey) {
+		this(rabbitTemplate, exchange, routingKey, new SimpleMessageConverter());
+	}
+
+	/**
+	 * 构造函数
+	 *
+	 * @param rabbitTemplate
+	 *        {@link RabbitTemplate}
+	 * @param exchange
+	 * 		Exchange 名称
+	 * @param routingKey
+	 * 		Routing key 名称
+	 * @param messageConverter
+	 *        {@link MessageConverter}
+	 */
+	public RabbitLogHandler(final RabbitTemplate rabbitTemplate, final String exchange, final String routingKey,
+	                        final MessageConverter messageConverter) {
+		Assert.isNull(rabbitTemplate, "RabbitTemplate is null.");
+		Assert.isNull(exchange, "exchange is null.");
+		Assert.isNull(routingKey, "routingKey is null.");
+		Assert.isNull(messageConverter, "MessageConverter is null.");
+		this.rabbitTemplate = rabbitTemplate;
+		this.exchange = exchange;
 		this.routingKey = routingKey;
+		this.messageConverter = messageConverter;
 	}
 
 	@Override

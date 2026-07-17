@@ -68,8 +68,10 @@ public class ElasticsearchLogHandlerFactoryBean extends BaseLogHandlerFactoryBea
 	 *        {@link  ElasticsearchLogHandlerFactoryBeanConfigurer}
 	 */
 	public ElasticsearchLogHandlerFactoryBean(final ElasticsearchLogHandlerFactoryBeanConfigurer configurer) {
-		propertyMapper.from(configurer.getIndexName()).to(this::setIndexName);
-		propertyMapper.from(configurer.getAutoCreateIndex()).to(this::setAutoCreateIndex);
+		if(configurer != null){
+			propertyMapper.from(configurer.getIndexName()).to(this::setIndexName);
+			propertyMapper.from(configurer.getAutoCreateIndex()).to(this::setAutoCreateIndex);
+		}
 	}
 
 	/**

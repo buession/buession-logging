@@ -19,7 +19,7 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2024 Buession.com Inc.														       |
+ * | Copyright @ 2013-2025 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.mongodb.core;
@@ -172,14 +172,14 @@ public interface Converters {
 
 	}
 
-	class ThreadLocalConverter extends NullConverter<ThreadLocal, DBObject> {
+	class ThreadLocalConverter extends NullConverter<ThreadLocal<?>, DBObject> {
 
 		public ThreadLocalConverter() {
 		}
 
 	}
 
-	class ReferenceQueueConverter extends NullConverter<ReferenceQueue, DBObject> {
+	class ReferenceQueueConverter extends NullConverter<ReferenceQueue<?>, DBObject> {
 
 		public ReferenceQueueConverter() {
 		}
@@ -193,14 +193,14 @@ public interface Converters {
 
 	}
 
-	class CacheConverter extends NullConverter<com.google.common.cache.Cache, DBObject> {
+	class CacheConverter extends NullConverter<com.google.common.cache.Cache<?, ?>, DBObject> {
 
 		public CacheConverter() {
 		}
 
 	}
 
-	class CacheLoaderConverter extends NullConverter<com.google.common.cache.CacheLoader, DBObject> {
+	class CacheLoaderConverter extends NullConverter<com.google.common.cache.CacheLoader<?, ?>, DBObject> {
 
 		public CacheLoaderConverter() {
 		}
@@ -214,7 +214,7 @@ public interface Converters {
 
 	}
 
-	class ClassConverter extends NullConverter<Class, DBObject> {
+	class ClassConverter extends NullConverter<Class<?>, DBObject> {
 
 		public ClassConverter() {
 		}

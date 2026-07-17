@@ -19,7 +19,7 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2025 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.core.request;
@@ -31,12 +31,12 @@ import com.buession.web.reactive.context.request.ReactiveRequestAttributes;
 import com.buession.web.reactive.http.request.RequestUtils;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.request.RequestContextHolder;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * WebFlux 请求对象
@@ -100,26 +100,25 @@ public class ReactiveRequest extends AbstractRequest {
 	@Override
 	public RequestMethod getRequestMethod() {
 		try{
-			switch(Objects.requireNonNull(request.getMethod())){
-				case GET:
-					return RequestMethod.GET;
-				case HEAD:
-					return RequestMethod.HEAD;
-				case POST:
-					return RequestMethod.POST;
-				case PUT:
-					return RequestMethod.PUT;
-				case PATCH:
-					return RequestMethod.PATCH;
-				case DELETE:
-					return RequestMethod.DELETE;
-				case OPTIONS:
-					return RequestMethod.OPTIONS;
-				case TRACE:
-					return RequestMethod.TRACE;
-				default:
-					return RequestMethod.GET;
+			HttpMethod method = request.getMethod();
+			if(method.equals(HttpMethod.GET)){
+				return RequestMethod.GET;
+			}else if(method.equals(HttpMethod.HEAD)){
+				return RequestMethod.HEAD;
+			}else if(method.equals(HttpMethod.POST)){
+				return RequestMethod.POST;
+			}else if(method.equals(HttpMethod.PUT)){
+				return RequestMethod.PUT;
+			}else if(method.equals(HttpMethod.PATCH)){
+				return RequestMethod.PATCH;
+			}else if(method.equals(HttpMethod.DELETE)){
+				return RequestMethod.DELETE;
+			}else if(method.equals(HttpMethod.OPTIONS)){
+				return RequestMethod.OPTIONS;
+			}else if(method.equals(HttpMethod.TRACE)){
+				return RequestMethod.TRACE;
 			}
+			return RequestMethod.GET;
 		}catch(Exception e){
 			return RequestMethod.GET;
 		}

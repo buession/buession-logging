@@ -7,7 +7,7 @@
 		<groupId>com.buession.logging</groupId>
 		<artifactId>buession-logging-parent</artifactId>
 		<relativePath>../buession-logging-parent</relativePath>
-		<version>1.0.1</version>
+		<version>2.0.0</version>
 	</parent>
 	<artifactId>buession-logging-spring</artifactId>
 	<url>https://security.buession.com/</url>

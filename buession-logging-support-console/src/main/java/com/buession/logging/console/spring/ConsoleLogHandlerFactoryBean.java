@@ -64,8 +64,10 @@ public class ConsoleLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<Cons
 	 *        {@link  ConsoleLogHandlerFactoryBeanConfigurer}
 	 */
 	public ConsoleLogHandlerFactoryBean(final ConsoleLogHandlerFactoryBeanConfigurer configurer) {
-		setTemplate(configurer.getTemplate());
-		Optional.ofNullable(configurer.getFormatter()).ifPresent(this::setFormatter);
+		if(configurer != null){
+			setTemplate(configurer.getTemplate());
+			Optional.ofNullable(configurer.getFormatter()).ifPresent(this::setFormatter);
+		}
 	}
 
 	/**

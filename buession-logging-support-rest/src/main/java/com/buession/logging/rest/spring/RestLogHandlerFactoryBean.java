@@ -26,7 +26,7 @@ package com.buession.logging.rest.spring;
 
 import com.buession.core.utils.Assert;
 import com.buession.httpclient.HttpAsyncClient;
-import com.buession.httpclient.HttpClient;;
+import com.buession.httpclient.HttpClient;
 import com.buession.logging.core.RequestMethod;
 import com.buession.logging.rest.core.JsonRequestBodyBuilder;
 import com.buession.logging.rest.core.RequestBodyBuilder;
@@ -84,9 +84,11 @@ public class RestLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<RestLog
 	 *        {@link RestLogHandlerFactoryBeanConfigurer}
 	 */
 	public RestLogHandlerFactoryBean(final RestLogHandlerFactoryBeanConfigurer configurer) {
-		setUrl(configurer.getUrl());
-		setRequestMethod(configurer.getRequestMethod());
-		setRequestBodyBuilder(configurer.getRequestBodyBuilder());
+		if(configurer != null){
+			setUrl(configurer.getUrl());
+			setRequestMethod(configurer.getRequestMethod());
+			setRequestBodyBuilder(configurer.getRequestBodyBuilder());
+		}
 	}
 
 	/**

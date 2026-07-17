@@ -30,7 +30,6 @@ import com.buession.logging.rabbitmq.spring.RabbitLogHandlerFactoryBean;
 import com.buession.logging.rabbitmq.spring.config.AbstractRabbitConfiguration;
 import com.buession.logging.rabbitmq.spring.config.RabbitConfigurer;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
-import com.buession.logging.springboot.config.RabbitProperties;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
@@ -96,7 +95,7 @@ public class RabbitConfiguration extends AbstractRabbitConfiguration {
 		return super.rabbitConnectionFactory(configurer);
 	}
 
-	@Bean(name = "loggingRabbitRabbitTemplate")
+	@Bean(name = "loggingRabbitTemplate")
 	public RabbitTemplate rabbitTemplate(
 			@Qualifier("loggingRabbitConfigurer") RabbitConfigurer configurer,
 			@Qualifier("loggingRabbitConnectionFactory") ConnectionFactory connectionFactory) {

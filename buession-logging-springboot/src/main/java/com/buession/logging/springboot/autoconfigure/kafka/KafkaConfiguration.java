@@ -30,7 +30,6 @@ import com.buession.logging.kafka.spring.KafkaLogHandlerFactoryBean;
 import com.buession.logging.kafka.spring.config.AbstractKafkaConfiguration;
 import com.buession.logging.kafka.spring.config.KafkaConfigurer;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
-import com.buession.logging.springboot.config.KafkaProperties;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -93,9 +92,9 @@ public class KafkaConfiguration extends AbstractKafkaConfiguration {
 	@Bean(name = "loggingKafkaTemplate")
 	@Override
 	public KafkaTemplate<String, Object> kafkaTemplate(@Qualifier("loggingKafkaConfigurer") KafkaConfigurer configurer,
-													   @Qualifier("loggingKafkaProducerFactory")
+	                                                   @Qualifier("loggingKafkaProducerFactory")
 													   ProducerFactory<String, Object> producerFactory,
-													   @Qualifier("loggingKafkaProducerListener") ProducerListener<String, Object> kafkaProducerListener) {
+	                                                   @Qualifier("loggingKafkaProducerListener") ProducerListener<String, Object> kafkaProducerListener) {
 		return super.kafkaTemplate(configurer, producerFactory, kafkaProducerListener);
 	}
 

@@ -64,8 +64,10 @@ public class FileLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<FileLog
 	 *        {@link FileLogHandlerFactoryBeanConfigurer}
 	 */
 	public FileLogHandlerFactoryBean(final FileLogHandlerFactoryBeanConfigurer configurer) {
-		propertyMapper.alwaysApplyingWhenHasText().from(configurer::getPath).as(File::new).to(this::setFile);
-		propertyMapper.from(configurer::getFormatter).to(this::setFormatter);
+		if(configurer != null){
+			propertyMapper.alwaysApplyingWhenHasText().from(configurer::getPath).as(File::new).to(this::setFile);
+			propertyMapper.from(configurer::getFormatter).to(this::setFormatter);
+		}
 	}
 
 	/**

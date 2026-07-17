@@ -108,15 +108,16 @@ public class JdbcLogHandlerFactoryBean extends BaseLogHandlerFactoryBean<JdbcLog
 	 *        {@link JdbcLogHandlerFactoryBeanConfigurer}
 	 */
 	public JdbcLogHandlerFactoryBean(final JdbcLogHandlerFactoryBeanConfigurer configurer) {
-		setJdbcTemplate(jdbcTemplate);
-		setSql(configurer.getSql());
+		if(configurer != null){
+			setSql(configurer.getSql());
 
-		propertyMapper.from(configurer::getIdGenerator).to(this::setIdGenerator);
-		propertyMapper.from(configurer::getDateTimeFormat).to(this::setDateTimeFormat);
-		propertyMapper.from(configurer::getRequestParametersFormatter).to(this::setRequestParametersFormatter);
-		propertyMapper.from(configurer::getGeoFormatter).to(this::setGeoFormatter);
-		propertyMapper.from(configurer::getExtraFormatter).to(this::setExtraFormatter);
-		propertyMapper.from(configurer::getDataConverter).to(this::setLogDataConverter);
+			propertyMapper.from(configurer::getIdGenerator).to(this::setIdGenerator);
+			propertyMapper.from(configurer::getDateTimeFormat).to(this::setDateTimeFormat);
+			propertyMapper.from(configurer::getRequestParametersFormatter).to(this::setRequestParametersFormatter);
+			propertyMapper.from(configurer::getGeoFormatter).to(this::setGeoFormatter);
+			propertyMapper.from(configurer::getExtraFormatter).to(this::setExtraFormatter);
+			propertyMapper.from(configurer::getDataConverter).to(this::setLogDataConverter);
+		}
 	}
 
 	/**

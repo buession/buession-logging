@@ -31,7 +31,6 @@ import com.buession.logging.rest.spring.RestLogHandlerFactoryBean;
 import com.buession.logging.rest.spring.config.RestLogHandlerFactoryBeanConfigurer;
 import com.buession.logging.springboot.autoconfigure.AbstractLogHandlerConfiguration;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
-import com.buession.logging.springboot.config.RestProperties;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;

@@ -19,7 +19,7 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2024 Buession.com Inc.														       |
+ * | Copyright @ 2013-2025 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.core.mgt;
@@ -151,7 +151,7 @@ public abstract class AbstractLogManager implements LogManager {
 			}
 
 			final GeoLocation.Country country = new GeoLocation.Country();
-			country.setCode(Optional.ofNullable(location.getCountry().getCode()).orElse(Constants.EMPTY_STRING));
+			country.setCode(Optional.ofNullable(location.getCountry().getIsoCode()).orElse(Constants.EMPTY_STRING));
 			country.setName(Optional.ofNullable(location.getCountry().getName()).orElse(Constants.EMPTY_STRING));
 			country.setFullName(
 					Optional.ofNullable(location.getCountry().getFullName()).orElse(Constants.EMPTY_STRING));

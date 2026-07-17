@@ -1,6 +1,20 @@
  Buession Logging Changelog
 ===========================
 
+## [2.0.0](https://github.com/buession/buession-logging/releases/tag/v2.0.0) (2025-07-17)
+
+### 🔨依赖升级
+
+- [依赖库版本升级和安全漏洞修复](https://github.com/buession/buession-parent/releases/tag/v4.0.0)
+
+
+### ⭐ 新特性
+
+- **buession-logging-support-rocketmq：** 新增 RocketMQ 日志处理
+
+
+---
+
 
 ## [1.0.1](https://github.com/buession/buession-logging/releases/tag/v1.0.1) (2025-05-20)
 
