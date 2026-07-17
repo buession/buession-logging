@@ -6,7 +6,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/com.buession.logging/buession-logging-core.svg)](https://search.maven.org/search?q=g:com.buession.logging)
 [![GitHub release](https://img.shields.io/github/release/buession/buession-logging.svg)](https://github.com/buession/buession-logging/releases)
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
-[![Java support](https://img.shields.io/badge/Java-8+-green?logo=java&logoColor=white)](https://openjdk.java.net/)
+[![Java support](https://img.shields.io/badge/Java-17+-green?logo=java&logoColor=white)](https://openjdk.java.net/)
 [![Javadocs](http://www.javadoc.io/badge/com.buession.logging/buession-logging-core.svg)](http://www.javadoc.io/doc/com.buession.logging/buession-logging-core)
 
 

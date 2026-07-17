@@ -1,7 +1,7 @@
  Buession Logging Changelog
 ===========================
 
-## [2.0.0](https://github.com/buession/buession-logging/releases/tag/v2.0.0) (2025-xx-xx)
+## [2.0.0](https://github.com/buession/buession-logging/releases/tag/v2.0.0) (2025-07-17)
 
 ### 🔨依赖升级
 
