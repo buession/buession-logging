@@ -72,8 +72,8 @@
 	</modules>
 
 	<properties>
-		<buession.version>4.0.0</buession.version>
-		<buession.springboot.version>4.0.0</buession.springboot.version>
+		<buession.version>4.0.1</buession.version>
+		<buession.springboot.version>4.0.1</buession.springboot.version>
 	</properties>
 
 	<dependencyManagement>

@@ -159,6 +159,7 @@
 			<artifactId>kotlin-stdlib</artifactId>
 		</dependency>
 
+		<!--
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp</artifactId>
@@ -173,6 +174,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		-->
 
 		<dependency>
 			<groupId>io.netty</groupId>
@@ -248,7 +250,7 @@
 			<artifactId>zstd-jni</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.lz4</groupId>
+			<groupId>at.yawk.lz4</groupId>
 			<artifactId>lz4-java</artifactId>
 		</dependency>
 
