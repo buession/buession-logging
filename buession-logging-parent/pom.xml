@@ -7,13 +7,13 @@
 		<groupId>com.buession</groupId>
 		<artifactId>parent</artifactId>
 		<relativePath/>
-		<version>4.0.1</version>
+		<version>5.0.0</version>
 	</parent>
 	<groupId>com.buession.logging</groupId>
 	<artifactId>buession-logging-parent</artifactId>
 	<url>https://logging.buession.com/</url>
 	<description>Buession Logging Framework Parent</description>
-	<version>2.0.1</version>
+	<version>3.0.0</version>
 	<packaging>pom</packaging>
 
 	<organization>
@@ -36,7 +36,7 @@
 	<licenses>
 		<license>
 			<name>The Apache License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
 			<distribution>repo</distribution>
 			<comments>A business-friendly OSS license</comments>
 		</license>
