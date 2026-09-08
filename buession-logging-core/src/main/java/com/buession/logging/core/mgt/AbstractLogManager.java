@@ -19,7 +19,7 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2025 Buession.com Inc.														       |
+ * | Copyright @ 2013-2026 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.core.mgt;
@@ -145,22 +145,20 @@ public abstract class AbstractLogManager implements LogManager {
 
 			final GeoLocation geoLocation = new GeoLocation();
 
-			if(location.getGeo() != null && location.getGeo().getLongitude() != null &&
-					location.getGeo().getLatitude() != null){
-				geoLocation.setGeo(new Geo(location.getGeo().getLongitude(), location.getGeo().getLatitude()));
+			if(location.geo() != null && location.geo().longitude() != null &&
+					location.geo().latitude() != null){
+				geoLocation.setGeo(new Geo(location.geo().longitude(), location.geo().latitude()));
 			}
 
 			final GeoLocation.Country country = new GeoLocation.Country();
-			country.setCode(Optional.ofNullable(location.getCountry().getIsoCode()).orElse(Constants.EMPTY_STRING));
-			country.setName(Optional.ofNullable(location.getCountry().getName()).orElse(Constants.EMPTY_STRING));
-			country.setFullName(
-					Optional.ofNullable(location.getCountry().getFullName()).orElse(Constants.EMPTY_STRING));
+			country.setCode(Optional.ofNullable(location.country().isoCode()).orElse(Constants.EMPTY_STRING));
+			country.setName(Optional.ofNullable(location.country().name()).orElse(Constants.EMPTY_STRING));
+			country.setFullName(Optional.ofNullable(location.country().fullName()).orElse(Constants.EMPTY_STRING));
 			geoLocation.setCountry(country);
 
 			final GeoLocation.District district = new GeoLocation.District();
-			district.setName(Optional.ofNullable(location.getDistrict().getName()).orElse(Constants.EMPTY_STRING));
-			district.setFullName(
-					Optional.ofNullable(location.getDistrict().getFullName()).orElse(Constants.EMPTY_STRING));
+			district.setName(Optional.ofNullable(location.district().name()).orElse(Constants.EMPTY_STRING));
+			district.setFullName(Optional.ofNullable(location.district().name()).orElse(Constants.EMPTY_STRING));
 			geoLocation.setDistrict(district);
 
 			logData.setLocation(geoLocation);

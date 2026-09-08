@@ -19,30 +19,18 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2024 Buession.com Inc.														       |
+ * | Copyright @ 2013-2026 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.springboot.autoconfigure.elasticsearch;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import com.buession.core.converter.mapper.PropertyMapper;
-import com.buession.core.validator.Validate;
 import com.buession.logging.core.handler.LogHandler;
-import com.buession.logging.elasticsearch.ElasticsearchCredentialsProvider;
-import com.buession.logging.elasticsearch.RestClientBuilderCustomizer;
-import com.buession.logging.elasticsearch.TransportOptionsCustomizer;
+import com.buession.logging.elasticsearch.ElasticsearchTransportConfigBuilderCustomizer;
 import com.buession.logging.elasticsearch.spring.ElasticsearchLogHandlerFactoryBean;
 import com.buession.logging.elasticsearch.spring.config.AbstractElasticsearchConfiguration;
 import com.buession.logging.elasticsearch.spring.config.ElasticsearchConfigurer;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.Credentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -57,9 +45,6 @@ import org.springframework.data.elasticsearch.core.RefreshPolicy;
 import org.springframework.data.elasticsearch.core.convert.ElasticsearchConverter;
 import org.springframework.data.elasticsearch.core.convert.ElasticsearchCustomConversions;
 import org.springframework.data.elasticsearch.core.mapping.SimpleElasticsearchMappingContext;
-
-import java.net.URI;
-import java.time.Duration;
 
 /**
  * Elasticsearch 日志处理器自动配置类
@@ -86,7 +71,6 @@ public class ElasticsearchConfiguration extends AbstractElasticsearchConfigurati
 		final ElasticsearchConfigurer configurer = new ElasticsearchConfigurer();
 
 		configurer.setUrls(elasticsearchProperties.getUrls());
-		configurer.setPathPrefix(elasticsearchProperties.getPathPrefix());
 		configurer.setHeaders(elasticsearchProperties.getHeaders());
 		configurer.setParameters(elasticsearchProperties.getParameters());
 		propertyMapper.from(elasticsearchProperties::getEntityCallbacks).as(BeanUtils::instantiateClass)
@@ -119,28 +103,12 @@ public class ElasticsearchConfiguration extends AbstractElasticsearchConfigurati
 		return super.elasticsearchCustomConversions();
 	}
 
-	@Bean(name = "loggingElasticsearchRestClientBuilderCustomizer")
-	@ConditionalOnMissingBean(name = "loggingElasticsearchRestClientBuilderCustomizer")
-	@Override
-	public RestClientBuilderCustomizer restClientBuilderCustomizer() {
-		return new DefaultRestClientBuilderCustomizer(elasticsearchProperties);
-	}
-
-	@Bean(name = "loggingElasticsearchRestClient")
-	@ConditionalOnMissingBean(name = "loggingElasticsearchRestClient")
-	@Override
-	public RestClient restClient(@Qualifier("loggingElasticsearchConfigurer") ElasticsearchConfigurer configurer,
-	                             @Qualifier("loggingElasticsearchRestClientBuilderCustomizer") ObjectProvider<RestClientBuilderCustomizer> restClientBuilderCustomizer) {
-		return super.restClient(configurer, restClientBuilderCustomizer);
-	}
-
 	@Bean(name = "loggingElasticsearchClient")
 	@Override
 	public ElasticsearchClient elasticsearchClient(
 			@Qualifier("loggingElasticsearchConfigurer") ElasticsearchConfigurer configurer,
-			@Qualifier("loggingElasticsearchRestClient") RestClient restClient,
-			@Qualifier("loggingElasticsearchTransportOptionsCustomizer") ObjectProvider<TransportOptionsCustomizer> transportOptionsCustomizer) {
-		return super.elasticsearchClient(configurer, restClient, transportOptionsCustomizer);
+			@Qualifier("loggingElasticsearchTransportConfigBuilderCustomizer") ObjectProvider<ElasticsearchTransportConfigBuilderCustomizer> transportConfigBuilderCustomizer) {
+		return super.elasticsearchClient(configurer, transportConfigBuilderCustomizer);
 	}
 
 	@Bean(name = "loggingElasticsearchTemplate")
@@ -155,73 +123,6 @@ public class ElasticsearchConfiguration extends AbstractElasticsearchConfigurati
 	@Override
 	protected RefreshPolicy refreshPolicy() {
 		return elasticsearchProperties.getRefreshPolicy();
-	}
-
-	static class DefaultRestClientBuilderCustomizer implements RestClientBuilderCustomizer,
-			org.springframework.boot.autoconfigure.elasticsearch.RestClientBuilderCustomizer {
-
-		private final static PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
-
-		private final ElasticsearchProperties elasticsearchProperties;
-
-		DefaultRestClientBuilderCustomizer(ElasticsearchProperties elasticsearchProperties) {
-			this.elasticsearchProperties = elasticsearchProperties;
-		}
-
-		@Override
-		public void customize(RestClientBuilder builder) {
-		}
-
-		@Override
-		public void customize(HttpAsyncClientBuilder builder) {
-			final CredentialsProvider credentialsProvider = new ElasticsearchCredentialsProvider(
-					elasticsearchProperties.getUsername(), elasticsearchProperties.getPassword());
-
-			builder.setDefaultCredentialsProvider(credentialsProvider);
-
-			elasticsearchProperties.getUrls()
-					.stream()
-					.map(this::toUri)
-					.filter(this::hasUserInfo)
-					.forEach((uri)->this.addUserInfoCredentials(uri, credentialsProvider));
-		}
-
-		@Override
-		public void customize(RequestConfig.Builder builder) {
-			propertyMapper.from(elasticsearchProperties::getConnectionTimeout).asInt(Duration::toMillis)
-					.to(builder::setConnectTimeout);
-			propertyMapper.from(elasticsearchProperties::getReadTimeout).asInt(Duration::toMillis)
-					.to(builder::setSocketTimeout);
-		}
-
-		private URI toUri(final String uri) {
-			try{
-				return URI.create(uri);
-			}catch(IllegalArgumentException ex){
-				return null;
-			}
-		}
-
-		private boolean hasUserInfo(final URI uri) {
-			return uri != null && Validate.hasText(uri.getUserInfo());
-		}
-
-		private void addUserInfoCredentials(final URI uri, final CredentialsProvider credentialsProvider) {
-			AuthScope authScope = new AuthScope(uri.getHost(), uri.getPort());
-			Credentials credentials = createUserInfoCredentials(uri.getUserInfo());
-			credentialsProvider.setCredentials(authScope, credentials);
-		}
-
-		private Credentials createUserInfoCredentials(final String userInfo) {
-			int delimiter = userInfo.indexOf(":");
-			if(delimiter == -1){
-				return new UsernamePasswordCredentials(userInfo, null);
-			}
-			String username = userInfo.substring(0, delimiter);
-			String password = userInfo.substring(delimiter + 1);
-			return new UsernamePasswordCredentials(username, password);
-		}
-
 	}
 
 }

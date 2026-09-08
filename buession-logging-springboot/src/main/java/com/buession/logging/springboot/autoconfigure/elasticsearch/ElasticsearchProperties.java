@@ -29,11 +29,9 @@ import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import com.buession.core.builder.ListBuilder;
 import com.buession.logging.springboot.autoconfigure.LogProperties;
 import com.buession.logging.support.config.AdapterProperties;
-import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.data.elasticsearch.core.RefreshPolicy;
 import org.springframework.data.mapping.callback.EntityCallbacks;
 
-import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,12 +64,18 @@ public class ElasticsearchProperties implements AdapterProperties {
 	/**
 	 * 连接超时
 	 */
+	/*
 	private Duration connectionTimeout = Duration.ofMillis(RestClientBuilder.DEFAULT_CONNECT_TIMEOUT_MILLIS);
+
+	 */
 
 	/**
 	 * 读取超时
 	 */
+	/*
 	private Duration readTimeout = Duration.ofMillis(RestClientBuilder.DEFAULT_SOCKET_TIMEOUT_MILLIS);
+
+	 */
 
 	/**
 	 * 路径前缀
@@ -189,9 +193,12 @@ public class ElasticsearchProperties implements AdapterProperties {
 	 *
 	 * @return 连接超时
 	 */
+	/*
 	public Duration getConnectionTimeout() {
 		return connectionTimeout;
 	}
+
+	 */
 
 	/**
 	 * 设置连接超时
@@ -199,15 +206,19 @@ public class ElasticsearchProperties implements AdapterProperties {
 	 * @param connectionTimeout
 	 * 		连接超时
 	 */
+	/*
 	public void setConnectionTimeout(Duration connectionTimeout) {
 		this.connectionTimeout = connectionTimeout;
 	}
+
+	 */
 
 	/**
 	 * 返回读取超时
 	 *
 	 * @return 读取超时
 	 */
+	/*
 	public Duration getReadTimeout() {
 		return readTimeout;
 	}
@@ -218,9 +229,12 @@ public class ElasticsearchProperties implements AdapterProperties {
 	 * @param readTimeout
 	 * 		读取超时
 	 */
+	/*
 	public void setReadTimeout(Duration readTimeout) {
 		this.readTimeout = readTimeout;
 	}
+
+	 */
 
 	/**
 	 * 返回路径前缀

@@ -19,55 +19,32 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2024 Buession.com Inc.														       |
+ * | Copyright @ 2013-2026 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.elasticsearch;
 
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
-import org.elasticsearch.client.RestClientBuilder;
+import co.elastic.clients.transport.ElasticsearchTransportConfig;
 
 /**
- * Callback interface that can be implemented by beans wishing to further customize the
- * {@link org.elasticsearch.client.RestClient} through a {@link RestClientBuilder} whilst
+ * Callback interface that can be implemented by beans wishing to further customize the {@link ElasticsearchTransportConfig.Builder} whilst
  * retaining default auto-configuration.
  *
  * @author Yong.Teng
  * @since 1.0.0
  */
 @FunctionalInterface
-public interface RestClientBuilderCustomizer {
+public interface ElasticsearchTransportConfigBuilderCustomizer {
 
 	/**
-	 * Customize the {@link RestClientBuilder}.
+	 * Customize the {@link ElasticsearchTransportConfig.Builder}.
 	 * <p>
 	 * Possibly overrides customizations made with the {@code "spring.elasticsearch.rest"}
 	 * configuration properties namespace. For more targeted changes, see
-	 * {@link #customize(HttpAsyncClientBuilder)} and
-	 * {@link #customize(RequestConfig.Builder)}.
 	 *
 	 * @param builder
 	 * 		the builder to customize
 	 */
-	void customize(RestClientBuilder builder);
-
-	/**
-	 * Customize the {@link HttpAsyncClientBuilder}.
-	 *
-	 * @param builder
-	 * 		the builder
-	 */
-	default void customize(HttpAsyncClientBuilder builder) {
-	}
-
-	/**
-	 * Customize the {@link RequestConfig.Builder}.
-	 *
-	 * @param builder
-	 * 		the builder
-	 */
-	default void customize(RequestConfig.Builder builder) {
-	}
+	void customize(ElasticsearchTransportConfig.Builder builder);
 
 }

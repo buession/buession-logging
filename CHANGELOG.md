@@ -1,6 +1,17 @@
  Buession Logging Changelog
 ===========================
 
+
+## [3.0.0](https://github.com/buession/buession-logging/releases/tag/v3.0.0) (2025-09-08)
+
+### 🔨依赖升级
+
+- [依赖库版本升级和安全漏洞修复](https://github.com/buession/buession-parent/releases/tag/v5.0.0)
+
+
+---
+
+
 ## [2.0.0](https://github.com/buession/buession-logging/releases/tag/v2.0.0) (2025-07-17)
 
 ### 🔨依赖升级

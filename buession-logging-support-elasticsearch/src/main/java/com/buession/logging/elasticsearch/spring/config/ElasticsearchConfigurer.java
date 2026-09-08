@@ -19,19 +19,19 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2024 Buession.com Inc.														       |
+ * | Copyright @ 2013-2026 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.elasticsearch.spring.config;
 
-import org.elasticsearch.client.RestClient;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import org.springframework.data.mapping.callback.EntityCallbacks;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- * Configures {@link RestClient} with sensible defaults.
+ * Configures {@link ElasticsearchClient} with sensible defaults.
  *
  * @author Yong.Teng
  * @since 1.0.0
@@ -44,9 +44,24 @@ public class ElasticsearchConfigurer {
 	private List<String> urls;
 
 	/**
-	 * 路径前缀
+	 * 用户名
 	 */
-	private String pathPrefix;
+	private String username;
+
+	/**
+	 * 密码
+	 */
+	private String password;
+
+	/**
+	 * Token
+	 */
+	private String token;
+
+	/**
+	 * API key
+	 */
+	private String apiKey;
 
 	/**
 	 * 请求头
@@ -57,6 +72,11 @@ public class ElasticsearchConfigurer {
 	 * 请求参数
 	 */
 	private Map<String, String> parameters;
+
+	/**
+	 * 是否压缩
+	 */
+	private boolean useCompression;
 
 	/**
 	 * {@link EntityCallbacks}
@@ -83,22 +103,79 @@ public class ElasticsearchConfigurer {
 	}
 
 	/**
-	 * 返回路径前缀
+	 * 返回用户名
 	 *
-	 * @return 路径前缀
+	 * @return 用户名
 	 */
-	public String getPathPrefix() {
-		return pathPrefix;
+	public String getUsername() {
+		return username;
 	}
 
 	/**
-	 * 设置路径前缀
+	 * 设置用户名
 	 *
-	 * @param pathPrefix
-	 * 		路径前缀
+	 * @param username
+	 * 		用户名
 	 */
-	public void setPathPrefix(String pathPrefix) {
-		this.pathPrefix = pathPrefix;
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	/**
+	 * 返回密码
+	 *
+	 * @return 密码
+	 */
+	public String getPassword() {
+		return password;
+	}
+
+	/**
+	 * 设置密码
+	 *
+	 * @param password
+	 * 		密码
+	 */
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	/**
+	 * 返回 Token
+	 *
+	 * @return Token
+	 */
+	public String getToken() {
+		return token;
+	}
+
+	/**
+	 * 设置 Token
+	 *
+	 * @param token
+	 * 		Token
+	 */
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	/**
+	 * 返回 API key
+	 *
+	 * @return API key
+	 */
+	public String getApiKey() {
+		return apiKey;
+	}
+
+	/**
+	 * 设置 API key
+	 *
+	 * @param apiKey
+	 * 		API key
+	 */
+	public void setApiKey(String apiKey) {
+		this.apiKey = apiKey;
 	}
 
 	/**
@@ -137,6 +214,34 @@ public class ElasticsearchConfigurer {
 	 */
 	public void setParameters(Map<String, String> parameters) {
 		this.parameters = parameters;
+	}
+
+	/**
+	 * 返回是否压缩
+	 *
+	 * @return 是否压缩
+	 */
+	public boolean isUseCompression() {
+		return getUseCompression();
+	}
+
+	/**
+	 * 返回是否压缩
+	 *
+	 * @return 是否压缩
+	 */
+	public boolean getUseCompression() {
+		return useCompression;
+	}
+
+	/**
+	 * 设置是否压缩
+	 *
+	 * @param useCompression
+	 * 		是否压缩
+	 */
+	public void setUseCompression(boolean useCompression) {
+		this.useCompression = useCompression;
 	}
 
 	/**

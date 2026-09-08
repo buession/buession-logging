@@ -19,7 +19,7 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2025 Buession.com Inc.														       |
+ * | Copyright @ 2013-2026 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.elasticsearch.spring.config;
@@ -27,25 +27,19 @@ package com.buession.logging.elasticsearch.spring.config;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.DefaultTransportOptions;
+import co.elastic.clients.transport.ElasticsearchTransportConfig;
 import co.elastic.clients.transport.TransportOptions;
 import co.elastic.clients.transport.http.HeaderMap;
 import com.buession.core.converter.mapper.PropertyMapper;
 import com.buession.core.utils.Assert;
-import com.buession.core.validator.Validate;
-import com.buession.logging.elasticsearch.RestClientBuilderCustomizer;
-import com.buession.logging.elasticsearch.TransportOptionsCustomizer;
-import org.apache.http.HttpHost;
-import org.elasticsearch.client.Node;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
+import com.buession.logging.elasticsearch.ElasticsearchTransportConfigBuilderCustomizer;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.data.elasticsearch.client.elc.ElasticsearchClients;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.config.ElasticsearchConfigurationSupport;
 import org.springframework.data.elasticsearch.core.convert.ElasticsearchConverter;
 
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.List;
 
 /**
  * @author Yong.Teng
@@ -55,30 +49,31 @@ public abstract class AbstractElasticsearchConfiguration extends ElasticsearchCo
 
 	protected final static PropertyMapper propertyMapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
 
-	public abstract RestClientBuilderCustomizer restClientBuilderCustomizer();
-
-	public RestClient restClient(ElasticsearchConfigurer configurer,
-								 ObjectProvider<RestClientBuilderCustomizer> restClientBuilderCustomizer) {
+	public ElasticsearchClient elasticsearchClient(ElasticsearchConfigurer configurer,
+	                                               ObjectProvider<ElasticsearchTransportConfigBuilderCustomizer> transportConfigBuilderCustomizer) {
 		Assert.isEmpty(configurer.getUrls(), "Property 'urls' is required");
-
-		final RestClientBuilder restClientBuilder = createRestClientBuilder(configurer, restClientBuilderCustomizer);
-		return restClientBuilder.build();
-	}
-
-	public ElasticsearchClient elasticsearchClient(ElasticsearchConfigurer configurer, RestClient restClient,
-												   ObjectProvider<TransportOptionsCustomizer> transportOptionsCustomizer) {
+		final ElasticsearchTransportConfig.Builder transportConfigBuilder = new ElasticsearchTransportConfig.Builder();
 		final HeaderMap headers = configurer.getHeaders() == null ? null : new HeaderMap(configurer.getHeaders());
 		final TransportOptions transportOptions = new DefaultTransportOptions(headers, configurer.getParameters(),
 				null);
+		final List<URI> nodes = configurer.getUrls().stream().map(URI::create).toList();
 
-		transportOptionsCustomizer.orderedStream().forEach((customizer)->customizer.customize(transportOptions));
+		transportConfigBuilder.hosts(nodes)
+				.usernameAndPassword(configurer.getUsername(), configurer.getPassword())
+				.token(configurer.getToken())
+				.apiKey(configurer.getApiKey())
+				.useCompression(configurer.isUseCompression())
+				.jsonMapper(new JacksonJsonpMapper());
 
-		return ElasticsearchClients.createImperative(restClient, transportOptions, new JacksonJsonpMapper());
+		transportConfigBuilderCustomizer.orderedStream()
+				.forEach((customizer)->customizer.customize(transportConfigBuilder));
+
+		return new ElasticsearchClient(transportConfigBuilder.build().buildTransport(), transportOptions);
 	}
 
 	public ElasticsearchTemplate elasticsearchTemplate(ElasticsearchConfigurer configurer,
-													   ElasticsearchClient elasticsearchClient,
-													   ObjectProvider<ElasticsearchConverter> elasticsearchConverter) {
+	                                                   ElasticsearchClient elasticsearchClient,
+	                                                   ObjectProvider<ElasticsearchConverter> elasticsearchConverter) {
 		final ElasticsearchTemplate elasticsearchTemplate = new ElasticsearchTemplate(elasticsearchClient,
 				elasticsearchConverter.getIfAvailable());
 
@@ -86,53 +81,6 @@ public abstract class AbstractElasticsearchConfiguration extends ElasticsearchCo
 		elasticsearchTemplate.setRefreshPolicy(refreshPolicy());
 
 		return elasticsearchTemplate;
-	}
-
-	private RestClientBuilder createRestClientBuilder(final ElasticsearchConfigurer configurer,
-													  final ObjectProvider<RestClientBuilderCustomizer> restClientBuilderCustomizer) {
-		final Node[] nodes = configurer.getUrls()
-				.stream()
-				.map((url)->new Node(this.createHttpHost(url)))
-				.toArray(Node[]::new);
-		final RestClientBuilder builder = RestClient.builder(nodes);
-
-		builder.setHttpClientConfigCallback((httpClientBuilder)->{
-			restClientBuilderCustomizer.orderedStream().forEach((customizer)->customizer.customize(httpClientBuilder));
-			return httpClientBuilder;
-		});
-
-		builder.setRequestConfigCallback((requestConfigBuilder)->{
-			restClientBuilderCustomizer.orderedStream()
-					.forEach((customizer)->customizer.customize(requestConfigBuilder));
-			return requestConfigBuilder;
-		});
-
-		propertyMapper.from(configurer::getPathPrefix).to(builder::setPathPrefix);
-
-		restClientBuilderCustomizer.orderedStream().forEach((customizer)->customizer.customize(builder));
-
-		return builder;
-	}
-
-	private HttpHost createHttpHost(final String uri) {
-		try{
-			return createHttpHost(URI.create(uri));
-		}catch(IllegalArgumentException ex){
-			return HttpHost.create(uri);
-		}
-	}
-
-	private HttpHost createHttpHost(final URI uri) {
-		if(Validate.isBlank(uri.getUserInfo())){
-			return HttpHost.create(uri.toString());
-		}
-
-		try{
-			return HttpHost.create(new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), uri.getPath(),
-					uri.getQuery(), uri.getFragment()).toString());
-		}catch(URISyntaxException ex){
-			throw new IllegalStateException(ex);
-		}
 	}
 
 }
