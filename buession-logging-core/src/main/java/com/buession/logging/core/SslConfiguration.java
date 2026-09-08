@@ -19,12 +19,12 @@
  * +-------------------------------------------------------------------------------------------------------+
  * | License: http://www.apache.org/licenses/LICENSE-2.0.txt 										       |
  * | Author: Yong.Teng <webmaster@buession.com> 													       |
- * | Copyright @ 2013-2023 Buession.com Inc.														       |
+ * | Copyright @ 2013-2026 Buession.com Inc.														       |
  * +-------------------------------------------------------------------------------------------------------+
  */
 package com.buession.logging.core;
 
-import com.buession.net.ssl.SslConfigure;
+import com.buession.core.ssl.SslConfigure;
 
 import java.io.Serializable;
 
@@ -48,7 +48,7 @@ public class SslConfiguration extends SslConfigure implements Serializable {
 	 *
 	 * @return true / false
 	 */
-	public boolean isEnabled(){
+	public boolean isEnabled() {
 		return enabled;
 	}
 
@@ -58,7 +58,7 @@ public class SslConfiguration extends SslConfigure implements Serializable {
 	 * @param enabled
 	 * 		true / false
 	 */
-	public void setEnabled(boolean enabled){
+	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
 
